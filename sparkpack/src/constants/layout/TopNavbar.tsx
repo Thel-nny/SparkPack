@@ -105,7 +105,7 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ className = '' }) => {
                 <div key={index} className="relative">
                   <button
                     onClick={() => handleDropdownToggle(index)}
-                    className="flex items-center text-[#342d47] hover:text-[#8ba77d] px-3 py-2 text-sm font-medium transition-colors duration-200"
+                    className="flex items-center text-[#342d47] hover:text-[#7eb238] px-3 py-2 text-sm font-medium transition-colors duration-200"
                     aria-expanded={activeDropdown === index}
                     aria-haspopup={item.hasDropdown}
                   >
@@ -138,7 +138,7 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ className = '' }) => {
                               <Link
                                 key={subIndex}
                                 href={subItem.href}
-                                className="block px-4 py-2 text-sm text-[#342d47] hover:bg-[#f5f8f3] hover:text-[#8ba77d] transition-colors duration-150"
+                                className="block px-4 py-2 text-sm text-[#342d47] hover:bg-[#f5f8f3] hover:text-[#7eb238] transition-colors duration-150"
                                 onClick={() => setActiveDropdown(null)}
                               >
                                 {subItem.label}
@@ -159,7 +159,7 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ className = '' }) => {
             {/* Get Quote Button */}
             <Link
               href="/get-quote" 
-              className="flex items-center bg-[#abc896] hover:bg-[#8ba77d] text-white px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+              className="flex items-center bg-[#8cc63f] hover:bg-[#7eb238] text-white px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200"
             >
               Get Quote
             </Link>
@@ -168,7 +168,7 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ className = '' }) => {
             <div className="relative">
               <button
                 onClick={() => handleDropdownToggle(navItems.length)} 
-                className="flex items-center text-[#342d47] hover:text-[#8ba77d] px-3 py-2 text-sm font-medium transition-colors duration-200"
+                className="flex items-center text-[#342d47] hover:text-[#7eb238] px-3 py-2 text-sm font-medium transition-colors duration-200"
                 aria-expanded={activeDropdown === navItems.length}
                 aria-haspopup="true"
               >
@@ -191,29 +191,29 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ className = '' }) => {
                   <div className="absolute top-full right-0 mt-1 w-56 bg-white rounded-md shadow-lg border border-gray-200 z-20">
                     <div className="py-1">
                       <Link
-                        href="/auth/policyholder-login"
-                        className="block px-4 py-2 text-sm text-[#342d47] hover:bg-[#f5f8f3] hover:text-[#8ba77d] transition-colors duration-150"
+                        href="/auth/login"
+                        className="block px-4 py-2 text-sm text-[#342d47] hover:bg-[#f5f8f3] hover:text-[#7eb238] transition-colors duration-150"
                         onClick={() => setActiveDropdown(null)}
                       >
                         Policyholder Login
                       </Link>
                       <Link
                         href="/claims/file"
-                        className="block px-4 py-2 text-sm text-[#342d47] hover:bg-[#f5f8f3] hover:text-[#8ba77d] transition-colors duration-150"
+                        className="block px-4 py-2 text-sm text-[#342d47] hover:bg-[#f5f8f3] hover:text-[#7eb238] transition-colors duration-150"
                         onClick={() => setActiveDropdown(null)}
                       >
                         File a Claim
                       </Link>
                       <Link
                         href="/account/management"
-                        className="block px-4 py-2 text-sm text-[#342d47] hover:bg-[#f5f8f3] hover:text-[#8ba77d] transition-colors duration-150"
+                        className="block px-4 py-2 text-sm text-[#342d47] hover:bg-[#f5f8f3] hover:text-[#7eb238] transition-colors duration-150"
                         onClick={() => setActiveDropdown(null)}
                       >
                         Account Management
                       </Link>
                       <Link
                         href="/support/contact"
-                        className="block px-4 py-2 text-sm text-[#342d47] hover:bg-[#f5f8f3] hover:text-[#8ba77d] transition-colors duration-150"
+                        className="block px-4 py-2 text-sm text-[#342d47] hover:bg-[#f5f8f3] hover:text-[#7eb238] transition-colors duration-150"
                         onClick={() => setActiveDropdown(null)}
                       >
                         Contact Support

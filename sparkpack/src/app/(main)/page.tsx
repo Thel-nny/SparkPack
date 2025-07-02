@@ -12,7 +12,7 @@ export default function LandingPage() {
             <div className="space-y-8">
               <div className="space-y-4">
                 <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 leading-tight">
-                  Your Pet's Lifetime Companion in <span className="text-[#abc896]">Iloilo</span>
+                  Your Pet's Lifetime Companion in <span className="text-[#8cc63f]">Iloilo</span>
                 </h1>
                 <p className="text-xl text-gray-600 leading-relaxed">
                   Complete peace of mind from playful puppy days to a dignified farewell. Sparkpack combines
@@ -21,22 +21,22 @@ export default function LandingPage() {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" className="bg-[#abc896] hover:[#99c896] text-white px-8 py-4 text-lg">
+                <Button size="lg" className="bg-[#8cc63f] hover:bg-[#7eb238] text-white px-8 py-4 text-lg">
                   Learn More
                 </Button>
               </div>
 
               <div className="flex items-center gap-6 text-sm text-gray-600">
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="h-5 w-5 text-[#abc896]" />
+                  <CheckCircle className="h-5 w-5 text-[#8cc63f]" />
                   <span>No hidden fees</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="h-5 w-5 text-[#abc896]" />
+                  <CheckCircle className="h-5 w-5 text-[#8cc63f]" />
                   <span>Local Iloilo network</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="h-5 w-5 text-[#abc896]" />
+                  <CheckCircle className="h-5 w-5 text-[#8cc63f]" />
                   <span>Lifetime coverage</span>
                 </div>
               </div>
