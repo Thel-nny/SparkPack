@@ -1,2 +1,2 @@
-export * from "./AdvisorFilterSkeleton";
-export * from "./AdvisorTableSkeleton";
+export { default as AdvisorFilterSkeleton } from './AdvisorFilterSkeleton';
+export { default as AdvisorTableSkeleton } from './AdvisorTableSkeleton';

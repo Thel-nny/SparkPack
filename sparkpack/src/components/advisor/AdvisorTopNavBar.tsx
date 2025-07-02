@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ChevronDown, User } from 'lucide-react';
+import { usePathname } from 'next/navigation'; 
 
 interface NavItem {
   label: string;
@@ -21,6 +22,7 @@ interface AdvisorTopNavbarProps {
 
 const AdvisorTopNavbar: React.FC<AdvisorTopNavbarProps> = ({ className = '' }) => {
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
+  const pathname = usePathname(); // Get the current path
 
   const navItems: NavItem[] = [
     {
@@ -30,7 +32,7 @@ const AdvisorTopNavbar: React.FC<AdvisorTopNavbarProps> = ({ className = '' }) =
     },
     {
       label: 'Applications in Progress',
-      href: '/advisor/applications/in-progress', 
+      href: '/advisor/applications/in-progress',
       hasDropdown: false,
     },
     {
@@ -55,10 +57,10 @@ const AdvisorTopNavbar: React.FC<AdvisorTopNavbarProps> = ({ className = '' }) =
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="flex-shrink-0 flex items-center">
-              <Image 
+              <Image
                 src="/Furrest Logo-02.svg"
                 alt="Furrest Logo"
-                width={125} 
+                width={125}
                 height={40}
                 className="mr-3"
               />
@@ -68,63 +70,71 @@ const AdvisorTopNavbar: React.FC<AdvisorTopNavbarProps> = ({ className = '' }) =
           {/* Navigation Items */}
           <div>
             <div className="ml-10 flex items-baseline space-x-8">
-              {navItems.map((item, index) => (
-                <div key={index} className="relative">
-                  {item.hasDropdown ? (
-                    <button
-                      onClick={() => handleDropdownToggle(index)}
-                      className="flex items-center text-[#342d47] hover:text-[#7eb238] px-3 py-2 text-sm font-medium transition-colors duration-200"
-                      aria-expanded={activeDropdown === index}
-                      aria-haspopup={item.hasDropdown}
-                    >
-                      {item.label}
-                      <ChevronDown
-                        className={`ml-1 h-4 w-4 transition-transform duration-200 ${
-                          activeDropdown === index ? 'rotate-180' : ''
-                        }`}
-                      />
-                    </button>
-                  ) : (
-                    <Link
-                      href={item.href || '#'} // Fallback to '#' if href is undefined
-                      className="text-[#342d47] hover:text-[#7eb238] px-3 py-2 text-sm font-medium transition-colors duration-200"
-                    >
-                      {item.label}
-                    </Link>
-                  )}
+              {navItems.map((item, index) => {
+                // Determine if the current item is active
+                const isActive = item.href === pathname;
+                const linkClasses = `px-3 py-2 text-sm font-medium transition-colors duration-200 ${
+                  isActive ? 'text-[#7eb238] border-b-2 border-[#7eb238]' : 'text-[#342d47] hover:text-[#7eb238]'
+                }`;
 
-                  {/* Dropdown Menu (only if hasDropdown is true) */}
-                  {item.hasDropdown && activeDropdown === index && (
-                    <>
-                      <div
-                        className="fixed inset-0 z-10"
-                        onClick={handleClickOutside}
-                        aria-hidden="true"
-                      />
-                      <div className="absolute top-full left-0 mt-1 w-56 bg-white rounded-md shadow-lg border border-gray-200 z-20">
-                        <div className="py-1">
-                          {item.items?.map((subItem, subIndex) => (
-                            subItem.type === 'heading' ? (
-                              <div key={subIndex} className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider mt-2">
-                                {subItem.label}
-                              </div>
-                            ) : (
-                              <Link
-                                key={subIndex}
-                                href={subItem.href}
-                                className="block px-4 py-2 text-sm text-[#342d47] hover:bg-[#f5f8f3] hover:text-[#7eb238] transition-colors duration-150"
-                                onClick={() => setActiveDropdown(null)}
-                              >
-                                {subItem.label}
-                              </Link>
-                            )
-                          ))}
+                return (
+                  <div key={index} className="relative">
+                    {item.hasDropdown ? (
+                      <button
+                        onClick={() => handleDropdownToggle(index)}
+                        className={`flex items-center ${linkClasses}`} // Apply linkClasses here
+                        aria-expanded={activeDropdown === index}
+                        aria-haspopup={item.hasDropdown}
+                      >
+                        {item.label}
+                        <ChevronDown
+                          className={`ml-1 h-4 w-4 transition-transform duration-200 ${
+                            activeDropdown === index ? 'rotate-180' : ''
+                          }`}
+                        />
+                      </button>
+                    ) : (
+                      <Link
+                        href={item.href || '#'} // Fallback to '#' if href is undefined
+                        className={linkClasses} // Apply linkClasses here
+                      >
+                        {item.label}
+                      </Link>
+                    )}
+
+                    {/* Dropdown Menu (only if hasDropdown is true) */}
+                    {item.hasDropdown && activeDropdown === index && (
+                      <>
+                        <div
+                          className="fixed inset-0 z-10"
+                          onClick={handleClickOutside}
+                          aria-hidden="true"
+                        />
+                        <div className="absolute top-full left-0 mt-1 w-56 bg-white rounded-md shadow-lg border border-gray-200 z-20">
+                          <div className="py-1">
+                            {item.items?.map((subItem, subIndex) => (
+                              subItem.type === 'heading' ? (
+                                <div key={subIndex} className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider mt-2">
+                                  {subItem.label}
+                                </div>
+                              ) : (
+                                <Link
+                                  key={subIndex}
+                                  href={subItem.href}
+                                  className="block px-4 py-2 text-sm text-[#342d47] hover:bg-[#f5f8f3] hover:text-[#7eb238] transition-colors duration-150"
+                                  onClick={() => setActiveDropdown(null)}
+                                >
+                                  {subItem.label}
+                                </Link>
+                              )
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    </>
-                  )}
-                </div>
-              ))}
+                      </>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
 
@@ -141,7 +151,7 @@ const AdvisorTopNavbar: React.FC<AdvisorTopNavbarProps> = ({ className = '' }) =
             {/* Account Dropdown */}
             <div className="relative">
               <button
-                onClick={() => handleDropdownToggle(navItems.length)} 
+                onClick={() => handleDropdownToggle(navItems.length)}
                 className="flex items-center text-[#342d47] hover:text-[#7eb238] px-3 py-2 text-sm font-medium transition-colors duration-200"
                 aria-expanded={activeDropdown === navItems.length}
                 aria-haspopup="true"
@@ -190,4 +200,4 @@ const AdvisorTopNavbar: React.FC<AdvisorTopNavbarProps> = ({ className = '' }) =
   );
 };
 
-export default AdvisorTopNavbar; 
+export default AdvisorTopNavbar;
