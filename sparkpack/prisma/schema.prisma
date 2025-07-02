@@ -1,0 +1,125 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  CUSTOMER
+}
+
+enum ApplicationStatus {
+  ADVISOR_DECLERATION_PENDING
+  SIGNATURE_PROCESS_PENDING
+  SIGNATURE_IN_PROCESS
+}
+
+enum PlanType {
+  MEDICAL_CARE_INSURANCE
+  LEGACY_INSURANCE
+}
+
+enum ClaimStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  PROCESSING
+}
+
+enum PetSpecies {
+  DOG
+  CAT
+  BIRD
+  RABBIT
+  OTHER
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  role      UserRole @default(CUSTOMER)
+  firstName String?
+  lastName  String?
+  phone     String?
+  address   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  pets         Pet[]
+  applications Application[]
+}
+
+model Pet {
+  id                String     @id @default(uuid())
+  ownerId           String
+  name              String
+  species           PetSpecies
+  breed             String?
+  dateOfBirth       DateTime?
+  gender            String?
+  weight            Float?
+  medicalConditions String[]
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+
+  owner        User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  applications Application[]
+}
+
+model Application {
+  id             String             @id @default(uuid())
+  customerId     String
+  petId          String
+  policyNumber   String             @unique
+  planType       PlanType
+  premiumAmount  Float
+  deductible     Float
+  coverageLimit  Float?
+  status         ApplicationStatus @default(ADVISOR_DECLERATION_PENDING)
+  startDate      DateTime
+  endDate        DateTime?
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+
+  customer User     @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  pet      Pet      @relation(fields: [petId], references: [id], onDelete: Cascade)
+  claims   Claim[]
+  payments Payment[]
+}
+
+model Claim {
+  id                  String      @id @default(uuid())
+  applicationId       String
+  claimNumber         String      @unique
+  incidentDate        DateTime
+  claimAmount         Float
+  approvedAmount      Float?
+  status              ClaimStatus @default(PENDING)
+  description         String?
+  veterinarianName    String?
+  veterinarianContact String?
+  documents           String[]
+  adminNotes          String?
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+}
+
+model Payment {
+  id             String   @id @default(uuid())
+  applicationId  String
+  amount         Float
+  paymentDate    DateTime
+  paymentMethod  String?
+  transactionId  String?
+  status         String   @default("COMPLETED")
+  createdAt      DateTime @default(now())
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+}
