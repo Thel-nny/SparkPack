@@ -31,13 +31,18 @@ const AdvisorTopNavbar: React.FC<AdvisorTopNavbarProps> = ({ className = '' }) =
       hasDropdown: false,
     },
     {
+      label: 'Submitted Applications',
+      href: '/advisor/applications/submitted',
+      hasDropdown: false,
+    },
+    {
       label: 'Applications in Progress',
       href: '/advisor/applications/in-progress',
       hasDropdown: false,
     },
     {
-      label: 'Submitted Applications',
-      href: '/advisor/applications/submitted',
+      label: 'Active Applications',
+      href: '/advisor/applications/active',
       hasDropdown: false,
     }
   ];
@@ -142,7 +147,7 @@ const AdvisorTopNavbar: React.FC<AdvisorTopNavbarProps> = ({ className = '' }) =
           <div className="flex items-center space-x-4">
             {/* Start New Application Button */}
             <Link
-              href="/start-new-application" // Updated href for start new application
+              href="/advisor/applications/new" 
               className="flex items-center bg-[#8cc63f] hover:bg-[#7eb238] text-white px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200"
             >
               Start New Application
