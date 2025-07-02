@@ -84,7 +84,6 @@ export default function Login() {
   };
 
   return (
-    // Changed background from image to solid color #f5f7f8
     <div className="min-h-screen flex items-center justify-center bg-[#f5f7f8] p-2 md:p-4">
       <div className="z-10 w-full max-w-md p-6 md:px-8 lg:px-10 rounded-lg bg-white bg-opacity-95 border-2 border-gray-400 shadow-md">
         <div className="flex flex-col items-center mb-2 md:mb-4">
