@@ -191,7 +191,7 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ className = '' }) => {
                   <div className="absolute top-full right-0 mt-1 w-56 bg-white rounded-md shadow-lg border border-gray-200 z-20">
                     <div className="py-1">
                       <Link
-                        href="/auth/policyholder-login"
+                        href="/auth/login"
                         className="block px-4 py-2 text-sm text-[#342d47] hover:bg-[#f5f8f3] hover:text-[#8ba77d] transition-colors duration-150"
                         onClick={() => setActiveDropdown(null)}
                       >
