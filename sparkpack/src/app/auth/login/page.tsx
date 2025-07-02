@@ -84,7 +84,8 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-cover bg-center p-2 md:p-4" style={{ backgroundImage: "url('/images/auth-bg.webp')" }}>
+    // Changed background from image to solid color #f5f7f8
+    <div className="min-h-screen flex items-center justify-center bg-[#f5f7f8] p-2 md:p-4">
       <div className="z-10 w-full max-w-md p-6 md:px-8 lg:px-10 rounded-lg bg-white bg-opacity-95 border-2 border-gray-400 shadow-md">
         <div className="flex flex-col items-center mb-2 md:mb-4">
           <Image src="/Furrest_Logo-04.svg" width={120} height={120} alt="Furrest logo" className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32" />
