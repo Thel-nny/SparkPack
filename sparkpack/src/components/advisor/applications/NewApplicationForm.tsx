@@ -1,10 +1,9 @@
-// sparkpack/src/components/advisor/applications/NewApplicationForm.tsx
-
 "use client";
 
 import React, { useState } from 'react';
-import ApplicationStepNavbar from './ApplicationStepNavbar'; // Corrected import
+import ApplicationStepNavbar from './ApplicationStepNavbar';
 import ClientDetailsStep from './form-steps/ClientDetailsStep';
+import PetDetailsStep from './form-steps/PetDetailsStep';
 
 interface ClientDetails {
   title?: string;
@@ -25,8 +24,39 @@ interface ClientDetails {
   declarationAccuracy: boolean;
 }
 
+interface PetDetails {
+  petName: string;
+  dobOrAdoptionDate: string;
+  estimatedAge: string;
+  gender: string;
+  species: string;
+  otherSpecies?: string;
+  breed: string;
+  otherBreed?: string;
+  microchipNumber?: string;
+  colorMarkings: string;
+  spayedNeutered: string;
+  vaccinationStatus: string;
+  lifestyle: string;
+  chronicIllness: string;
+  chronicIllnessExplanation?: string;
+  surgeryHistory: string;
+  surgeryHistoryExplanation?: string;
+  recurringConditions: string;
+  recurringConditionsExplanation?: string;
+  onMedication: string;
+  onMedicationExplanation?: string;
+  vetName: string;
+  vetClinicName: string;
+  clinicPhoneNumber: string;
+  clinicAddress: string;
+  lastVetVisitDate: string;
+}
+
+// Define the overall ApplicationFormData interface to include both steps
 interface ApplicationFormData {
   client: ClientDetails;
+  pet: PetDetails; 
 }
 
 const NewApplicationForm: React.FC = () => {
@@ -40,7 +70,7 @@ const NewApplicationForm: React.FC = () => {
       dob: '',
       pob: '',
       gender: '',
-      allowPhoneCollection: false,
+      allowPhoneCollection: true, 
       phoneNumber: '',
       email: '',
       streetAddress: '',
@@ -50,9 +80,32 @@ const NewApplicationForm: React.FC = () => {
       postalCode: '5000',
       declarationAccuracy: false,
     },
+    pet: {
+      petName: '',
+      dobOrAdoptionDate: '',
+      estimatedAge: '',
+      gender: '',
+      species: '',
+      breed: '',
+      microchipNumber: '',
+      colorMarkings: '',
+      spayedNeutered: '',
+      vaccinationStatus: '',
+      lifestyle: '',
+      chronicIllness: '',
+      surgeryHistory: '',
+      recurringConditions: '',
+      onMedication: '',
+      vetName: '',
+      vetClinicName: '',
+      clinicPhoneNumber: '',
+      clinicAddress: '',
+      lastVetVisitDate: '',
+    },
   });
 
-  const updateFormData = (field: 'client', data: Partial<ClientDetails>) => {
+  // Generic update function for any form section
+  const updateFormData = <T extends keyof ApplicationFormData>(field: T, data: Partial<ApplicationFormData[T]>) => {
     setFormData((prevData) => ({
       ...prevData,
       [field]: { ...prevData[field], ...data },
@@ -60,16 +113,27 @@ const NewApplicationForm: React.FC = () => {
   };
 
   const handleNextStep = () => {
-    console.log("Attempting to proceed from Client Details. Form data:", formData.client);
-    alert("Client Details submitted (check console). This is the end of the form for now!");
+    if (currentStep === 1) {
+        console.log("Client Details submitted (check console). Proceeding to Pet Details.", formData.client);
+    } else if (currentStep === 2) {
+        console.log("Pet Details submitted (check console). This is the end of the form for now!");
+        alert("Pet Details submitted (check console). This is the end of the form for now!");
+    }
+
+    if (currentStep < 2) { 
+        setCurrentStep((prevStep) => prevStep + 1);
+    }
   };
 
   const handlePrevStep = () => {
-    // Not applicable for the first step alone
+    if (currentStep > 1) {
+      setCurrentStep((prevStep) => prevStep - 1);
+    }
   };
 
   const handleSubmit = () => {
-    console.log('Final Form Submission (if applicable):', formData);
+    console.log('Final Form Submission:', formData);
+    alert('Form Submitted! Check console for data.');
   };
 
   const renderStepContent = () => {
@@ -82,8 +146,17 @@ const NewApplicationForm: React.FC = () => {
             onNext={handleNextStep}
           />
         );
+      case 2:
+        return (
+          <PetDetailsStep
+            formData={formData.pet}
+            onUpdate={(data) => updateFormData('pet', data)}
+            onNext={handleNextStep}
+            onPrev={handlePrevStep} 
+          />
+        );
       default:
-        return <div className="p-4 text-center text-red-500">Error: Invalid step. Currently displaying only Client Details.</div>;
+        return <div className="p-4 text-center text-red-500">Error: Invalid step.</div>;
     }
   };
 
