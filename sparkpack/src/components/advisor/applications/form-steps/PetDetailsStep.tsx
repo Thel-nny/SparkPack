@@ -4,41 +4,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-
-interface PetDetails {
-  petName: string;
-  dobOrAdoptionDate?: string; 
-  estimatedAge: string; // e.g., "5 years", "6 months"
-  gender: string;
-  species: string; // Dog, Cat, Other
-  otherSpecies?: string; // If species is 'Other'
-  breed: string; // Dropdown value, or 'Mixed Breed', 'Other'
-  otherBreed?: string; // If breed is 'Other'
-  microchipNumber?: string;
-  colorMarkings: string;
-
-  // Health & Lifestyle
-  spayedNeutered: string; // Yes/No
-  vaccinationStatus: string; // Up-to-date, Not vaccinated, etc.
-  lifestyle: string; // Mainly indoor, Mainly outdoor, Working animal, Show animal
-
-  // Existing Medical Conditions/History
-  chronicIllness: string; // Yes/No
-  chronicIllnessExplanation?: string;
-  surgeryHistory: string; // Yes/No
-  surgeryHistoryExplanation?: string;
-  recurringConditions: string; // Yes/No
-  recurringConditionsExplanation?: string;
-  onMedication: string; // Yes/No
-  onMedicationExplanation?: string;
-
-  // Veterinarian Information
-  vetName: string;
-  vetClinicName: string;
-  clinicPhoneNumber: string;
-  clinicAddress: string;
-  lastVetVisitDate?: string; 
-}
+import { PetDetails } from '@/types/formData';
 
 interface PetDetailsStepProps {
   formData: PetDetails;

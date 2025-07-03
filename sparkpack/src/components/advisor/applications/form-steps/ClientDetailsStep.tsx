@@ -3,25 +3,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-
-interface ClientDetails {
-  title?: string;
-  firstName: string;
-  middleName?: string;
-  lastName: string;
-  dob: string; 
-  pob: string;
-  gender: string;
-  allowPhoneCollection: boolean; 
-  phoneNumber?: string;
-  email: string;
-  streetAddress: string;
-  country: string;
-  city: string;
-  province: string;
-  postalCode: string;
-  declarationAccuracy: boolean;
-}
+import { ClientDetails } from '@/types/formData';
 
 interface ClientDetailsStepProps {
   formData: ClientDetails;
