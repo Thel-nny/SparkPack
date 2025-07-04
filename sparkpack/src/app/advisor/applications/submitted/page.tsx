@@ -1,9 +1,13 @@
-"use client"
+'use client';
 
 import AdvisorTopNavbar from "@/components/advisor/AdvisorTopNavBar";
+import AdvisorSubmittedApplications from "@/components/advisor/AdvisorSubmittedApplications";
 
-export default function ApplicationsSubmitted() {
+export default function SubmittedApplications() {
   return (
-    <AdvisorTopNavbar/>
+    <>
+      <AdvisorTopNavbar/>
+      <AdvisorSubmittedApplications />
+    </>
   );
 }
