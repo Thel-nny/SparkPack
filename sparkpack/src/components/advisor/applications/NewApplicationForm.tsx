@@ -6,6 +6,8 @@ import ClientDetailsStep from './form-steps/ClientDetailsStep';
 import PetDetailsStep from './form-steps/PetDetailsStep';
 import ProductDetailsStep from './form-steps/ProductDetailsStep';
 import PaymentDetailsStep from './form-steps/PaymentDetailsStep';
+import SummaryDetailsStep from './form-steps/SummaryDetailsStep'; 
+import SubmitStep from './form-steps/SubmitStep';
 import { ApplicationFormData } from '@/types/formData';
 import { createApplication, updateApplication } from '@/lib/api/applications';
 import { useRouter } from 'next/navigation';
@@ -15,14 +17,15 @@ const applicationSteps = [
   { id: 2, name: 'Pet Details' },
   { id: 3, name: 'Product Details' },
   { id: 4, name: 'Payment Details' },
-  { id: 5, name: 'Evidence' },
-  { id: 6, name: 'Summary' },
-  { id: 7, name: 'Sign & Submit' },
+  { id: 5, name: 'Summary' },
+  { id: 6, name: 'Sign & Submit' }, 
 ];
 
 const NewApplicationForm: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter(); // Initialize useRouter
+
   const [formData, setFormData] = useState<ApplicationFormData>({
     client: {
       title: '',
@@ -72,7 +75,7 @@ const NewApplicationForm: React.FC = () => {
     },
     product: {
       productName: '',
-      // coverageType: '', // This line from your previous paste was the source of the 'coverageType' error. It should not be here if not in ProductDetails type.
+      // coverageType: '', // REMOVED THIS LINE - IT WAS CAUSING THE ERROR
       coverageAmount: '',
       deductible: '',
       reimbursementRate: '',
@@ -89,6 +92,7 @@ const NewApplicationForm: React.FC = () => {
       expiryDate: '',
       cvv: '',
     },
+    // No 'evidence' property here anymore.
   });
 
   const updateFormData = <T extends keyof ApplicationFormData>(field: T, data: Partial<ApplicationFormData[T]>) => {
@@ -99,7 +103,9 @@ const NewApplicationForm: React.FC = () => {
   };
 
   const handleNextStep = () => {
-    if (currentStep < applicationSteps.length) {
+    if (currentStep === applicationSteps.length) {
+      handleSubmit();
+    } else {
       setCurrentStep((prevStep) => prevStep + 1);
     }
   };
@@ -110,38 +116,42 @@ const NewApplicationForm: React.FC = () => {
     }
   };
 
-  // The handleSubmit function would typically be called on the final step's "Next" or a dedicated "Submit" button
-  const router = useRouter();
-
   const handleSubmit = async () => {
+    console.log('Final Form Submission Attempt:', formData);
+
+    setIsSubmitting(true);
+
     try {
       // Prepare data for API
       const applicationData = {
         customer: formData.client,
         pet: formData.pet,
         product: formData.product,
+        payment: formData.payment, // Include payment details in submission
         // Map fields as needed to match backend schema
         petId: '', // This should be set after pet creation or selection
         policyNumber: formData.product.productName, // Example mapping
-        // planType: formData.product.coverageType, // Example mapping
-        premiumAmount: parseFloat(formData.product.coverageAmount) || 0,
-        deductible: parseFloat(formData.product.deductible) || 0,
-        coverageLimit: parseFloat(formData.product.coverageAmount) || 0,
+        premiumAmount: parseFloat(formData.product.coverageAmount.replace(/[₱,]/g, '')) || 0, // Clean and parse
+        deductible: parseFloat(formData.product.deductible.replace(/[₱,]/g, '')) || 0, // Clean and parse
+        coverageLimit: parseFloat(formData.product.coverageAmount.replace(/[₱,]/g, '')) || 0, // Clean and parse
         startDate: formData.product.startDate,
-        endDate: '', // Optional
+        endDate: '', // Optional: calculate based on startDate and coverageLength
       };
 
       // Call backend API to create application
-      const response = await createApplication(applicationData);
+      const response = await createApplication(applicationData); // Ensure createApplication expects this structure
 
       // After successful creation, update status to SUBMITTED
+      // Assuming response.data.id is available and your API supports status updates
       await updateApplication(response.data.id, { status: 'SUBMITTED' });
 
       alert('Application submitted successfully!');
       router.push('/advisor/applications/submitted'); // Redirect to submitted applications page
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error submitting application:', error);
-      alert('Failed to submit application. Please try again.');
+      alert(`Submission failed: ${error.message || 'An unknown error occurred.'}`);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -183,30 +193,22 @@ const NewApplicationForm: React.FC = () => {
             onPrev={handlePrevStep}
           />
         );
-      case 5:
-      case 6:
-      case 7:
+      case 5: // This is now the Summary Step
         return (
-          <div className="p-4 text-center text-blue-600">
-            <h3>Step {currentStep}: {applicationSteps.find(s => s.id === currentStep)?.name || 'Unknown Step'}</h3>
-            <p>This step is currently under construction. Please use the navigation to go back or forward.</p>
-            <div className="flex justify-between mt-4">
-              <button
-                onClick={handlePrevStep}
-                className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded"
-              >
-                Previous Step
-              </button>
-              {currentStep < applicationSteps.length && (
-                  <button
-                      onClick={handleNextStep}
-                      className="bg-[#8cc63f] hover:bg-[#7eb238] text-white font-bold py-2 px-4 rounded"
-                  >
-                      Next Step
-                  </button>
-              )}
-            </div>
-          </div>
+          <SummaryDetailsStep
+            formData={formData} // Pass the entire formData for summary
+            onNext={handleNextStep} // This will lead to the final "Sign & Submit"
+            onPrev={handlePrevStep}
+          />
+        );
+      case 6: // This is now the Sign & Submit Step (final step)
+        return (
+          <SubmitStep
+            formData={formData}
+            onPrev={handlePrevStep}
+            onSubmit={handleSubmit} // Pass the main handleSubmit function
+            isSubmitting={isSubmitting} // Pass the submitting state
+          />
         );
       default:
         return <div className="p-4 text-center text-red-500">Error: Invalid step.</div>;

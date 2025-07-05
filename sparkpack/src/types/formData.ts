@@ -58,11 +58,9 @@ export interface SelectedAddOn {
   type: 'one-time' | 'annual';
 }
 
-// Product Details Interface - REVISED
+// Product Details Interface 
 export interface ProductDetails {
   productName: string;
-  // REMOVED 'coverageType' here as it was causing the error and wasn't present in the ProductDetails initial state.
-  // If you later decide you need it, add it back *here* with its type.
   coverageAmount: string;
   deductible: string;
   reimbursementRate: string;
@@ -101,11 +99,16 @@ export interface ProductOption {
 }
 
 export interface PaymentDetails {
-  paymentMethod: 'Credit/Debit Card' | 'Bank Transfer' | 'GCash' | 'Cash/Cheque' | ''; 
+  paymentMethod: 'Credit/Debit Card' | 'Bank Transfer' | 'GCash' | 'Cash/Cheque' | '';
   cardNumber?: string;
   cardName?: string;
   expiryDate?: string;
   cvv?: string;
+  bankName?: string;
+  accountNumber?: string;
+  accountName?: string;
+  gcashNumber?: string;
+  gcashName?: string;
 }
 
 // Define the overall ApplicationFormData interface to include all steps
@@ -114,7 +117,6 @@ export interface ApplicationFormData {
   pet: PetDetails;
   product: ProductDetails;
   payment: PaymentDetails;
-  // evidence?: EvidenceDetails;
   // summary?: SummaryDetails;
   // signSubmit?: SignSubmitDetails;
 }

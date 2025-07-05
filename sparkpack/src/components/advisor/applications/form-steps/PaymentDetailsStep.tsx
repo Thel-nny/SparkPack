@@ -1,18 +1,15 @@
-// sparkpack/src/components/advisor/applications/form-steps/PaymentDetailsStep.tsx
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label'; 
+import { Label } from '@/components/ui/label';
 
 import { PaymentDetails, ProductDetails, AddOnDefinition, SelectedAddOn, ProductOption } from '@/types/formData'; // Import ProductDetails as we need it to calculate premium
 
-// Import the PremiumSummary component (new path)
 import PremiumSummary from './payment-details-subcomponents/PremiumSummary';
 
-// Import the calculatePremium function
-import { calculatePremium } from './ProductDetailsStep'; // Adjust path if you move calculatePremium to a utility file
+import { calculatePremium } from './ProductDetailsStep';
 
 const productOptions: ProductOption[] = [
   {
@@ -109,7 +106,7 @@ const productOptions: ProductOption[] = [
       "What's Covered": [
         'Extensive Accidental Injury & Illness Coverage: Up to ₱70,000+ for vet consultations, diagnostics (X-rays, MRI, blood work), prescribed medications, surgeries, hospitalization, and emergency care. Covers both minor and major medical events.',
         'Accidental Death or Essential Euthanasia: Up to ₱20,000 for accidental death or veterinarian-prescribed essential euthanasia due to covered accidental injuries or severe illnesses.',
-        'Burial/Cremation Assistance: Up to 10,000 to help cover end-of-life arrangements.',
+        'Burial/Cremation Assistance: Up to 10,000 for end-of-life arrangements.',
         'Lost Pet Advertising and Reward: Up to 10,000 for advertising costs and reward to help locate your missing pet.',
       ],
       'Important Notes': [
@@ -193,6 +190,7 @@ const addOnDefinitions: AddOnDefinition[] = [
 
 const donationPercentages = [0, 1, 2, 3, 5];
 
+
 interface PaymentDetailsStepProps {
   formData: PaymentDetails; // This component handles PaymentDetails specific data
   productDetails: ProductDetails; // We need the *full* ProductDetails to calculate premium
@@ -255,12 +253,52 @@ const PaymentDetailsStep: React.FC<PaymentDetailsStepProps> = ({
   };
 
   const validateForm = (): boolean => {
-    // Basic validation for payment details
     if (!localFormData.paymentMethod) {
       alert('Please select a payment method.');
       return false;
     }
-    // Add more validation based on payment method chosen (e.g., card details)
+
+    if (localFormData.paymentMethod === 'Credit/Debit Card') {
+      if (!localFormData.cardNumber || localFormData.cardNumber.length < 16) {
+        alert('Please enter a valid 16-digit card number.');
+        return false;
+      }
+      if (!localFormData.cardName) {
+        alert('Please enter the name on the card.');
+        return false;
+      }
+      if (!localFormData.expiryDate || !/^(0[1-9]|1[0-2])\/\d{2}$/.test(localFormData.expiryDate)) {
+        alert('Please enter a valid expiry date (MM/YY).');
+        return false;
+      }
+      if (!localFormData.cvv || localFormData.cvv.length < 3 || localFormData.cvv.length > 4) {
+        alert('Please enter a valid 3 or 4-digit CVV.');
+        return false;
+      }
+    } else if (localFormData.paymentMethod === 'Bank Transfer') {
+      if (!localFormData.bankName) {
+        alert('Please enter the bank name for bank transfer.');
+        return false;
+      }
+      if (!localFormData.accountNumber) {
+        alert('Please enter the account number for bank transfer.');
+        return false;
+      }
+      if (!localFormData.accountName) {
+        alert('Please enter the account name for bank transfer.');
+        return false;
+      }
+    } else if (localFormData.paymentMethod === 'GCash') {
+      if (!localFormData.gcashNumber || localFormData.gcashNumber.length < 11 || !/^\d+$/.test(localFormData.gcashNumber)) {
+        alert('Please enter a valid 11-digit GCash number.');
+        return false;
+      }
+      if (!localFormData.gcashName) {
+        alert('Please enter the GCash account name.');
+        return false;
+      }
+    }
+
     return true;
   };
 
@@ -285,6 +323,7 @@ const PaymentDetailsStep: React.FC<PaymentDetailsStepProps> = ({
           <h3 className="text-xl font-bold text-[#342d47] mb-4">Choose Payment Method</h3>
 
           <div className="space-y-4">
+            {/* Credit/Debit Card */}
             <div className="flex items-center">
               <input
                 type="radio"
@@ -320,6 +359,7 @@ const PaymentDetailsStep: React.FC<PaymentDetailsStepProps> = ({
               </div>
             )}
 
+            {/* Bank Transfer */}
             <div className="flex items-center">
               <input
                 type="radio"
@@ -334,7 +374,24 @@ const PaymentDetailsStep: React.FC<PaymentDetailsStepProps> = ({
                 Bank Transfer (Instructions will be provided)
               </Label>
             </div>
+            {localFormData.paymentMethod === 'Bank Transfer' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ml-6 p-4 border border-gray-200 rounded-md bg-gray-50">
+                <div>
+                  <Label htmlFor="bankName" className="block text-sm font-medium text-gray-700 mb-1">Bank Name</Label>
+                  <Input type="text" id="bankName" name="bankName" value={localFormData.bankName || ''} onChange={handleChange} placeholder="e.g., BDO, BPI" required />
+                </div>
+                <div>
+                  <Label htmlFor="accountNumber" className="block text-sm font-medium text-gray-700 mb-1">Account Number</Label>
+                  <Input type="text" id="accountNumber" name="accountNumber" value={localFormData.accountNumber || ''} onChange={handleChange} placeholder="e.g., 001234567890" required />
+                </div>
+                <div className="col-span-full"> {/* Make this span full width */}
+                  <Label htmlFor="accountName" className="block text-sm font-medium text-gray-700 mb-1">Account Name</Label>
+                  <Input type="text" id="accountName" name="accountName" value={localFormData.accountName || ''} onChange={handleChange} placeholder="Full Name of Account Holder" required />
+                </div>
+              </div>
+            )}
 
+            {/* GCash */}
             <div className="flex items-center">
               <input
                 type="radio"
@@ -349,6 +406,35 @@ const PaymentDetailsStep: React.FC<PaymentDetailsStepProps> = ({
                 GCash
               </Label>
             </div>
+            {localFormData.paymentMethod === 'GCash' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ml-6 p-4 border border-gray-200 rounded-md bg-gray-50">
+                <div>
+                  <Label htmlFor="gcashNumber" className="block text-sm font-medium text-gray-700 mb-1">GCash Number</Label>
+                  <Input type="text" id="gcashNumber" name="gcashNumber" value={localFormData.gcashNumber || ''} onChange={handleChange} placeholder="e.g., 0917XXXXXXX" required />
+                </div>
+                <div>
+                  <Label htmlFor="gcashName" className="block text-sm font-medium text-gray-700 mb-1">GCash Account Name</Label>
+                  <Input type="text" id="gcashName" name="gcashName" value={localFormData.gcashName || ''} onChange={handleChange} placeholder="Full Name of GCash Account Holder" required />
+                </div>
+              </div>
+            )}
+
+             {/* Cash/Cheque - no additional fields for now */}
+            <div className="flex items-center">
+              <input
+                type="radio"
+                id="paymentMethodCashCheque"
+                name="paymentMethod"
+                value="Cash/Cheque"
+                checked={localFormData.paymentMethod === 'Cash/Cheque'}
+                onChange={handleChange}
+                className="h-4 w-4 text-[#8cc63f] border-gray-300 focus:ring-[#8cc63f]"
+              />
+              <Label htmlFor="paymentMethodCashCheque" className="ml-2 block text-sm font-medium text-gray-700">
+                Cash / Cheque (For in-person payment)
+              </Label>
+            </div>
+
           </div>
         </form>
       </div>
