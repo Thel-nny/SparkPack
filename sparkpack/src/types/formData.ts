@@ -5,7 +5,7 @@ export interface ClientDetails {
   middleName?: string;
   lastName: string;
   dob: string;
-  pob: string;
+  pob: string; // Place of Birth
   gender: string;
   allowPhoneCollection: boolean;
   phoneNumber?: string;
@@ -21,7 +21,7 @@ export interface ClientDetails {
 // Pet Details Interface
 export interface PetDetails {
   petName: string;
-  dobOrAdoptionDate?: string;
+  dobOrAdoptionDate: string;
   estimatedAge: string;
   gender: string;
   species: string;
@@ -45,11 +45,24 @@ export interface PetDetails {
   vetClinicName: string;
   clinicPhoneNumber: string;
   clinicAddress: string;
-  lastVetVisitDate?: string;
+  lastVetVisitDate: string;
 }
 
-// Overall Application Form Data Interface
+// Product Details Interface
+export interface ProductDetails {
+  productName: string; 
+  coverageType: string; 
+  coverageAmount: string; 
+  deductible: string; 
+  reimbursementRate: string; 
+  paymentFrequency: string; 
+  startDate: string; 
+  coverageLength: string; 
+}
+
+// Define the overall ApplicationFormData interface to include all steps
 export interface ApplicationFormData {
   client: ClientDetails;
   pet: PetDetails;
+  product: ProductDetails;
 }

@@ -1,63 +1,12 @@
+// sparkpack/src/components/advisor/applications/NewApplicationForm.tsx
 "use client";
 
 import React, { useState } from 'react';
 import ApplicationStepNavbar from './ApplicationStepNavbar';
 import ClientDetailsStep from './form-steps/ClientDetailsStep';
 import PetDetailsStep from './form-steps/PetDetailsStep';
-
-interface ClientDetails {
-  title?: string;
-  firstName: string;
-  middleName?: string;
-  lastName: string;
-  dob: string;
-  pob: string;
-  gender: string;
-  allowPhoneCollection: boolean;
-  phoneNumber?: string;
-  email: string;
-  streetAddress: string;
-  country: string;
-  city: string;
-  province: string;
-  postalCode: string;
-  declarationAccuracy: boolean;
-}
-
-interface PetDetails {
-  petName: string;
-  dobOrAdoptionDate: string;
-  estimatedAge: string;
-  gender: string;
-  species: string;
-  otherSpecies?: string;
-  breed: string;
-  otherBreed?: string;
-  microchipNumber?: string;
-  colorMarkings: string;
-  spayedNeutered: string;
-  vaccinationStatus: string;
-  lifestyle: string;
-  chronicIllness: string;
-  chronicIllnessExplanation?: string;
-  surgeryHistory: string;
-  surgeryHistoryExplanation?: string;
-  recurringConditions: string;
-  recurringConditionsExplanation?: string;
-  onMedication: string;
-  onMedicationExplanation?: string;
-  vetName: string;
-  vetClinicName: string;
-  clinicPhoneNumber: string;
-  clinicAddress: string;
-  lastVetVisitDate: string;
-}
-
-// Define the overall ApplicationFormData interface to include both steps
-interface ApplicationFormData {
-  client: ClientDetails;
-  pet: PetDetails; 
-}
+import ProductDetailsStep from './form-steps/ProductDetailsStep'; // Import the new step
+import { ApplicationFormData, ClientDetails, PetDetails, ProductDetails } from '@/types/formData'; // Import all interfaces
 
 const NewApplicationForm: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -70,7 +19,7 @@ const NewApplicationForm: React.FC = () => {
       dob: '',
       pob: '',
       gender: '',
-      allowPhoneCollection: true, 
+      allowPhoneCollection: true,
       phoneNumber: '',
       email: '',
       streetAddress: '',
@@ -86,21 +35,38 @@ const NewApplicationForm: React.FC = () => {
       estimatedAge: '',
       gender: '',
       species: '',
+      otherSpecies: '',
       breed: '',
+      otherBreed: '',
       microchipNumber: '',
       colorMarkings: '',
       spayedNeutered: '',
       vaccinationStatus: '',
       lifestyle: '',
       chronicIllness: '',
+      chronicIllnessExplanation: '',
       surgeryHistory: '',
+      surgeryHistoryExplanation: '',
       recurringConditions: '',
+      recurringConditionsExplanation: '',
       onMedication: '',
+      onMedicationExplanation: '',
       vetName: '',
       vetClinicName: '',
       clinicPhoneNumber: '',
       clinicAddress: '',
       lastVetVisitDate: '',
+    },
+    // Initialize product details
+    product: {
+      productName: '',
+      coverageType: '',
+      coverageAmount: '',
+      deductible: '',
+      reimbursementRate: '',
+      paymentFrequency: '',
+      startDate: '',
+      coverageLength: '', // Initialize new field
     },
   });
 
@@ -114,14 +80,18 @@ const NewApplicationForm: React.FC = () => {
 
   const handleNextStep = () => {
     if (currentStep === 1) {
-        console.log("Client Details submitted (check console). Proceeding to Pet Details.", formData.client);
+      console.log("Client Details submitted (check console). Proceeding to Pet Details.", formData.client);
     } else if (currentStep === 2) {
-        console.log("Pet Details submitted (check console). This is the end of the form for now!");
-        alert("Pet Details submitted (check console). This is the end of the form for now!");
+      console.log("Pet Details submitted (check console). Proceeding to Product Details.", formData.pet);
+    } else if (currentStep === 3) {
+      console.log("Product Details submitted (check console). This is the end of the form for now!");
+      // In a real app, you might trigger the final submission here or move to a summary step
+      alert("Product Details submitted (check console). This is the end of the form for now!");
     }
 
-    if (currentStep < 2) { 
-        setCurrentStep((prevStep) => prevStep + 1);
+    // Only proceed if not on the last step (which is now 3)
+    if (currentStep < 3) { // Changed from 2 to 3
+      setCurrentStep((prevStep) => prevStep + 1);
     }
   };
 
@@ -131,9 +101,11 @@ const NewApplicationForm: React.FC = () => {
     }
   };
 
+  // The handleSubmit function would typically be called on the final step's "Next" or a dedicated "Submit" button
   const handleSubmit = () => {
     console.log('Final Form Submission:', formData);
     alert('Form Submitted! Check console for data.');
+    // In a real application, you would send this formData to your API
   };
 
   const renderStepContent = () => {
@@ -152,7 +124,16 @@ const NewApplicationForm: React.FC = () => {
             formData={formData.pet}
             onUpdate={(data) => updateFormData('pet', data)}
             onNext={handleNextStep}
-            onPrev={handlePrevStep} 
+            onPrev={handlePrevStep}
+          />
+        );
+      case 3: // New case for Product Details
+        return (
+          <ProductDetailsStep
+            formData={formData.product}
+            onUpdate={(data) => updateFormData('product', data)}
+            onNext={handleNextStep}
+            onPrev={handlePrevStep}
           />
         );
       default:
@@ -162,6 +143,7 @@ const NewApplicationForm: React.FC = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 overflow-hidden">
+      {/* Application Step Navbar is always visible at the top */}
       <ApplicationStepNavbar currentStepId={currentStep} />
       <div className="flex-1 py-8 px-4 h-full">
         <div className="bg-white p-6 rounded-lg shadow-md max-w-6xl w-full mx-auto flex flex-col h-full overflow-y-auto">
