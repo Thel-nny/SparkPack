@@ -1,5 +1,3 @@
-// sparkpack/src/app/advisor/applications/new/page.tsx
-
 import NewApplicationForm from '@/components/advisor/applications/NewApplicationForm'; // Adjust path if needed
 
 const NewApplicationPage = () => {
