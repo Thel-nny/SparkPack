@@ -6,6 +6,7 @@ import ApplicationStepNavbar from './ApplicationStepNavbar';
 import ClientDetailsStep from './form-steps/ClientDetailsStep';
 import PetDetailsStep from './form-steps/PetDetailsStep';
 import ProductDetailsStep from './form-steps/ProductDetailsStep';
+import PaymentDetailsStep from './form-steps/PaymentDetailsStep';
 import { ApplicationFormData } from '@/types/formData';
 
 const applicationSteps = [
@@ -70,15 +71,22 @@ const NewApplicationForm: React.FC = () => {
     },
     product: {
       productName: '',
-      coverageType: '',
+      // coverageType: '', // This line from your previous paste was the source of the 'coverageType' error. It should not be here if not in ProductDetails type.
       coverageAmount: '',
       deductible: '',
       reimbursementRate: '',
       paymentFrequency: '',
-      startDate: '',
-      coverageLength: '',
+      startDate: new Date().toISOString().split('T')[0],
+      coverageLength: '1 Year',
       selectedAddOns: [],
       donationPercentage: 0
+    },
+    payment: {
+      paymentMethod: '',
+      cardNumber: '',
+      cardName: '',
+      expiryDate: '',
+      cvv: '',
     },
   });
 
@@ -90,10 +98,8 @@ const NewApplicationForm: React.FC = () => {
   };
 
   const handleNextStep = () => {
-    if (currentStep < 3) {
+    if (currentStep < applicationSteps.length) {
       setCurrentStep((prevStep) => prevStep + 1);
-    } else {
-      handleSubmit();
     }
   };
 
@@ -150,13 +156,22 @@ const NewApplicationForm: React.FC = () => {
           />
         );
       case 4:
+        return (
+          <PaymentDetailsStep
+            formData={formData.payment}
+            productDetails={formData.product}
+            onUpdate={(data) => updateFormData('payment', data)}
+            onNext={handleNextStep}
+            onPrev={handlePrevStep}
+          />
+        );
       case 5:
       case 6:
       case 7:
         return (
           <div className="p-4 text-center text-blue-600">
             <h3>Step {currentStep}: {applicationSteps.find(s => s.id === currentStep)?.name || 'Unknown Step'}</h3>
-            <p>This step is currently under construction. Please use the navigation to go back.</p>
+            <p>This step is currently under construction. Please use the navigation to go back or forward.</p>
             <div className="flex justify-between mt-4">
               <button
                 onClick={handlePrevStep}
@@ -164,6 +179,14 @@ const NewApplicationForm: React.FC = () => {
               >
                 Previous Step
               </button>
+              {currentStep < applicationSteps.length && (
+                  <button
+                      onClick={handleNextStep}
+                      className="bg-[#8cc63f] hover:bg-[#7eb238] text-white font-bold py-2 px-4 rounded"
+                  >
+                      Next Step
+                  </button>
+              )}
             </div>
           </div>
         );
@@ -176,7 +199,7 @@ const NewApplicationForm: React.FC = () => {
     <div className="flex flex-col h-screen bg-gray-50">
       <ApplicationStepNavbar currentStepId={currentStep} steps={applicationSteps} />
       <div className="flex-1 py-8 px-4 overflow-y-auto">
-        <div className="bg-white p-6 rounded-lg shadow-md max-w-6xl w-full mx-auto flex flex-col min-h-[calc(100vh-160px)]"> {/* Adjusted min-h to consider navbar + padding */}
+        <div className="bg-white p-6 rounded-lg shadow-md max-w-6xl w-full mx-auto flex flex-col min-h-[calc(100vh-160px)]">
           {isSubmitting ? (
             <div className="flex items-center justify-center h-full text-lg text-[#8cc63f]">
               <p>Submitting your application, please wait...</p>

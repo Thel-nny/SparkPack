@@ -8,8 +8,6 @@ import ProductCard from './product-details-subcomponents/ProductCard';
 import ProductOverview from './product-details-subcomponents/ProductOverview';
 import PackageConfiguration from './product-details-subcomponents/PackageConfiguration';
 import OptionalBenefitsAndDonation from './product-details-subcomponents/OptionalBenefitsAndDonation';
-import PremiumSummary from './product-details-subcomponents/PremiumSummary';
-
 
 import { ProductDetails, AddOnDefinition, SelectedAddOn, ProductOption } from '@/types/formData'; 
 
@@ -28,15 +26,26 @@ interface ProductDetailsStepProps {
 
 const productIcons: { [key: string]: React.ReactNode } = { 
   medicalCareIcon: (
-    <ShieldCheck className="w-12 h-12 text-[#8cc63f] mb-4" />
+    <svg className="w-12 h-12 text-[#8cc63f] mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
   ),
   legacyInsuranceIcon: (
-    <Award className="w-12 h-12 text-[#8cc63f] mb-4" />
+    <svg className="w-12 h-12 text-[#8cc63f] mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c1.657 0 3 .895 3 2s-1.343 2-3 2-3-.895-3-2 1.343-2 3-2z" />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12c0 4.418-4.03 8-9 8s-9-3.582-9-8 4.03-8 9-8 9 3.582 9 8z" />
+    </svg>
   ),
   medicareLegacyIcon: (
-    <PlusCircle className="w-12 h-12 text-[#8cc63f] mb-4" />
+    <svg className="w-12 h-12 text-[#8cc63f] mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
   ),
 };
+
+// ==========================================================
+// Product and Add-on Definitions (Kept here)
+// ==========================================================
 
 const productOptions: ProductOption[] = [
   {
@@ -86,9 +95,9 @@ const productOptions: ProductOption[] = [
       'Coverage up to ₱5,000 - ₱20,000'
     ],
     iconKey: 'legacyInsuranceIcon',
-    coverageOptions: ['₱5,000', '₱10,000', '₱20,000'], // For lost pet/end-of-life benefit amounts
-    deductibleOptions: ['₱0', '₱500'], // Might have smaller deductibles or none for legacy
-    reimbursementOptions: ['100%'], // Often 100% for specific lump sum payouts
+    coverageOptions: ['₱5,000', '₱10,000', '₱20,000'],
+    deductibleOptions: ['₱0', '₱500'],
+    reimbursementOptions: ['100%'],
     paymentFreqOptions: ['Annually', 'Monthly'],
     fullDetails: {
       'Key Benefits': [
@@ -120,7 +129,7 @@ const productOptions: ProductOption[] = [
       'Coverage up to ₱7,500 - ₱100,000+'
     ],
     iconKey: 'medicareLegacyIcon',
-    coverageOptions: ['₱7,500', '₱25,000', '₱50,000', '₱100,000+'], // High tiers
+    coverageOptions: ['₱7,500', '₱25,000', '₱50,000', '₱100,000+'],
     deductibleOptions: ['₱1,000', '₱2,000', '₱3,000'],
     reimbursementOptions: ['80%', '90%'],
     paymentFreqOptions: ['Annually', 'Monthly'],
@@ -219,25 +228,21 @@ const addOnDefinitions: AddOnDefinition[] = [
 
 const donationPercentages = [0, 1, 2, 3, 5];
 
-// ==========================================================
-// Premium Calculation Function (Kept here as it uses data from this file)
-// ==========================================================
-
-const calculatePremium = (
+export const calculatePremium = ( 
   productName: string,
   coverageAmount: string,
   deductible: string,
   reimbursementRate: string,
   _paymentFrequency: string,
   selectedAddOns: SelectedAddOn[],
-  donationPercentage: number
+  donationPercentage: number,
+
 ): { baseAnnual: number; annualTotal: number; monthlyTotal: number; oneTimeTotal: number; donationAmount: number } => {
   let basePrice = 0;
   let coverageFactor = 1;
   let deductibleFactor = 1;
   let reimbursementFactor = 1;
 
-  // 1. Calculate Base Premium based on Product and Core Options
   const cleanCoverage = parseFloat(coverageAmount?.replace(/[₱,]/g, '') || '0');
   const cleanDeductible = parseFloat(deductible?.replace(/[₱,]/g, '') || '0');
   const cleanReimbursement = parseFloat(reimbursementRate?.replace(/%/g, '') || '0') / 100;
@@ -254,16 +259,16 @@ const calculatePremium = (
       basePrice = 600;
       if (cleanCoverage === 10000) basePrice = 750;
       if (cleanCoverage === 20000) basePrice = 900;
-      if (cleanDeductible === 500) deductibleFactor = 0.95; // Small discount for minor deductible
+      if (cleanDeductible === 500) deductibleFactor = 0.95;
       break;
     case 'Medicare and Legacy Insurance':
       basePrice = 1500;
       if (cleanCoverage === 25000) basePrice = 2000;
       if (cleanCoverage === 50000) basePrice = 2800;
-      if (cleanCoverage === 100000) basePrice = 4000; // Higher tier, higher base
+      if (cleanCoverage === 100000) basePrice = 4000;
       if (cleanDeductible === 2000) deductibleFactor = 0.9;
       if (cleanDeductible === 3000) deductibleFactor = 0.85;
-      if (cleanReimbursement === 0.80) reimbursementFactor = 0.9; // Lower reimbursement gives slightly lower premium
+      if (cleanReimbursement === 0.80) reimbursementFactor = 0.9;
       break;
     default:
       return { baseAnnual: 0, annualTotal: 0, monthlyTotal: 0, oneTimeTotal: 0, donationAmount: 0 };
@@ -271,32 +276,28 @@ const calculatePremium = (
 
   let calculatedBaseAnnualPremium = basePrice * coverageFactor * deductibleFactor * reimbursementFactor;
 
-  // 2. Add Annual Add-on Costs
   let annualAddOnCost = 0;
   let oneTimeAddOnCost = 0;
   selectedAddOns.forEach(addOn => {
-    if (addOn.type === 'annual') {
-      annualAddOnCost += addOn.price;
-    } else if (addOn.type === 'one-time') {
-      oneTimeAddOnCost += addOn.price;
+    const def = addOnDefinitions.find(d => d.id === addOn.id);
+    if (def) {
+      if (def.type === 'annual') {
+        annualAddOnCost += def.price;
+      } else if (def.type === 'one-time') {
+        oneTimeAddOnCost += def.price;
+      }
     }
   });
 
   let totalAnnualPremiumBeforeDonation = calculatedBaseAnnualPremium + annualAddOnCost;
-
-  // 3. Calculate Donation Amount (added to annual premium)
-  let calculatedDonationAmount = (totalAnnualPremiumBeforeDonation * (donationPercentage / 100)); // Changed to 'let'
-
+  let calculatedDonationAmount = (totalAnnualPremiumBeforeDonation * (donationPercentage / 100));
   let finalAnnualTotalPremium = totalAnnualPremiumBeforeDonation + calculatedDonationAmount;
-
-  // 4. Calculate Monthly Premium (with slight surcharge for monthly)
-  const monthlySurchargeFactor = 1.05; // 5% surcharge for monthly payments
+  const monthlySurchargeFactor = 1.05;
   let finalMonthlyTotalPremium = (finalAnnualTotalPremium / 12) * monthlySurchargeFactor;
 
-  // Round for display
   finalAnnualTotalPremium = Math.round(finalAnnualTotalPremium);
-  finalMonthlyTotalPremium = Math.round(finalMonthlyTotalPremium * 100) / 100; // Keep two decimal places
-  calculatedDonationAmount = Math.round(calculatedDonationAmount * 100) / 100; // Round donation amount
+  finalMonthlyTotalPremium = Math.round(finalMonthlyTotalPremium * 100) / 100;
+  calculatedDonationAmount = Math.round(calculatedDonationAmount * 100) / 100;
 
   return {
     baseAnnual: Math.round(calculatedBaseAnnualPremium),
@@ -313,62 +314,14 @@ const calculatePremium = (
 
 const ProductDetailsStep: React.FC<ProductDetailsStepProps> = ({ formData, onUpdate, onPrev, onNext }) => {
   const [localFormData, setLocalFormData] = useState<ProductDetails>(formData);
-  const [currentSubStep, setCurrentSubStep] = useState(1); // 1: Select Product, 2: Configure Package, 3: Optional Benefits & Donation, 4: Summary/Compare
-  const [premiumCalculation, setPremiumCalculation] = useState({
-    baseAnnual: 0, annualTotal: 0, monthlyTotal: 0, oneTimeTotal: 0, donationAmount: 0
-  });
+  const [currentSubStep, setCurrentSubStep] = useState(1); // 1: Select Product, 2: Configure Package, 3: Optional Benefits & Donation
+  const totalSubSteps = 3; // Reduced from 4
 
-  const totalSubSteps = 4; // Now four sub-steps
 
   // Effect to update localFormData when parent formData changes (e.g., on back navigation)
   useEffect(() => {
     setLocalFormData(formData);
-    // Ensure calculation runs when component mounts or formData changes externally
-    if (formData.productName) {
-      setPremiumCalculation(calculatePremium(
-        formData.productName,
-        formData.coverageAmount,
-        formData.deductible,
-        formData.reimbursementRate,
-        formData.paymentFrequency,
-        formData.selectedAddOns,
-        formData.donationPercentage
-      ));
-    } else {
-      setPremiumCalculation({ baseAnnual: 0, annualTotal: 0, monthlyTotal: 0, oneTimeTotal: 0, donationAmount: 0 });
-    }
   }, [formData]);
-
-  // Recalculate premium whenever relevant localFormData changes
-  const memoizedCalculatePremium = useCallback(() => {
-    if (localFormData.productName && localFormData.coverageAmount && localFormData.deductible &&
-        localFormData.reimbursementRate && localFormData.paymentFrequency) {
-      const calculated = calculatePremium(
-        localFormData.productName,
-        localFormData.coverageAmount,
-        localFormData.deductible,
-        localFormData.reimbursementRate,
-        localFormData.paymentFrequency,
-        localFormData.selectedAddOns,
-        localFormData.donationPercentage
-      );
-      setPremiumCalculation(calculated);
-    } else {
-      setPremiumCalculation({ baseAnnual: 0, annualTotal: 0, monthlyTotal: 0, oneTimeTotal: 0, donationAmount: 0 });
-    }
-  }, [
-    localFormData.productName,
-    localFormData.coverageAmount,
-    localFormData.deductible,
-    localFormData.reimbursementRate,
-    localFormData.paymentFrequency,
-    localFormData.selectedAddOns,
-    localFormData.donationPercentage
-  ]);
-
-  useEffect(() => {
-    memoizedCalculatePremium();
-  }, [memoizedCalculatePremium]);
 
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -392,15 +345,14 @@ const ProductDetailsStep: React.FC<ProductDetailsStepProps> = ({ formData, onUpd
     setLocalFormData({
       ...localFormData,
       productName: productName,
-      // Reset config options to sensible defaults for the new product
       coverageAmount: selectedProduct?.coverageOptions?.[0] || '',
       deductible: selectedProduct?.deductibleOptions?.[0] || '',
       reimbursementRate: selectedProduct?.reimbursementOptions?.[0] || '',
-      paymentFrequency: 'Annually', // Default to annual
-      startDate: new Date().toISOString().split('T')[0], // Default to today
-      coverageLength: '1 Year', // Assuming fixed 1 year for now
-      selectedAddOns: [], // Clear add-ons when product changes
-      donationPercentage: 0, // Reset donation
+      paymentFrequency: 'Annually',
+      startDate: new Date().toISOString().split('T')[0],
+      coverageLength: '1 Year',
+      selectedAddOns: [],
+      donationPercentage: 0,
     });
   };
 
@@ -447,7 +399,6 @@ const ProductDetailsStep: React.FC<ProductDetailsStepProps> = ({ formData, onUpd
           message = 'Please configure all required package options.';
           isValid = false;
         } else if (currentProduct) {
-          // Basic check that selected values are valid options for the chosen product
           if (currentProduct.coverageOptions && !currentProduct.coverageOptions.includes(localFormData.coverageAmount)) {
             message = 'Invalid coverage amount selected for this product.'; isValid = false;
           }
@@ -465,15 +416,12 @@ const ProductDetailsStep: React.FC<ProductDetailsStepProps> = ({ formData, onUpd
       case 3: // Optional Benefits & Donation - No required fields for this step, it's all optional.
         isValid = true;
         break;
-      case 4: // Summary & Comparison - No validation needed, just confirmation.
-        isValid = true;
-        break;
       default:
-        isValid = false; // Should not happen
+        isValid = false;
     }
 
     if (!isValid) {
-      alert(message); // Replace with a toast notification in a real app
+      alert(message);
     }
     return isValid;
   };
@@ -483,23 +431,23 @@ const ProductDetailsStep: React.FC<ProductDetailsStepProps> = ({ formData, onUpd
       return;
     }
 
-    onUpdate(localFormData); // Save current data to parent
+    onUpdate(localFormData);
 
     if (currentSubStep < totalSubSteps) {
       setCurrentSubStep((prevSubStep) => prevSubStep + 1);
     } else {
-      // If it's the last sub-step, then call the parent onNext
-      onNext(); // This moves to Payment Details
+      // If it's the last sub-step of Product Details, call parent onNext
+      onNext(); // This will now move to PaymentDetailsStep
     }
   };
 
   const handleInternalPrev = () => {
-    onUpdate(localFormData); // Save current data to parent
+    onUpdate(localFormData);
 
     if (currentSubStep > 1) {
       setCurrentSubStep((prevSubStep) => prevSubStep - 1);
     } else {
-      // If it's the first sub-step, then call the parent onPrev
+      // If it's the first sub-step, call parent onPrev
       onPrev(); // This moves to Pet Details
     }
   };
@@ -526,7 +474,7 @@ const ProductDetailsStep: React.FC<ProductDetailsStepProps> = ({ formData, onUpd
                   product={product}
                   isSelected={localFormData.productName === product.name}
                   onSelect={handleProductSelect}
-                  productIcons={productIcons} // Pass the icons map
+                  productIcons={productIcons}
                 />
               ))}
             </div>
@@ -551,13 +499,6 @@ const ProductDetailsStep: React.FC<ProductDetailsStepProps> = ({ formData, onUpd
             donationPercentages={donationPercentages}
             handleAddOnToggle={handleAddOnToggle}
             handleChange={handleChange}
-          />
-        );
-      case 4: // Summary & Comparison
-        return (
-          <PremiumSummary
-            premiumCalculation={premiumCalculation}
-            selectedPaymentFrequency={localFormData.paymentFrequency}
           />
         );
       default:

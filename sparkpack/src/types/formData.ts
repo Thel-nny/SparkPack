@@ -1,3 +1,5 @@
+// sparkpack/src/types/formData.ts
+
 // Client Details Interface
 export interface ClientDetails {
   title?: string;
@@ -56,18 +58,19 @@ export interface SelectedAddOn {
   type: 'one-time' | 'annual';
 }
 
-// Product Details Interface - UPDATED
+// Product Details Interface - REVISED
 export interface ProductDetails {
   productName: string;
-  coverageType: string; // Could be 'Basic', 'Premium', etc., or just derived
-  coverageAmount: string; // e.g., '₱20,000'
-  deductible: string;     // e.g., '₱1,000'
-  reimbursementRate: string; // e.g., '80%'
-  paymentFrequency: string; // 'Annually' or 'Monthly'
-  startDate: string;      //YYYY-MM-DD
-  coverageLength: string; // e.g., '1 Year'
-  selectedAddOns: SelectedAddOn[]; // NEW: Array to store selected add-ons
-  donationPercentage: number; // NEW: 0, 1, 2, 3, 5 (as a percentage, e.g., 2 for 2%)
+  // REMOVED 'coverageType' here as it was causing the error and wasn't present in the ProductDetails initial state.
+  // If you later decide you need it, add it back *here* with its type.
+  coverageAmount: string;
+  deductible: string;
+  reimbursementRate: string;
+  paymentFrequency: string;
+  startDate: string;
+  coverageLength: string;
+  selectedAddOns: SelectedAddOn[];
+  donationPercentage: number;
 }
 
 // Interface for Add-on Definitions (used internally in ProductDetailsStep.tsx)
@@ -97,9 +100,21 @@ export interface ProductOption {
   };
 }
 
+export interface PaymentDetails {
+  paymentMethod: 'Credit/Debit Card' | 'Bank Transfer' | 'GCash' | 'Cash/Cheque' | ''; 
+  cardNumber?: string;
+  cardName?: string;
+  expiryDate?: string;
+  cvv?: string;
+}
+
 // Define the overall ApplicationFormData interface to include all steps
 export interface ApplicationFormData {
   client: ClientDetails;
   pet: PetDetails;
   product: ProductDetails;
+  payment: PaymentDetails;
+  // evidence?: EvidenceDetails;
+  // summary?: SummaryDetails;
+  // signSubmit?: SignSubmitDetails;
 }
