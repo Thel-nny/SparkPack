@@ -1,27 +1,21 @@
+// sparkpack/src/components/advisor/applications/ApplicationStepNavbar.tsx
 "use client";
 
 import React from 'react';
 
+// Define the shape of a single step object
 interface Step {
   id: number;
   name: string;
 }
 
+// Define the props for the ApplicationStepNavbar component
 interface ApplicationStepNavbarProps {
-  currentStepId: number; 
+  currentStepId: number;
+  steps: Step[]; // This is now a prop
 }
 
-const steps: Step[] = [
-  { id: 1, name: 'Client Details' },
-  { id: 2, name: 'Pet Details' },
-  { id: 3, name: 'Product Details' },
-  { id: 4, name: 'Payment Details' },
-  { id: 5, name: 'Evidence' },
-  { id: 6, name: 'Summary' },
-  { id: 7, name: 'Sign & Submit' },
-];
-
-const ApplicationStepNavbar: React.FC<ApplicationStepNavbarProps> = ({ currentStepId }) => {
+const ApplicationStepNavbar: React.FC<ApplicationStepNavbarProps> = ({ currentStepId, steps }) => {
   return (
     <nav className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -40,7 +34,6 @@ const ApplicationStepNavbar: React.FC<ApplicationStepNavbarProps> = ({ currentSt
               `;
               // Remove the 'after' pseudo-element for the last step
               const lastStepClass = step.id === steps.length ? 'after:hidden' : '';
-
 
               return (
                 <div key={step.id} className={`${stepClasses} ${lastStepClass}`}>
@@ -72,8 +65,8 @@ const ApplicationStepNavbar: React.FC<ApplicationStepNavbarProps> = ({ currentSt
                       ${isActive
                         ? 'text-[#7eb238] font-semibold'
                         : isCompleted
-                          ? 'text-[#342d47] font-medium' 
-                          : 'text-gray-600' 
+                          ? 'text-[#342d47] font-medium'
+                          : 'text-gray-600'
                       }
                     `}
                   >
