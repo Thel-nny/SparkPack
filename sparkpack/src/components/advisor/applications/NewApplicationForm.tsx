@@ -6,7 +6,7 @@ import ApplicationStepNavbar from './ApplicationStepNavbar';
 import ClientDetailsStep from './form-steps/ClientDetailsStep';
 import PetDetailsStep from './form-steps/PetDetailsStep';
 import ProductDetailsStep from './form-steps/ProductDetailsStep';
-import { ApplicationFormData, ClientDetails, PetDetails, ProductDetails } from '@/types/formData';
+import { ApplicationFormData } from '@/types/formData';
 
 const applicationSteps = [
   { id: 1, name: 'Client Details' },
@@ -77,6 +77,8 @@ const NewApplicationForm: React.FC = () => {
       paymentFrequency: '',
       startDate: '',
       coverageLength: '',
+      selectedAddOns: [],
+      donationPercentage: 0
     },
   });
 
@@ -171,10 +173,10 @@ const NewApplicationForm: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 overflow-hidden">
+    <div className="flex flex-col h-screen bg-gray-50">
       <ApplicationStepNavbar currentStepId={currentStep} steps={applicationSteps} />
-      <div className="flex-1 py-8 px-4 h-full">
-        <div className="bg-white p-6 rounded-lg shadow-md max-w-6xl w-full mx-auto flex flex-col h-full overflow-y-auto">
+      <div className="flex-1 py-8 px-4 overflow-y-auto">
+        <div className="bg-white p-6 rounded-lg shadow-md max-w-6xl w-full mx-auto flex flex-col min-h-[calc(100vh-160px)]"> {/* Adjusted min-h to consider navbar + padding */}
           {isSubmitting ? (
             <div className="flex items-center justify-center h-full text-lg text-[#8cc63f]">
               <p>Submitting your application, please wait...</p>

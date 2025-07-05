@@ -48,16 +48,53 @@ export interface PetDetails {
   lastVetVisitDate: string;
 }
 
-// Product Details Interface
+// Interface for a single selected add-on
+export interface SelectedAddOn {
+  id: string; // Unique identifier for the add-on
+  name: string;
+  price: number;
+  type: 'one-time' | 'annual';
+}
+
+// Product Details Interface - UPDATED
 export interface ProductDetails {
-  productName: string; 
-  coverageType: string; 
-  coverageAmount: string; 
-  deductible: string; 
-  reimbursementRate: string; 
-  paymentFrequency: string; 
-  startDate: string; 
-  coverageLength: string; 
+  productName: string;
+  coverageType: string; // Could be 'Basic', 'Premium', etc., or just derived
+  coverageAmount: string; // e.g., '₱20,000'
+  deductible: string;     // e.g., '₱1,000'
+  reimbursementRate: string; // e.g., '80%'
+  paymentFrequency: string; // 'Annually' or 'Monthly'
+  startDate: string;      //YYYY-MM-DD
+  coverageLength: string; // e.g., '1 Year'
+  selectedAddOns: SelectedAddOn[]; // NEW: Array to store selected add-ons
+  donationPercentage: number; // NEW: 0, 1, 2, 3, 5 (as a percentage, e.g., 2 for 2%)
+}
+
+// Interface for Add-on Definitions (used internally in ProductDetailsStep.tsx)
+export interface AddOnDefinition {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  type: 'one-time' | 'annual'; // Is it a one-time charge or adds to annual premium?
+  availableFor: string[]; // Which base products can this add-on be selected for?
+}
+
+// This interface is specific to the productOptions array in ProductDetailsStep
+export interface ProductOption {
+  name: string;
+  description: string;
+  premiumRange: string;
+  coverageRange: string;
+  details: string[]; 
+  iconKey: string;
+  coverageOptions?: string[];
+  deductibleOptions?: string[];
+  reimbursementOptions?: string[];
+  paymentFreqOptions?: string[];
+  fullDetails: {
+    [key: string]: string[]; // For accordion content, e.g., 'Key Benefits': ['...']
+  };
 }
 
 // Define the overall ApplicationFormData interface to include all steps
