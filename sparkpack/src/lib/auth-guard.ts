@@ -1,26 +1,21 @@
-import { getServerSession } from "next-auth/next";
+import { getToken } from "next-auth/jwt";
 import { NextRequest, NextResponse } from "next/server";
-import { authOptions } from "./auth";
 
-export async function withAuth(
+export function withAuth(
   handler: (req: NextRequest, userId: string, userRole: string) => Promise<NextResponse>,
   requiredRole?: string
 ) {
-  return async (req: NextRequest) => {
-    const session = await getServerSession(authOptions);
+  return async (req: NextRequest): Promise<NextResponse> => {
+    const token = await getToken({ req });
 
-    if (!session || !session.user) {
+    if (!token || !token.sub || !token.role) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (requiredRole && session.user.role !== requiredRole) {
+    if (requiredRole && token.role !== requiredRole) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    if (!session.user.id || !session.user.role) {
-      return NextResponse.json({ error: "Invalid session data" }, { status: 400 });
-    }
-
-    return handler(req, session.user.id, session.user.role);
+    return handler(req, token.sub, token.role as string);
   };
 }

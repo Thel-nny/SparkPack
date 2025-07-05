@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -7,8 +7,9 @@ import { Spinner } from "@/components/ui/spinner";
 import { Eye, EyeOff } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import validator from "validator"; 
-import { signIn } from "next-auth/react"; 
+import validator from "validator";
+import { signIn } from "next-auth/react";
+import { getSession } from "next-auth/react";
 
 const MAX_LENGTH = {
   email: 255,
@@ -53,33 +54,45 @@ export default function Login() {
     if (!validateForm()) return;
 
     setIsLoading(true);
-    setErrors(prev => ({ ...prev, submit: "" }));
+    setErrors((prev) => ({ ...prev, submit: "" }));
 
     const result = await signIn("credentials", {
       redirect: false,
       email,
       password,
-      callbackUrl
+      callbackUrl,
     });
 
     if (result?.error) {
       console.error("Login error:", result.error);
 
       let submitMsg = "An error occurred during login.";
-      if (result.error.includes("Email not found") || result.error.includes("CredentialsSignin")) {
+      if (
+        result.error.includes("Email not found") ||
+        result.error.includes("CredentialsSignin")
+      ) {
         submitMsg = "Email not found. Please register first.";
       } else if (result.error.includes("Invalid email or password")) {
         submitMsg = "Invalid email or password.";
-      } else if (result.error.includes("Please verify your email before logging in")) {
+      } else if (
+        result.error.includes("Please verify your email before logging in")
+      ) {
         submitMsg = "Please verify your email before logging in.";
       }
 
-      setErrors(prev => ({ ...prev, submit: submitMsg }));
+      setErrors((prev) => ({ ...prev, submit: submitMsg }));
       setIsLoading(false);
       return;
     }
 
-    router.push(result?.url || callbackUrl);
+    const session = await getSession();
+    const userRole = session?.user?.role;
+
+    if (userRole === "ADMIN") {
+      router.push("/advisor/dashboard");
+    } else {
+      router.push("/");
+    }
     setIsLoading(false);
   };
 
@@ -87,60 +100,125 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-[#f5f7f8] p-2 md:p-4">
       <div className="z-10 w-full max-w-md p-6 md:px-8 lg:px-10 rounded-lg bg-white bg-opacity-95 border-2 border-gray-400 shadow-md">
         <div className="flex flex-col items-center mb-2 md:mb-4">
-          <Image src="/Furrest_Logo-04.svg" width={120} height={120} alt="Furrest logo" className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32" />
+          <Image
+            src="/Furrest_Logo-04.svg"
+            width={120}
+            height={120}
+            alt="Furrest logo"
+            className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32"
+          />
           <p className="text-base md:text-lg font-semibold text-[#7eb238]">
             SparkPack
           </p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-800 mb-1">Email</label>
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-800 mb-1"
+            >
+              Email
+            </label>
             <Input
               id="email"
               type="email"
               value={email}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setEmail(e.target.value)
+              }
               placeholder="Enter your email"
               maxLength={MAX_LENGTH.email}
-              className="w-full bg-white border-gray-400 text-gray-800 placeholder-gray-600 pr-10" />
-            {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+              className="w-full bg-white border-gray-400 text-gray-800 placeholder-gray-600 pr-10"
+            />
+            {errors.email && (
+              <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+            )}
           </div>
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-800 mb-1">Password</label>
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-800 mb-1"
+            >
+              Password
+            </label>
             <div className="relative">
               <Input
                 id="password"
                 type={showPassword ? "text" : "password"}
                 value={password}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setPassword(e.target.value)
+                }
                 placeholder="Enter your password"
                 maxLength={MAX_LENGTH.password}
                 className="w-full bg-white border-gray-400 text-gray-800 placeholder-gray-600 pr-10"
               />
-              <button type="button" onClick={() => setShowPassword(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300">
-                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300"
+              >
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
               </button>
             </div>
-            {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+            {errors.password && (
+              <p className="text-red-500 text-xs mt-1">{errors.password}</p>
+            )}
           </div>
           <div className="flex justify-between items-center">
-            <a href="/auth/reset-password" className="text-sm text-[#8cc63f] hover:underline">Forgot Password?</a>
+            <a
+              href="/auth/reset-password"
+              className="text-sm text-[#8cc63f] hover:underline"
+            >
+              Forgot Password?
+            </a>
           </div>
           <div>
-            <Button type="submit" disabled={isLoading} className="w-full bg-[#8cc63f] text-black hover:bg-[#7eb238]">
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-[#8cc63f] text-black hover:bg-[#7eb238]"
+            >
               <div className="flex items-center justify-center gap-2 text-white">
                 {isLoading && <Spinner size="small" />}
                 <span>{isLoading ? "Logging in..." : "Log In"}</span>
               </div>
             </Button>
-            {errors.submit && <p className="text-red-500 text-xs mt-1">{errors.submit}</p>}
+            {errors.submit && (
+              <p className="text-red-500 text-xs mt-1">{errors.submit}</p>
+            )}
           </div>
         </form>
         <div className="mt-4 text-center">
-          <p className="text-sm text-gray-500">Don&apos;t have an account? <a href={`/auth/register`} className="text-[#8cc63f] hover:underline">Register here</a></p>
+          <p className="text-sm text-gray-500">
+            Don&apos;t have an account?{" "}
+            <a
+              href={`/auth/register`}
+              className="text-[#8cc63f] hover:underline"
+            >
+              Register here
+            </a>
+          </p>
         </div>
         <div className="mt-6 text-center text-xs text-gray-500">
-          <a href="mailto:partnerships.iloilo@sparkpack.org" className="hover:underline">Help</a> · <a href="/privacy-policy" className="ml-2 hover:underline">Privacy Policy</a> · <a href="/terms-and-conditions" className="ml-2 hover:underline">Terms and Conditions</a>
+          <a
+            href="mailto:partnerships.iloilo@sparkpack.org"
+            className="hover:underline"
+          >
+            Help
+          </a>{" "}
+          ·{" "}
+          <a href="/privacy-policy" className="ml-2 hover:underline">
+            Privacy Policy
+          </a>{" "}
+          ·{" "}
+          <a href="/terms-and-conditions" className="ml-2 hover:underline">
+            Terms and Conditions
+          </a>
         </div>
       </div>
     </div>

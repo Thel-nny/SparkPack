@@ -1,154 +1,146 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { withAuth } from "@/lib/auth-guard";
-import { UserCreateInput } from "@/types";
 
-export const GET = withAuth(async (req: NextRequest, userId: string, userRole: string) => {
-  try {
-    const { searchParams } = new URL(req.url);
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '10');
-    const skip = (page - 1) * limit;
+export async function GET(req: NextRequest) {
+  return await (await withAuth(async (req: NextRequest, userId: string, userRole: string) => {
+    try {
+      const url = new URL(req.url);
+      const pathSegments = url.pathname.split('/');
+      const targetUserId = pathSegments[pathSegments.length - 1];
 
-    if (userRole !== 'ADMIN') {
-      // Regular users can only see their own profile
+      // Users can only access their own data unless they're admin
+      if (userRole !== 'ADMIN' && userId !== targetUserId) {
+        return NextResponse.json(
+          { success: false, error: "Forbidden" },
+          { status: 403 }
+        );
+      }
+
       const user = await prisma.user.findUnique({
-        where: { id: userId },
+        where: { id: targetUserId },
+        include: {
+          pets: {
+            include: {
+              applications: {
+                include: {
+                  claims: true,
+                  payments: true,
+                },
+              },
+            },
+          },
+          applications: {
+            include: {
+              pet: true,
+              claims: true,
+              payments: true,
+            },
+          },
+        },
+      });
+
+      if (!user) {
+        return NextResponse.json(
+          { success: false, error: "User not found" },
+          { status: 404 }
+        );
+      }
+
+      return NextResponse.json({
+        success: true,
+        data: user,
+      });
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      return NextResponse.json(
+        { success: false, error: "Internal server error" },
+        { status: 500 }
+      );
+    }
+  }))(req);
+}
+
+export async function PUT(req: NextRequest) {
+  return await (await withAuth(async (req: NextRequest, userId: string, userRole: string) => {
+    try {
+      const url = new URL(req.url);
+      const pathSegments = url.pathname.split('/');
+      const targetUserId = pathSegments[pathSegments.length - 1];
+
+      // Users can only update their own data unless they're admin
+      if (userRole !== 'ADMIN' && userId !== targetUserId) {
+        return NextResponse.json(
+          { success: false, error: "Forbidden" },
+          { status: 403 }
+        );
+      }
+
+      const body = await req.json();
+
+      const user = await prisma.user.update({
+        where: { id: targetUserId },
+        data: {
+          firstName: body.firstName,
+          lastName: body.lastName,
+          phoneNum: body.phone,
+          ...(userRole === 'ADMIN' && { role: body.role }),
+        },
         select: {
           id: true,
           email: true,
           firstName: true,
           lastName: true,
-          phone: true,
-          address: true,
-          Country: true,
-          City: true,
-          Pronvince: true,
-          PostalCode: true,
+          phoneNum: true,
           role: true,
-          createdAt: true,
+          updatedAt: true,
         },
       });
 
       return NextResponse.json({
         success: true,
         data: user,
+        message: "User updated successfully",
       });
-    }
-
-    // Admin can see all users
-    const users = await prisma.user.findMany({
-      skip,
-      take: limit,
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        phone: true,
-        address: true,
-        Country: true,
-        City: true,
-        Pronvince: true,
-        PostalCode: true,
-        role: true,
-        createdAt: true,
-        _count: {
-          select: {
-            pets: true,
-            applications: true,
-          },
-        },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
-
-    const total = await prisma.user.count();
-
-    return NextResponse.json({
-      success: true,
-      data: {
-        users,
-        pagination: {
-          page,
-          limit,
-          total,
-          pages: Math.ceil(total / limit),
-        },
-      },
-    });
-  } catch (error) {
-    console.error("Error fetching users:", error);
-    return NextResponse.json(
-      { success: false, error: "Internal server error" },
-      { status: 500 }
-    );
-  }
-});
-
-export const POST = withAuth(async (req: NextRequest, userId: string, userRole: string) => {
-  try {
-    const body: UserCreateInput = await req.json();
-
-    // Validate required fields
-    if (!body.email) {
+    } catch (error) {
+      console.error("Error updating user:", error);
       return NextResponse.json(
-        { success: false, error: "Email is required" },
-        { status: 400 }
+        { success: false, error: "Internal server error" },
+        { status: 500 }
       );
     }
+  }))(req);
+}
 
-    // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email: body.email },
-    });
+export async function DELETE(req: NextRequest) {
+  return await (await (withAuth(async (req: NextRequest, userId: string, userRole: string) => {
+    try {
+      const url = new URL(req.url);
+      const pathSegments = url.pathname.split('/');
+      const targetUserId = pathSegments[pathSegments.length - 1];
 
-    if (existingUser) {
+      // Only admin can delete users
+      if (userRole !== 'ADMIN') {
+        return NextResponse.json(
+          { success: false, error: "Forbidden" },
+          { status: 403 }
+        );
+      }
+
+      await prisma.user.delete({
+        where: { id: targetUserId },
+      });
+
+      return NextResponse.json({
+        success: true,
+        message: "User deleted successfully",
+      });
+    } catch (error) {
+      console.error("Error deleting user:", error);
       return NextResponse.json(
-        { success: false, error: "User already exists" },
-        { status: 400 }
+        { success: false, error: "Internal server error" },
+        { status: 500 }
       );
     }
-
-    const user = await prisma.user.create({
-  data: {
-    email: body.email,
-    firstName: body.firstName,
-    lastName: body.lastName,
-    phone: body.phone,
-    address: body.address,
-    Country: body.Country,
-    City: body.City,
-    Pronvince: body.Pronvince,
-    PostalCode: body.PostalCode ?? 0,
-    role: userRole === 'ADMIN' ? 'CUSTOMER' : 'CUSTOMER',
-  },
-  select: {
-    id: true,
-    email: true,
-    firstName: true,
-    lastName: true,
-    phone: true,
-    address: true,
-    Country: true,
-    City: true,
-    Pronvince: true,
-    PostalCode: true,
-    role: true,
-    createdAt: true,
-  },
-});
-
-    return NextResponse.json({
-      success: true,
-      data: user,
-      message: "User created successfully",
-    });
-  } catch (error) {
-    console.error("Error creating user:", error);
-    return NextResponse.json(
-      { success: false, error: "Internal server error" },
-      { status: 500 }
-    );
-  }
-});
+  })))(req);
+}

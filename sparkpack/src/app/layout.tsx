@@ -1,15 +1,15 @@
-"use client";
-
 import "./globals.css"; // Your global styles
 import { SessionProvider } from "next-auth/react";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/authOptions";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
-  session,
 }: Readonly<{
   children: React.ReactNode;
-  session?: any;
 }>) {
+  const session = await getServerSession(authOptions);
+
   return (
     <html lang="en">
       <body>

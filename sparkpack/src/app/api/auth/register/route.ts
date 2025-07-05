@@ -4,10 +4,14 @@ import bcrypt from "bcrypt";
 
 export async function POST(req: NextRequest) {
   try {
-    const { username, email, password } = await req.json();
+    const { username, email, password, role, phoneNum } = await req.json();
 
-    if (!username || !email || !password) {
+    if (!username || !email || !password || !role) {
       return NextResponse.json({ error: "All fields are required." }, { status: 400 });
+    }
+
+    if (role !== "CUSTOMER" && role !== "ADMIN") {
+      return NextResponse.json({ error: "Invalid role." }, { status: 400 });
     }
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
@@ -19,10 +23,11 @@ export async function POST(req: NextRequest) {
 
     await prisma.user.create({
       data: {
-        firstName: username, // or use 'username' if that's your field
+        firstName: username,
         email,
+        phoneNum,
         password: hashedPassword,
-        PostalCode: 0, // Provide a default or required value here
+        role,
       },
     });
 

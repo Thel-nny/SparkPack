@@ -8,10 +8,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum UserRole {
-  ADMIN
-  CUSTOMER
-}
 
 enum ApplicationStatus {
   ADVISOR_DECLERATION_PENDING
@@ -24,6 +20,11 @@ enum PlanType {
   LEGACY_INSURANCE
   MEDICARE_AND_LEGACY_INSURANCE
   SINGLE_PRODUCT
+}
+
+enum UserRole {
+  ADMIN
+  CUSTOMER
 }
 
 enum ClaimStatus {
@@ -43,15 +44,10 @@ model User {
   id        String   @id @default(uuid())
   email     String   @unique
   password  String?
-  role      UserRole @default(CUSTOMER)
   firstName String?
   lastName  String?
-  phone     String?
-  address   String?
-  Country String?
-  City String?
-  Pronvince String?
-  PostalCode Float
+  phoneNum  String?
+  role UserRole @default(CUSTOMER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

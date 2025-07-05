@@ -27,6 +27,7 @@ export async function POST(req: NextRequest) {
     // You can set a session/cookie here if you want, or just return user info
     return NextResponse.json({
       message: "Login successful.",
+      role: user.role,
       user: {
         id: user.id,
         firstName: user.firstName,

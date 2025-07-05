@@ -117,13 +117,34 @@ export default function Register() {
     setErrors(prev => ({ ...prev, submit: "" }));
 
     try {
-      console.log("Attempting to register with:", { firstName, lastName, phoneNumber, email, password, isPolicyholder, isAdvisor });
 
+      let role = "";
+      if (isAdvisor) role = "ADMIN";
+      else if (isPolicyholder) role = "CUSTOMER";
+
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: firstName,
+          email,
+          password,
+          role, // Send role to backend
+        }),
+      });
+      
+      const data = await res.json();
+          if (!res.ok) {
+            setErrors(prev => ({ ...prev, submit: data.error || "Registration failed." }));
+            setIsLoading(false);
+            return;
+          }
+      
       await new Promise(resolve => setTimeout(resolve, 1500));
-
       console.log("Registration simulated successfully!");
       window.location.href = "/auth/login?registered=true";
 
+      console.log("Attempting to register with:", { firstName, lastName, phoneNumber, email, password, isPolicyholder, isAdvisor });
     } catch (error: any) {
       console.error("Simulated registration error:", error);
       let submitMsg = "A simulated error occurred during registration.";
