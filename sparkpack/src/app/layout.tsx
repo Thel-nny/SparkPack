@@ -1,7 +1,7 @@
 import "./globals.css"; // Your global styles
-import { SessionProvider } from "next-auth/react";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/authOptions";
+import SessionProviderWrapper from "./SessionProviderWrapper";
 
 export default async function RootLayout({
   children,
@@ -13,9 +13,9 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body>
-        <SessionProvider session={session}>
+        <SessionProviderWrapper session={session}>
           {children} {/* This will render either (main) layout or auth pages directly */}
-        </SessionProvider>
+        </SessionProviderWrapper>
       </body>
     </html>
   );

@@ -71,7 +71,12 @@ export async function PUT(req: NextRequest) {
           ...(body.deductible && { deductible: body.deductible }),
           ...(body.coverageLimit && { coverageLimit: body.coverageLimit }),
           ...(body.endDate && { endDate: body.endDate }),
-          ...(userRole === "ADMIN" && body.status && { status: body.status }),
+          ...(userRole === "ADMIN" && body.status && {
+            status:
+              body.status === "SUBMITTED"
+                ? "SUBMITTED"
+                : body.status,
+          }),
         },
         include: {
           customer: {

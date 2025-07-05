@@ -13,6 +13,7 @@ enum ApplicationStatus {
   ADVISOR_DECLERATION_PENDING
   SIGNATURE_PROCESS_PENDING
   SIGNATURE_IN_PROCESS
+  SUBMITTED
 }
 
 enum PlanType {
@@ -55,6 +56,23 @@ model User {
   applications Application[]
   accounts     Account[]
   sessions     Session[]
+
+  clientDetails ClientDetails?
+}
+
+model ClientDetails {
+  id                 String   @id @default(uuid())
+  userId             String   @unique
+  streetAddress      String
+  country            String
+  city               String
+  province           String
+  postalCode         String
+  declarationAccuracy Boolean
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Pet {

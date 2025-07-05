@@ -1,4 +1,3 @@
-// sparkpack/src/components/advisor/applications/NewApplicationForm.tsx
 "use client";
 
 import React, { useState } from 'react';
@@ -6,7 +5,9 @@ import ApplicationStepNavbar from './ApplicationStepNavbar';
 import ClientDetailsStep from './form-steps/ClientDetailsStep';
 import PetDetailsStep from './form-steps/PetDetailsStep';
 import ProductDetailsStep from './form-steps/ProductDetailsStep'; // Import the new step
-import { ApplicationFormData, ClientDetails, PetDetails, ProductDetails } from '@/types/formData'; // Import all interfaces
+import { ApplicationFormData } from '@/types/formData'; // Import all interfaces
+import { createApplication, updateApplication } from '@/lib/api/applications';
+import { useRouter } from 'next/navigation';
 
 const NewApplicationForm: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -102,10 +103,38 @@ const NewApplicationForm: React.FC = () => {
   };
 
   // The handleSubmit function would typically be called on the final step's "Next" or a dedicated "Submit" button
-  const handleSubmit = () => {
-    console.log('Final Form Submission:', formData);
-    alert('Form Submitted! Check console for data.');
-    // In a real application, you would send this formData to your API
+  const router = useRouter();
+
+  const handleSubmit = async () => {
+    try {
+      // Prepare data for API
+      const applicationData = {
+        customer: formData.client,
+        pet: formData.pet,
+        product: formData.product,
+        // Map fields as needed to match backend schema
+        petId: '', // This should be set after pet creation or selection
+        policyNumber: formData.product.productName, // Example mapping
+        planType: formData.product.coverageType, // Example mapping
+        premiumAmount: parseFloat(formData.product.coverageAmount) || 0,
+        deductible: parseFloat(formData.product.deductible) || 0,
+        coverageLimit: parseFloat(formData.product.coverageAmount) || 0,
+        startDate: formData.product.startDate,
+        endDate: '', // Optional
+      };
+
+      // Call backend API to create application
+      const response = await createApplication(applicationData);
+
+      // After successful creation, update status to SUBMITTED
+      await updateApplication(response.data.id, { status: 'SUBMITTED' });
+
+      alert('Application submitted successfully!');
+      router.push('/advisor/applications/submitted'); // Redirect to submitted applications page
+    } catch (error) {
+      console.error('Error submitting application:', error);
+      alert('Failed to submit application. Please try again.');
+    }
   };
 
   const renderStepContent = () => {
