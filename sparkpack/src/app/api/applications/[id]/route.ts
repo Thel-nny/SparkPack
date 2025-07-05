@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { withAuth } from "@/lib/auth-guard";
+import bcrypt from "bcryptjs";
+import { sendEmail } from "@/lib/email";
 
 export async function GET(req: NextRequest) {
   return (await withAuth(async (req: NextRequest, userId: string, userRole: string) => {
@@ -46,6 +48,15 @@ export async function GET(req: NextRequest) {
   }))(req);
 }
 
+function generateFakePassword(length = 12) {
+  const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+";
+  let password = "";
+  for (let i = 0; i < length; i++) {
+    password += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return password;
+}
+
 export async function PUT(req: NextRequest) {
   return (await withAuth(async (req: NextRequest, userId: string, userRole: string) => {
     try {
@@ -83,6 +94,45 @@ export async function PUT(req: NextRequest) {
         updateData.status = body.status === "SUBMITTED" ? "SUBMITTED" : body.status;
       }
 
+      // If status is being set to SUBMITTED, generate password and send email
+      let tempPassword: string | null = null;
+      if (updateData.status === "SUBMITTED") {
+        tempPassword = generateFakePassword();
+
+        // Hash the password
+        const hashedPassword = await bcrypt.hash(tempPassword, 10);
+
+        // Update user's password in the database
+        await prisma.user.update({
+          where: { id: existingApplication.customerId },
+          data: { password: hashedPassword },
+        });
+
+        // Generate email verification token
+        const crypto = await import("crypto");
+        const verificationToken = crypto.randomBytes(32).toString("hex");
+        const expires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours expiry
+
+        await prisma.verificationToken.create({
+          data: {
+            identifier: existingApplication.customerId,
+            token: verificationToken,
+            expires,
+          },
+        });
+
+        // Send email with temporary password and verification link
+        const customer = await prisma.user.findUnique({
+          where: { id: existingApplication.customerId },
+        });
+
+        if (customer && customer.email) {
+          const verificationUrl = `${process.env.NEXTAUTH_URL}/verify-email?token=${verificationToken}&id=${customer.id}`;
+          const emailText = `Dear ${customer.firstName || "Customer"},\n\nYour application has been submitted successfully. Your temporary password is: ${tempPassword}\n\nPlease verify your email by clicking the following link:\n${verificationUrl}\n\nPlease log in and change your password as soon as possible.\n\nBest regards,\nYour Company`;
+          await sendEmail(customer.email, "Your Temporary Password and Email Verification", emailText);
+        }
+      }
+
       const application = await prisma.application.update({
         where: { id: applicationId },
         data: updateData,
@@ -101,7 +151,9 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({
         success: true,
         data: application,
-        message: "Application updated successfully",
+        message: tempPassword
+          ? "Application updated successfully and temporary password sent via email"
+          : "Application updated successfully",
       });
     } catch (error: any) {
       console.error("Error updating application:", error.message, error.stack);
