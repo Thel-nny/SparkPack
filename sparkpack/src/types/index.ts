@@ -35,14 +35,80 @@ export interface PetCreateInput {
 }
 
 export interface ApplicationCreateInput {
-  petId: string;
-  policyNumber: string;
-  planType: 'MEDICAL_CARE_INSURANCE' | 'LEGACY_INSURANCE' | 'MEDICARE_AND_LEGACY_INSURANCE' | 'SINGLE_PRODUCT';
-  premiumAmount: number;
-  deductible: number;
-  coverageLimit?: number;
-  startDate: Date;
-  endDate?: Date;
+  client: {
+    title?: string;
+    firstName: string;
+    middleName?: string;
+    lastName: string;
+    dob: string;
+    pob: string;
+    gender: string;
+    phoneNumber: string;
+    email: string;
+    streetAddress: string;
+    country: string;
+    city: string;
+    province: string;
+    postalCode: string;
+    declarationAccuracy: boolean;
+  };
+  pet: {
+    petName: string;
+    dobOrAdoptionDate?: string;
+    estimatedAge?: string;
+    gender?: string;
+    species: 'DOG' | 'CAT' | 'OTHER';
+    otherSpecies?: string;
+    breed?: string;
+    otherBreed?: string;
+    microchipNumber?: string;
+    colorMarkings?: string;
+    spayedNeutered?: boolean | string;
+    vaccinationStatus?: 'UP_TO_DATE' | 'NOT_VACCINATED' | 'PARTIALLY_VACCINATED';
+    lifestyle?: string;
+    chronicIllness?: string;
+    chronicIllnessExplanation?: string;
+    surgeryHistory?: string;
+    surgeryHistoryExplanation?: string;
+    recurringConditions?: string;
+    recurringConditionsExplanation?: string;
+    onMedication?: string;
+    onMedicationExplanation?: string;
+    vetName?: string;
+    vetClinicName?: string;
+    clinicPhoneNumber?: string;
+    clinicAddress?: string;
+    lastVetVisitDate?: string;
+  };
+  product: {
+    productName: string;
+    coverageAmount: string;
+    deductible: string;
+    reimbursementRate: string;
+    paymentFrequency: string;
+    startDate: string;
+    coverageLength: string;
+    selectedAddOns: {
+      id: string;
+      name: string;
+      price: number;
+      type: string;
+    }[];
+    donationPercentage: number;
+  };
+  payment: {
+    paymentMethod: string;
+    cardNumber?: string;
+    cardName?: string;
+    expiryDate?: string;
+    cvv?: string;
+    bankName?: string;
+    accountNumber?: string;
+    accountName?: string;
+    gcashNumber?: string;
+    gcashName?: string;
+    transactionId?: string;
+  };
 }
 
 export interface ClaimCreateInput {

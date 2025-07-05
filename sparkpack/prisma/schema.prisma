@@ -8,7 +8,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 enum ApplicationStatus {
   ADVISOR_DECLERATION_PENDING
   SIGNATURE_PROCESS_PENDING
@@ -41,6 +40,12 @@ enum PetSpecies {
   OTHER
 }
 
+enum VacStatus {
+  UP_TO_DATE
+  NOT_VACCINATED
+  PARTIALLY_VACCINATED
+}
+
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
@@ -48,7 +53,7 @@ model User {
   firstName String?
   lastName  String?
   phoneNum  String?
-  role UserRole @default(CUSTOMER)
+  role      UserRole @default(CUSTOMER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -63,6 +68,15 @@ model User {
 model ClientDetails {
   id                 String   @id @default(uuid())
   userId             String   @unique
+  title              String?
+  firstName          String
+  middleName         String?
+  lastName           String
+  dob                DateTime
+  pob                String
+  gender             String
+  phoneNumber        String
+  email              String
   streetAddress      String
   country            String
   city               String
@@ -76,41 +90,74 @@ model ClientDetails {
 }
 
 model Pet {
-  id                String     @id @default(uuid())
-  ownerId           String
-  name              String
-  species           PetSpecies
-  breed             String?
-  dateOfBirth       DateTime?
-  gender            String?
-  weight            Float?
-  medicalConditions String[]
-  createdAt         DateTime   @default(now())
-  updatedAt         DateTime   @updatedAt
+  id                         String     @id @default(uuid())
+  ownerId                    String
+  petName                    String
+  dobOrAdoptionDate          DateTime?
+  estimatedAge               Int?
+  gender                     String?
+  species                    PetSpecies
+  otherSpecies               String?
+  breed                      String?
+  otherBreed                 String?
+  microchipNumber            String?
+  colorMarkings              String?
+  spayedNeutered             Boolean
+  vaccinationStatus          VacStatus
+  lifestyle                  String?
+  chronicIllness             String?
+  chronicIllnessExplanation  String?
+  surgeryHistory             String?
+  surgeryHistoryExplanation  String?
+  recurringConditions        String?
+  recurringConditionsExplanation String?
+  onMedication               String?
+  onMedicationExplanation    String?
+  vetName                    String?
+  vetClinicName              String?
+  clinicPhoneNumber          String?
+  clinicAddress              String?
+  lastVetVisitDate           DateTime?
+  createdAt                  DateTime   @default(now())
+  updatedAt                  DateTime   @updatedAt
 
   owner        User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   applications Application[]
 }
 
 model Application {
-  id             String             @id @default(uuid())
-  customerId     String
-  petId          String
-  policyNumber   String             @unique
-  planType       PlanType
-  premiumAmount  Float
-  deductible     Float
-  coverageLimit  Float?
-  status         ApplicationStatus @default(ADVISOR_DECLERATION_PENDING)
-  startDate      DateTime
-  endDate        DateTime?
-  createdAt      DateTime           @default(now())
-  updatedAt      DateTime           @updatedAt
+  id                 String             @id @default(uuid())
+  customerId         String
+  petId              String
+  policyNumber       String             @unique @default(uuid())
+  planType           PlanType
+  reimbursement      Float
+  deductible         Float
+  coverageAmount     Float?
+  status             ApplicationStatus @default(ADVISOR_DECLERATION_PENDING)
+  startDate          DateTime
+  endDate            DateTime?
+  coverageLength     Int?
+  donationPercentage Float?
+  paymentFrequency   String?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
 
   customer User     @relation(fields: [customerId], references: [id], onDelete: Cascade)
   pet      Pet      @relation(fields: [petId], references: [id], onDelete: Cascade)
   claims   Claim[]
   payments Payment[]
+  selectedAddOns SelectedAddOn[]
+}
+
+model SelectedAddOn {
+  id            String      @id @default(uuid())
+  applicationId String
+  name          String
+  price         Float
+  type          String
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
 }
 
 model Claim {
@@ -138,6 +185,15 @@ model Payment {
   amount         Float
   paymentDate    DateTime
   paymentMethod  String?
+  cardNumber     String?
+  cardName       String?
+  expiryDate     String?
+  cvv            String?
+  bankName       String?
+  accountNumber  String?
+  accountName    String?
+  gcashNumber    String?
+  gcashName      String?
   transactionId  String?
   status         String   @default("COMPLETED")
   createdAt      DateTime @default(now())

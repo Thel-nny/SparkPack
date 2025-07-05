@@ -75,7 +75,7 @@ const NewApplicationForm: React.FC = () => {
     },
     product: {
       productName: '',
-      // coverageType: '', // REMOVED THIS LINE - IT WAS CAUSING THE ERROR
+      planType: '', // Added planType field for validation
       coverageAmount: '',
       deductible: '',
       reimbursementRate: '',
@@ -92,7 +92,6 @@ const NewApplicationForm: React.FC = () => {
       expiryDate: '',
       cvv: '',
     },
-    // No 'evidence' property here anymore.
   });
 
   const updateFormData = <T extends keyof ApplicationFormData>(field: T, data: Partial<ApplicationFormData[T]>) => {
@@ -119,23 +118,32 @@ const NewApplicationForm: React.FC = () => {
   const handleSubmit = async () => {
     console.log('Final Form Submission Attempt:', formData);
 
+    // Frontend validation for required product fields
+    if (!formData.product.productName) {
+      alert('Product Name is required.');
+      return;
+    }
+    if (!formData.product.planType) {
+      alert('Plan Type is required.');
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
       // Prepare data for API
+
+      // Sanitize deductible to remove currency symbols and commas before sending
+      const sanitizedProduct = {
+        ...formData.product,
+        deductible: formData.product.deductible.replace(/[^0-9.-]+/g, ''),
+      };
+
       const applicationData = {
-        customer: formData.client,
+        client: formData.client,
         pet: formData.pet,
-        product: formData.product,
+        product: sanitizedProduct,
         payment: formData.payment, // Include payment details in submission
-        // Map fields as needed to match backend schema
-        petId: '', // This should be set after pet creation or selection
-        policyNumber: formData.product.productName, // Example mapping
-        premiumAmount: parseFloat(formData.product.coverageAmount.replace(/[₱,]/g, '')) || 0, // Clean and parse
-        deductible: parseFloat(formData.product.deductible.replace(/[₱,]/g, '')) || 0, // Clean and parse
-        coverageLimit: parseFloat(formData.product.coverageAmount.replace(/[₱,]/g, '')) || 0, // Clean and parse
-        startDate: formData.product.startDate,
-        endDate: '', // Optional: calculate based on startDate and coverageLength
       };
 
       // Call backend API to create application

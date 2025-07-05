@@ -25,6 +25,7 @@ export interface PetDetails {
   petName: string;
   dobOrAdoptionDate: string;
   estimatedAge: string;
+  weight: string;
   gender: string;
   species: string;
   otherSpecies?: string;
@@ -61,6 +62,7 @@ export interface SelectedAddOn {
 // Product Details Interface 
 export interface ProductDetails {
   productName: string;
+  planType: string;  // Added planType property
   coverageAmount: string;
   deductible: string;
   reimbursementRate: string;

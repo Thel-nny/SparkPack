@@ -342,9 +342,27 @@ const ProductDetailsStep: React.FC<ProductDetailsStepProps> = ({ formData, onUpd
 
   const handleProductSelect = (productName: string) => {
     const selectedProduct = productOptions.find(p => p.name === productName);
+
+    // Map productName to planType enum value
+    let planType = '';
+    switch (productName) {
+      case 'Medical Care Insurance':
+        planType = 'MEDICAL_CARE_INSURANCE';
+        break;
+      case 'Legacy Insurance':
+        planType = 'LEGACY_INSURANCE';
+        break;
+      case 'Medicare and Legacy Insurance':
+        planType = 'MEDICARE_AND_LEGACY_INSURANCE';
+        break;
+      default:
+        planType = 'SINGLE_PRODUCT';
+    }
+
     setLocalFormData({
       ...localFormData,
       productName: productName,
+      planType: planType,
       coverageAmount: selectedProduct?.coverageOptions?.[0] || '',
       deductible: selectedProduct?.deductibleOptions?.[0] || '',
       reimbursementRate: selectedProduct?.reimbursementOptions?.[0] || '',
