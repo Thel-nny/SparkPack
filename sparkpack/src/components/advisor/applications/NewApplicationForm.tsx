@@ -7,6 +7,8 @@ import PetDetailsStep from './form-steps/PetDetailsStep';
 import ProductDetailsStep from './form-steps/ProductDetailsStep';
 import PaymentDetailsStep from './form-steps/PaymentDetailsStep';
 import { ApplicationFormData } from '@/types/formData';
+import { createApplication, updateApplication } from '@/lib/api/applications';
+import { useRouter } from 'next/navigation';
 
 const applicationSteps = [
   { id: 1, name: 'Client Details' },
@@ -121,7 +123,7 @@ const NewApplicationForm: React.FC = () => {
         // Map fields as needed to match backend schema
         petId: '', // This should be set after pet creation or selection
         policyNumber: formData.product.productName, // Example mapping
-        planType: formData.product.coverageType, // Example mapping
+        // planType: formData.product.coverageType, // Example mapping
         premiumAmount: parseFloat(formData.product.coverageAmount) || 0,
         deductible: parseFloat(formData.product.deductible) || 0,
         coverageLimit: parseFloat(formData.product.coverageAmount) || 0,
