@@ -57,11 +57,32 @@ export async function POST(req: NextRequest) {
 
     // If role is CUSTOMER, create ClientDetails record
     if (role === "CUSTOMER") {
-      const { streetAddress, country, city, province, postalCode, declarationAccuracy } = await req.json();
+      const {
+        firstName,
+        lastName,
+        dob,
+        pob,
+        gender,
+        phoneNumber,
+        email: clientEmail,
+        streetAddress,
+        country,
+        city,
+        province,
+        postalCode,
+        declarationAccuracy,
+      } = await req.json();
 
       await prisma.clientDetails.create({
         data: {
           userId: user.id,
+          firstName: firstName || '',
+          lastName: lastName || '',
+          dob: dob ? new Date(dob) : new Date('1970-01-01'),
+          pob: pob || '',
+          gender: gender || '',
+          phoneNumber: phoneNumber || '',
+          email: clientEmail || '',
           streetAddress: streetAddress || '',
           country: country || '',
           city: city || '',

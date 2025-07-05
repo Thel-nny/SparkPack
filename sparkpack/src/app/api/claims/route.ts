@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
               pet: {
                 select: {
                   id: true,
-                  name: true,
+                  petName: true,
                   species: true,
                   breed: true,
                 },
@@ -129,7 +129,7 @@ export async function POST(req: NextRequest) {
               pet: {
                 select: {
                   id: true,
-                  name: true,
+                  petName: true,
                   species: true,
                   breed: true,
                 },

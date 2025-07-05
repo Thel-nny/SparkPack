@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
               breed: true,
               dobOrAdoptionDate: true,
               gender: true,
-              weight: true,
+              weight: ,
               medicalConditions: true,
             },
           },

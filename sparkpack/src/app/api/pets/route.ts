@@ -1,7 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { withAuth } from "@/lib/auth-guard";
-import { PetCreateInput } from "@/types";
+import { PetDetails } from "@/types/formData";
+
+const PetSpecies = {
+  DOG: "DOG",
+  CAT: "CAT",
+  OTHER: "OTHER",
+} as const;
+
+type PetSpecies = typeof PetSpecies[keyof typeof PetSpecies];
 
 export async function GET(req: NextRequest) {
   return (await withAuth(async (req: NextRequest, userId: string, userRole: string) => {
@@ -63,12 +71,12 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   return await (await withAuth(async (req: NextRequest, userId: string, userRole: string) => {
     try {
-      const body: PetCreateInput = await req.json();
+      const body: PetDetails = await req.json();
 
       // Validate required fields
-      if (!body.name || !body.species) {
+      if (!body.petName || !body.species) {
         return NextResponse.json(
-          { success: false, error: "Name and species are required" },
+          { success: false, error: "Pet name and species are required" },
           { status: 400 }
         );
       }
@@ -76,13 +84,33 @@ export async function POST(req: NextRequest) {
       const pet = await prisma.pet.create({
         data: {
           ownerId: userId,
-          name: body.name,
-          species: body.species,
+          petName: body.petName,
+          species: PetSpecies[body.species.toUpperCase() as keyof typeof PetSpecies],
+          otherSpecies: body.otherSpecies,
           breed: body.breed,
-          dateOfBirth: body.dateOfBirth,
+          otherBreed: body.otherBreed,
+          dobOrAdoptionDate: body.dobOrAdoptionDate ? new Date(body.dobOrAdoptionDate) : null,
+          estimatedAge: body.estimatedAge ? parseInt(body.estimatedAge) : null,
           gender: body.gender,
-          weight: body.weight,
-          medicalConditions: body.medicalConditions || [],
+          weight: body.weight ? parseFloat(body.weight) : null,
+          microchipNumber: body.microchipNumber,
+          colorMarkings: body.colorMarkings,
+          spayedNeutered: body.spayedNeutered === 'Yes',
+          vaccinationStatus: body.vaccinationStatus as any,
+          lifestyle: body.lifestyle,
+          chronicIllness: body.chronicIllness,
+          chronicIllnessExplanation: body.chronicIllnessExplanation,
+          surgeryHistory: body.surgeryHistory,
+          surgeryHistoryExplanation: body.surgeryHistoryExplanation,
+          recurringConditions: body.recurringConditions,
+          recurringConditionsExplanation: body.recurringConditionsExplanation,
+          onMedication: body.onMedication,
+          onMedicationExplanation: body.onMedicationExplanation,
+          vetName: body.vetName,
+          vetClinicName: body.vetClinicName,
+          clinicPhoneNumber: body.clinicPhoneNumber,
+          clinicAddress: body.clinicAddress,
+          lastVetVisitDate: body.lastVetVisitDate ? new Date(body.lastVetVisitDate) : null,
         },
         include: {
           owner: {

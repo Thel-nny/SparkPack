@@ -41,7 +41,7 @@ export async function PUT(req: NextRequest) {
               pet: {
                 select: {
                   id: true,
-                  name: true,
+                  petName: true,
                   species: true,
                   breed: true,
                 },

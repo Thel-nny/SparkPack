@@ -99,6 +99,7 @@ model Pet {
   species                    PetSpecies
   otherSpecies               String?
   breed                      String?
+  weight                     Float?
   otherBreed                 String?
   microchipNumber            String?
   colorMarkings              String?

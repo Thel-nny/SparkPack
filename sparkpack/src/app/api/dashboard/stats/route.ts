@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
             orderBy: { createdAt: 'desc' },
             include: {
               customer: { select: { firstName: true, lastName: true } },
-              pet: { select: { name: true, species: true } },
+              pet: { select: { petName: true, species: true } },
             },
           }),
           prisma.claim.findMany({
@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
               application: {
                 include: {
                   customer: { select: { firstName: true, lastName: true } },
-                  pet: { select: { name: true, species: true } },
+                  pet: { select: { petName: true, species: true } },
                 },
               },
             },
@@ -84,7 +84,7 @@ export async function GET(req: NextRequest) {
             include: {
               application: {
                 include: {
-                  pet: { select: { name: true, species: true } },
+                  pet: { select: { petName: true, species: true } },
                 },
               },
             },
