@@ -21,8 +21,8 @@ export async function GET(req: NextRequest) {
               breed: true,
               dobOrAdoptionDate: true,
               gender: true,
-              weight: ,
-              medicalConditions: true,
+              weight: true,
+              // medicalConditions: true, // Removed because it does not exist in PetSelect type
             },
           },
           claims: { orderBy: { createdAt: "desc" } },
