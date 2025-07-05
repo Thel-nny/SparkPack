@@ -5,11 +5,22 @@ import React, { useState } from 'react';
 import ApplicationStepNavbar from './ApplicationStepNavbar';
 import ClientDetailsStep from './form-steps/ClientDetailsStep';
 import PetDetailsStep from './form-steps/PetDetailsStep';
-import ProductDetailsStep from './form-steps/ProductDetailsStep'; // Import the new step
-import { ApplicationFormData, ClientDetails, PetDetails, ProductDetails } from '@/types/formData'; // Import all interfaces
+import ProductDetailsStep from './form-steps/ProductDetailsStep';
+import { ApplicationFormData, ClientDetails, PetDetails, ProductDetails } from '@/types/formData';
+
+const applicationSteps = [
+  { id: 1, name: 'Client Details' },
+  { id: 2, name: 'Pet Details' },
+  { id: 3, name: 'Product Details' },
+  { id: 4, name: 'Payment Details' },
+  { id: 5, name: 'Evidence' },
+  { id: 6, name: 'Summary' },
+  { id: 7, name: 'Sign & Submit' },
+];
 
 const NewApplicationForm: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<ApplicationFormData>({
     client: {
       title: '',
@@ -57,7 +68,6 @@ const NewApplicationForm: React.FC = () => {
       clinicAddress: '',
       lastVetVisitDate: '',
     },
-    // Initialize product details
     product: {
       productName: '',
       coverageType: '',
@@ -66,11 +76,10 @@ const NewApplicationForm: React.FC = () => {
       reimbursementRate: '',
       paymentFrequency: '',
       startDate: '',
-      coverageLength: '', // Initialize new field
+      coverageLength: '',
     },
   });
 
-  // Generic update function for any form section
   const updateFormData = <T extends keyof ApplicationFormData>(field: T, data: Partial<ApplicationFormData[T]>) => {
     setFormData((prevData) => ({
       ...prevData,
@@ -79,19 +88,10 @@ const NewApplicationForm: React.FC = () => {
   };
 
   const handleNextStep = () => {
-    if (currentStep === 1) {
-      console.log("Client Details submitted (check console). Proceeding to Pet Details.", formData.client);
-    } else if (currentStep === 2) {
-      console.log("Pet Details submitted (check console). Proceeding to Product Details.", formData.pet);
-    } else if (currentStep === 3) {
-      console.log("Product Details submitted (check console). This is the end of the form for now!");
-      // In a real app, you might trigger the final submission here or move to a summary step
-      alert("Product Details submitted (check console). This is the end of the form for now!");
-    }
-
-    // Only proceed if not on the last step (which is now 3)
-    if (currentStep < 3) { // Changed from 2 to 3
+    if (currentStep < 3) {
       setCurrentStep((prevStep) => prevStep + 1);
+    } else {
+      handleSubmit();
     }
   };
 
@@ -101,11 +101,22 @@ const NewApplicationForm: React.FC = () => {
     }
   };
 
-  // The handleSubmit function would typically be called on the final step's "Next" or a dedicated "Submit" button
-  const handleSubmit = () => {
-    console.log('Final Form Submission:', formData);
-    alert('Form Submitted! Check console for data.');
-    // In a real application, you would send this formData to your API
+  const handleSubmit = async () => {
+    console.log('Final Form Submission Attempt:', formData);
+
+    setIsSubmitting(true);
+
+    try {
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      console.log('Form Submitted Successfully:', formData);
+      alert('Application submitted successfully! Check console for data.');
+    } catch (error: any) {
+      console.error('Form submission error:', error);
+      alert(`Submission failed: ${error.message || 'An unknown error occurred.'}`);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const renderStepContent = () => {
@@ -127,7 +138,7 @@ const NewApplicationForm: React.FC = () => {
             onPrev={handlePrevStep}
           />
         );
-      case 3: // New case for Product Details
+      case 3:
         return (
           <ProductDetailsStep
             formData={formData.product}
@@ -136,6 +147,24 @@ const NewApplicationForm: React.FC = () => {
             onPrev={handlePrevStep}
           />
         );
+      case 4:
+      case 5:
+      case 6:
+      case 7:
+        return (
+          <div className="p-4 text-center text-blue-600">
+            <h3>Step {currentStep}: {applicationSteps.find(s => s.id === currentStep)?.name || 'Unknown Step'}</h3>
+            <p>This step is currently under construction. Please use the navigation to go back.</p>
+            <div className="flex justify-between mt-4">
+              <button
+                onClick={handlePrevStep}
+                className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded"
+              >
+                Previous Step
+              </button>
+            </div>
+          </div>
+        );
       default:
         return <div className="p-4 text-center text-red-500">Error: Invalid step.</div>;
     }
@@ -143,11 +172,16 @@ const NewApplicationForm: React.FC = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 overflow-hidden">
-      {/* Application Step Navbar is always visible at the top */}
-      <ApplicationStepNavbar currentStepId={currentStep} />
+      <ApplicationStepNavbar currentStepId={currentStep} steps={applicationSteps} />
       <div className="flex-1 py-8 px-4 h-full">
         <div className="bg-white p-6 rounded-lg shadow-md max-w-6xl w-full mx-auto flex flex-col h-full overflow-y-auto">
-          {renderStepContent()}
+          {isSubmitting ? (
+            <div className="flex items-center justify-center h-full text-lg text-[#8cc63f]">
+              <p>Submitting your application, please wait...</p>
+            </div>
+          ) : (
+            renderStepContent()
+          )}
         </div>
       </div>
     </div>

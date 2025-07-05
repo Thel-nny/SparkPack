@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { ProductDetails } from '@/types/formData';
 
 interface ProductDetailsStepProps {
@@ -13,13 +12,14 @@ interface ProductDetailsStepProps {
 }
 
 const ProductDetailsStep: React.FC<ProductDetailsStepProps> = ({ formData, onUpdate, onPrev, onNext }) => {
-  // Local state to manage form inputs for this step
+  // Local state to manage form inputs for this step (only productName now)
   const [localFormData, setLocalFormData] = useState<ProductDetails>(formData);
-  // State for internal sub-steps (1-indexed)
-  const [currentSubStep, setCurrentSubStep] = useState(1);
-  const totalSubSteps = 2; // Changed to 2 for the new sub-step
 
-  // Define product options based on the user's new requirements
+  // Effect to update localFormData when parent formData changes (e.g., on back navigation)
+  useEffect(() => {
+    setLocalFormData(formData);
+  }, [formData]);
+
   const productOptions = [
     {
       name: 'Medical Care Insurance',
@@ -31,7 +31,6 @@ const ProductDetailsStep: React.FC<ProductDetailsStepProps> = ({ formData, onUpd
         'Premium payment starts from ₱800 - ₱1,500 per year (monthly options available)',
         'Coverage up to ₱20,000 - ₱30,000',
       ],
-      coverageLengthOptions: ['1 year (renewable annually)'],
       icon: (
         <svg className="w-12 h-12 text-[#8cc63f] mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -48,7 +47,6 @@ const ProductDetailsStep: React.FC<ProductDetailsStepProps> = ({ formData, onUpd
         'Premium payment starts from ₱600 - ₱1,000 per year (monthly options available)',
         'Coverage up to ₱5,000 - ₱20,000'
       ],
-      coverageLengthOptions: ['1 year (renewable annually)'],
       icon: (
         <svg className="w-12 h-12 text-[#8cc63f] mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c1.657 0 3 .895 3 2s-1.343 2-3 2-3-.895-3-2 1.343-2 3-2z" />
@@ -66,7 +64,6 @@ const ProductDetailsStep: React.FC<ProductDetailsStepProps> = ({ formData, onUpd
         'Premium payment starts from ₱1,500 - ₱3,000+ per year (monthly options available, with potential discounts for combined coverage)',
         'Coverage up to ₱7,500 - ₱100,000+'
       ],
-      coverageLengthOptions: ['1 year (renewable annually)'],
       icon: (
         <svg className="w-12 h-12 text-[#8cc63f] mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -75,87 +72,49 @@ const ProductDetailsStep: React.FC<ProductDetailsStepProps> = ({ formData, onUpd
     },
   ];
 
-  // Get coverage length options based on selected product
-  const getCoverageLengthOptions = (productName: string) => {
-    const selectedProduct = productOptions.find(p => p.name === productName);
-    return selectedProduct ? selectedProduct.coverageLengthOptions : [];
-  };
-
-  /**
-   * Handles changes to input fields and updates the local form data state.
-   * @param e The change event from the input, select, or textarea element.
-   */
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setLocalFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  /**
-   * Handles product card selection.
-   * @param productName The name of the selected product.
-   */
   const handleProductSelect = (productName: string) => {
-    setLocalFormData((prevData) => ({
-      ...prevData,
+    setLocalFormData({
+      ...localFormData,
       productName: productName,
-      // Reset coverage length if product changes and old length is not valid for new product
-      coverageLength: getCoverageLengthOptions(productName).includes(prevData.coverageLength) ? prevData.coverageLength : '',
-    }));
+      coverageType: '',
+      coverageAmount: '',
+      deductible: '',
+      reimbursementRate: '',
+      paymentFrequency: '',
+      startDate: '',
+      coverageLength: '',
+    });
   };
 
   /**
-   * Validates the current sub-step's data.
-   * Returns true if valid, false otherwise, and shows an alert for errors.
+   * Validates that a product has been selected.
    */
-  const validateCurrentSubStep = (): boolean => {
-    let isValid = true;
-    let errorMessage = '';
-
-    if (currentSubStep === 1) { // Product Selection
-      if (!localFormData.productName.trim()) {
-        isValid = false;
-        errorMessage += 'Please select a product.\n';
-      }
+  const validateStep = (): boolean => {
+    if (!localFormData.productName.trim()) {
+      alert('Please select an insurance package to proceed.');
+      return false;
     }
-
-    if (!isValid) {
-      alert(errorMessage.trim()); // Show all accumulated errors
-    }
-    return isValid;
+    return true;
   };
 
   /**
-   * Handles navigation to the next internal sub-step or the next major form step.
+   * Handles navigation to the next major form step (Payment Details).
    */
-  const handleInternalNext = () => {
-    if (!validateCurrentSubStep()) {
+  const handleNextStep = () => {
+    if (!validateStep()) {
       return; // Stop if validation fails
     }
-
-    if (currentSubStep < totalSubSteps) {
-      setCurrentSubStep((prevSubStep) => prevSubStep + 1);
-    } else {
-      // If it's the last sub-step, update parent data and call parent onNext
-      onUpdate(localFormData);
-      onNext();
-    }
+    // Update parent data with only the selected product name
+    onUpdate({ productName: localFormData.productName });
+    onNext(); // Move to the next main form step (Payment Details)
   };
 
   /**
-   * Handles navigation to the previous internal sub-step or the previous major form step.
+   * Handles navigation to the previous major form step (Pet Details).
    */
-  const handleInternalPrev = () => {
-    // No need to validate when going back
-    if (currentSubStep > 1) {
-      setCurrentSubStep((prevSubStep) => prevSubStep - 1);
-    } else {
-      // If it's the first sub-step, update parent data and call parent onPrev
-      onUpdate(localFormData); // Save current data before going back
-      onPrev();
-    }
+  const handlePrevStep = () => {
+    onUpdate(localFormData); // Save current product selection before going back
+    onPrev();
   };
 
   const selectedProductData = productOptions.find(p => p.name === localFormData.productName);
@@ -163,53 +122,49 @@ const ProductDetailsStep: React.FC<ProductDetailsStepProps> = ({ formData, onUpd
   return (
     <div className="flex flex-col h-full justify-between">
       <div>
-        {/* Main Header for Product Details Section */}
-        <h2 className="text-2xl font-bold mb-6 text-[#8cc63f]">Product Details - Page {currentSubStep} of {totalSubSteps}</h2>
+        <h2 className="text-2xl font-bold mb-6 text-[#8cc63f]">Product Details</h2>
 
-        {/* --- Sub-step 1: Product Selection --- */}
-        {currentSubStep === 1 && (
-          <>
-            <p className="text-gray-700 mb-6">We offer three of the most common types of pet insurance. These products can be selected based on the one that best fits the reason you want pet insurance and is most useful for the specific needs of your pet.</p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {productOptions.map((product) => (
-                <div
-                  key={product.name}
-                  onClick={() => handleProductSelect(product.name)}
-                  className={`
-                    flex flex-col items-center text-center p-6 rounded-xl shadow-md cursor-pointer
-                    transition-all duration-300 border-2
-                    ${localFormData.productName === product.name
-                      ? 'border-[#8cc63f] bg-[#e6f4d9] scale-105' // Selected state
-                      : 'border-gray-200 bg-white hover:shadow-lg hover:border-gray-300' // Unselected state
-                    }
-                  `}
-                >
-                  {product.icon}
-                  <h3 className="text-xl font-semibold mb-2 text-gray-800">{product.name}</h3>
-                  <p className="text-gray-600 mb-4">{product.description}</p>
-                  <ul className="text-left w-full text-gray-700 space-y-2">
-                    {product.details.map((detail, index) => (
-                      <li key={index} className="flex items-start">
-                        <svg className="w-5 h-5 text-green-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path>
-                        </svg>
-                        {detail}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
+        <p className="text-gray-700 mb-6">We offer three of the most common types of pet insurance. These products can be selected based on the one that best fits the reason you want pet insurance and is most useful for the specific needs of your pet.</p>
+        
+        {/* Product Selection Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          {productOptions.map((product) => (
+            <div
+              key={product.name}
+              onClick={() => handleProductSelect(product.name)}
+              className={`
+                flex flex-col items-center text-center p-6 rounded-xl shadow-md cursor-pointer
+                transition-all duration-300 border-2
+                ${localFormData.productName === product.name
+                  ? 'border-[#8cc63f] bg-[#e6f4d9] scale-105' // Selected state
+                  : 'border-gray-200 bg-white hover:shadow-lg hover:border-gray-300' // Unselected state
+                }
+              `}
+            >
+              {product.icon}
+              <h3 className="text-xl font-semibold mb-2 text-gray-800">{product.name}</h3>
+              <p className="text-gray-600 mb-4">{product.description}</p>
+              <ul className="text-left w-full text-gray-700 space-y-2">
+                {product.details.map((detail, index) => (
+                  <li key={index} className="flex items-start">
+                    <svg className="w-5 h-5 text-green-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path>
+                    </svg>
+                    {detail}
+                  </li>
+                ))}
+              </ul>
             </div>
-          </>
-        )}
+          ))}
+        </div>
 
-        {/* --- Sub-step 2: Product Overview --- */}
-        {currentSubStep === 2 && (
-          <div className="space-y-6">
-            <h3 className="text-xl font-bold text-gray-800">Your Pet Insurance Overview: {selectedProductData?.name}</h3>
-            <p className="text-gray-700">Thank you for choosing {selectedProductData?.name} for your beloved pet! We're committed to providing comprehensive support and peace of mind for you and your furry family member here in Iloilo City.</p>
-            <p className="text-gray-700 font-semibold">Here's a detailed overview of your chosen plan:</p>
+        {/* Product Overview Section (conditionally displayed if a product is selected) */}
+        {selectedProductData && (
+          <div className="space-y-6 mt-8 p-6 bg-gray-50 rounded-lg shadow-inner">
+            <h3 className="text-xl font-bold text-gray-800">Overview: {selectedProductData.name}</h3>
+            <p className="text-gray-700">Here's a detailed overview of the <span className="font-semibold">{selectedProductData.name}</span> plan:</p>
 
+            {/* Render specific details based on selected product */}
             {localFormData.productName === 'Medical Care Insurance' && (
               <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
                 <h4 className="text-lg font-bold text-[#8cc63f] mb-3">Medical Care Insurance (Basic Plan) - Overview</h4>
@@ -348,22 +303,20 @@ const ProductDetailsStep: React.FC<ProductDetailsStepProps> = ({ formData, onUpd
         )}
       </div>
 
-      {/* Internal Pagination Buttons */}
+      {/* Navigation Buttons */}
       <div className="flex justify-between mt-4">
-        {/* "Previous" button */}
         <Button
-          onClick={handleInternalPrev}
+          onClick={handlePrevStep}
           className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded"
         >
-          {currentSubStep === 1 ? 'Previous: Pet Details' : 'Previous Page'}
+          Previous: Pet Details
         </Button>
 
-        {/* "Next" button */}
         <Button
-          onClick={handleInternalNext}
+          onClick={handleNextStep}
           className="bg-[#8cc63f] hover:bg-[#7eb238] text-white font-bold py-2 px-4 rounded"
         >
-          {currentSubStep === totalSubSteps ? 'Next: Payment Details' : 'Next Page'}
+          Next: Payment Details
         </Button>
       </div>
     </div>
