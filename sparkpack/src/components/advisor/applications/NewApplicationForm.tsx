@@ -4,13 +4,25 @@ import React, { useState } from 'react';
 import ApplicationStepNavbar from './ApplicationStepNavbar';
 import ClientDetailsStep from './form-steps/ClientDetailsStep';
 import PetDetailsStep from './form-steps/PetDetailsStep';
-import ProductDetailsStep from './form-steps/ProductDetailsStep'; // Import the new step
-import { ApplicationFormData } from '@/types/formData'; // Import all interfaces
+import ProductDetailsStep from './form-steps/ProductDetailsStep';
+import PaymentDetailsStep from './form-steps/PaymentDetailsStep';
+import { ApplicationFormData } from '@/types/formData';
 import { createApplication, updateApplication } from '@/lib/api/applications';
 import { useRouter } from 'next/navigation';
 
+const applicationSteps = [
+  { id: 1, name: 'Client Details' },
+  { id: 2, name: 'Pet Details' },
+  { id: 3, name: 'Product Details' },
+  { id: 4, name: 'Payment Details' },
+  { id: 5, name: 'Evidence' },
+  { id: 6, name: 'Summary' },
+  { id: 7, name: 'Sign & Submit' },
+];
+
 const NewApplicationForm: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<ApplicationFormData>({
     client: {
       title: '',
@@ -58,20 +70,27 @@ const NewApplicationForm: React.FC = () => {
       clinicAddress: '',
       lastVetVisitDate: '',
     },
-    // Initialize product details
     product: {
       productName: '',
-      coverageType: '',
+      // coverageType: '', // This line from your previous paste was the source of the 'coverageType' error. It should not be here if not in ProductDetails type.
       coverageAmount: '',
       deductible: '',
       reimbursementRate: '',
       paymentFrequency: '',
-      startDate: '',
-      coverageLength: '', // Initialize new field
+      startDate: new Date().toISOString().split('T')[0],
+      coverageLength: '1 Year',
+      selectedAddOns: [],
+      donationPercentage: 0
+    },
+    payment: {
+      paymentMethod: '',
+      cardNumber: '',
+      cardName: '',
+      expiryDate: '',
+      cvv: '',
     },
   });
 
-  // Generic update function for any form section
   const updateFormData = <T extends keyof ApplicationFormData>(field: T, data: Partial<ApplicationFormData[T]>) => {
     setFormData((prevData) => ({
       ...prevData,
@@ -80,18 +99,7 @@ const NewApplicationForm: React.FC = () => {
   };
 
   const handleNextStep = () => {
-    if (currentStep === 1) {
-      console.log("Client Details submitted (check console). Proceeding to Pet Details.", formData.client);
-    } else if (currentStep === 2) {
-      console.log("Pet Details submitted (check console). Proceeding to Product Details.", formData.pet);
-    } else if (currentStep === 3) {
-      console.log("Product Details submitted (check console). This is the end of the form for now!");
-      // In a real app, you might trigger the final submission here or move to a summary step
-      alert("Product Details submitted (check console). This is the end of the form for now!");
-    }
-
-    // Only proceed if not on the last step (which is now 3)
-    if (currentStep < 3) { // Changed from 2 to 3
+    if (currentStep < applicationSteps.length) {
       setCurrentStep((prevStep) => prevStep + 1);
     }
   };
@@ -115,7 +123,7 @@ const NewApplicationForm: React.FC = () => {
         // Map fields as needed to match backend schema
         petId: '', // This should be set after pet creation or selection
         policyNumber: formData.product.productName, // Example mapping
-        planType: formData.product.coverageType, // Example mapping
+        // planType: formData.product.coverageType, // Example mapping
         premiumAmount: parseFloat(formData.product.coverageAmount) || 0,
         deductible: parseFloat(formData.product.deductible) || 0,
         coverageLimit: parseFloat(formData.product.coverageAmount) || 0,
@@ -156,7 +164,7 @@ const NewApplicationForm: React.FC = () => {
             onPrev={handlePrevStep}
           />
         );
-      case 3: // New case for Product Details
+      case 3:
         return (
           <ProductDetailsStep
             formData={formData.product}
@@ -165,18 +173,58 @@ const NewApplicationForm: React.FC = () => {
             onPrev={handlePrevStep}
           />
         );
+      case 4:
+        return (
+          <PaymentDetailsStep
+            formData={formData.payment}
+            productDetails={formData.product}
+            onUpdate={(data) => updateFormData('payment', data)}
+            onNext={handleNextStep}
+            onPrev={handlePrevStep}
+          />
+        );
+      case 5:
+      case 6:
+      case 7:
+        return (
+          <div className="p-4 text-center text-blue-600">
+            <h3>Step {currentStep}: {applicationSteps.find(s => s.id === currentStep)?.name || 'Unknown Step'}</h3>
+            <p>This step is currently under construction. Please use the navigation to go back or forward.</p>
+            <div className="flex justify-between mt-4">
+              <button
+                onClick={handlePrevStep}
+                className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded"
+              >
+                Previous Step
+              </button>
+              {currentStep < applicationSteps.length && (
+                  <button
+                      onClick={handleNextStep}
+                      className="bg-[#8cc63f] hover:bg-[#7eb238] text-white font-bold py-2 px-4 rounded"
+                  >
+                      Next Step
+                  </button>
+              )}
+            </div>
+          </div>
+        );
       default:
         return <div className="p-4 text-center text-red-500">Error: Invalid step.</div>;
     }
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 overflow-hidden">
-      {/* Application Step Navbar is always visible at the top */}
-      <ApplicationStepNavbar currentStepId={currentStep} />
-      <div className="flex-1 py-8 px-4 h-full">
-        <div className="bg-white p-6 rounded-lg shadow-md max-w-6xl w-full mx-auto flex flex-col h-full overflow-y-auto">
-          {renderStepContent()}
+    <div className="flex flex-col h-screen bg-gray-50">
+      <ApplicationStepNavbar currentStepId={currentStep} steps={applicationSteps} />
+      <div className="flex-1 py-8 px-4 overflow-y-auto">
+        <div className="bg-white p-6 rounded-lg shadow-md max-w-6xl w-full mx-auto flex flex-col min-h-[calc(100vh-160px)]">
+          {isSubmitting ? (
+            <div className="flex items-center justify-center h-full text-lg text-[#8cc63f]">
+              <p>Submitting your application, please wait...</p>
+            </div>
+          ) : (
+            renderStepContent()
+          )}
         </div>
       </div>
     </div>

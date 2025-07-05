@@ -1,3 +1,5 @@
+// sparkpack/src/types/formData.ts
+
 // Client Details Interface
 export interface ClientDetails {
   title?: string;
@@ -48,16 +50,62 @@ export interface PetDetails {
   lastVetVisitDate: string;
 }
 
-// Product Details Interface
+// Interface for a single selected add-on
+export interface SelectedAddOn {
+  id: string; // Unique identifier for the add-on
+  name: string;
+  price: number;
+  type: 'one-time' | 'annual';
+}
+
+// Product Details Interface - REVISED
 export interface ProductDetails {
-  productName: string; 
-  coverageType: string; 
-  coverageAmount: string; 
-  deductible: string; 
-  reimbursementRate: string; 
-  paymentFrequency: string; 
-  startDate: string; 
-  coverageLength: string; 
+  productName: string;
+  // REMOVED 'coverageType' here as it was causing the error and wasn't present in the ProductDetails initial state.
+  // If you later decide you need it, add it back *here* with its type.
+  coverageAmount: string;
+  deductible: string;
+  reimbursementRate: string;
+  paymentFrequency: string;
+  startDate: string;
+  coverageLength: string;
+  selectedAddOns: SelectedAddOn[];
+  donationPercentage: number;
+}
+
+// Interface for Add-on Definitions (used internally in ProductDetailsStep.tsx)
+export interface AddOnDefinition {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  type: 'one-time' | 'annual'; // Is it a one-time charge or adds to annual premium?
+  availableFor: string[]; // Which base products can this add-on be selected for?
+}
+
+// This interface is specific to the productOptions array in ProductDetailsStep
+export interface ProductOption {
+  name: string;
+  description: string;
+  premiumRange: string;
+  coverageRange: string;
+  details: string[]; 
+  iconKey: string;
+  coverageOptions?: string[];
+  deductibleOptions?: string[];
+  reimbursementOptions?: string[];
+  paymentFreqOptions?: string[];
+  fullDetails: {
+    [key: string]: string[]; // For accordion content, e.g., 'Key Benefits': ['...']
+  };
+}
+
+export interface PaymentDetails {
+  paymentMethod: 'Credit/Debit Card' | 'Bank Transfer' | 'GCash' | 'Cash/Cheque' | ''; 
+  cardNumber?: string;
+  cardName?: string;
+  expiryDate?: string;
+  cvv?: string;
 }
 
 // Define the overall ApplicationFormData interface to include all steps
@@ -65,4 +113,8 @@ export interface ApplicationFormData {
   client: ClientDetails;
   pet: PetDetails;
   product: ProductDetails;
+  payment: PaymentDetails;
+  // evidence?: EvidenceDetails;
+  // summary?: SummaryDetails;
+  // signSubmit?: SignSubmitDetails;
 }
