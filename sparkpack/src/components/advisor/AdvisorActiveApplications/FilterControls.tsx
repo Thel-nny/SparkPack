@@ -23,9 +23,7 @@ interface FilterControlsProps {
 }
 
 const FilterControls: React.FC<FilterControlsProps> = ({
-  statusFilter,
   setStatusFilter,
-  productFilter,
   setProductFilter,
   minCoverage,
   setMinCoverage,

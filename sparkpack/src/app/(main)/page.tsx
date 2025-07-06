@@ -12,7 +12,7 @@ export default function LandingPage() {
             <div className="space-y-8">
               <div className="space-y-4">
                 <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 leading-tight">
-                  Your Pet's Lifetime Companion in <span className="text-[#8cc63f]">Iloilo</span>
+                  Your Pet&apos;s Lifetime Companion in <span className="text-[#8cc63f]">Iloilo</span>
                 </h1>
                 <p className="text-xl text-gray-600 leading-relaxed">
                   Complete peace of mind from playful puppy days to a dignified farewell. Sparkpack combines

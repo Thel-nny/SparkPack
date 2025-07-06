@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ChevronDown, Search, User } from 'lucide-react';
+import { ChevronDown, User } from 'lucide-react';
 
 interface NavItem {
   label: string;

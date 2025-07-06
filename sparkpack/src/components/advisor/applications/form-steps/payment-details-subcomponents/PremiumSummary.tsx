@@ -62,7 +62,7 @@ const PremiumSummary: React.FC<PremiumSummaryProps> = ({ premiumCalculation, sel
         </div>
 
         <div className="col-span-full mt-4 text-sm text-gray-500 italic">
-          <p>This is an estimated premium. Your final premium may vary based on a full review of your application and pet's medical history. One-time costs are billed separately at the start of your policy.</p>
+          <p>This is an estimated premium. Your final premium may vary based on a full review of your application and pet&apos;s medical history. One-time costs are billed separately at the start of your policy.</p>
         </div>
       </div>
     </div>

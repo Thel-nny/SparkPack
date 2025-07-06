@@ -1,5 +1,12 @@
 // Create a new application
-export async function createApplication(applicationData: any) {
+import { type ApplicationFormData } from "@/types/formData";
+
+interface updateApplicationData {
+  updateData: {
+    status?: string;
+  }}
+
+export async function createApplication(applicationData: ApplicationFormData) {
   const response = await fetch('/api/applications', {
     method: 'POST',
     headers: {
@@ -17,7 +24,7 @@ export async function createApplication(applicationData: any) {
 }
 
 // Update an existing application by ID
-export async function updateApplication(applicationId: string, updateData: any) {
+export async function updateApplication(applicationId: string, updateData: updateApplicationData) {
   const response = await fetch(`/api/applications/${applicationId}`, {
     method: 'PUT',
     headers: {

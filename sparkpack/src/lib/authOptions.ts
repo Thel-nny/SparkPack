@@ -1,4 +1,4 @@
-import { NextAuthOptions, User, DefaultSession, DefaultUser } from "next-auth";
+import { NextAuthOptions, User, DefaultUser } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";

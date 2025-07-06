@@ -23,9 +23,7 @@ interface FiltersProps {
 }
 
 const AdvisorInProgressApplicationsFilters: React.FC<FiltersProps> = ({
-  statusFilter,
   setStatusFilter,
-  productFilter,
   setProductFilter,
   minCoverage,
   setMinCoverage,

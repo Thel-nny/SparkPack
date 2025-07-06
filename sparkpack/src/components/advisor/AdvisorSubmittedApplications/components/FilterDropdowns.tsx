@@ -23,9 +23,8 @@ interface FilterDropdownsProps {
 }
 
 const FilterDropdowns: React.FC<FilterDropdownsProps> = ({
-  statusFilter,
+
   setStatusFilter,
-  productFilter,
   setProductFilter,
   minCoverage,
   setMinCoverage,

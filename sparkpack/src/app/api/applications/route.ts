@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { withAuth } from "@/lib/auth-guard";
-import { ApplicationCreateInput } from "@/types";
 import { UserRole } from "@prisma/client"; // ✅ Import the enum
 
 export async function GET(req: NextRequest) {
@@ -75,7 +74,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  return await (await withAuth(async (req: NextRequest, userId: string, userRole: string) => {
+  return await (await withAuth(async (req: NextRequest) => {
     try {
       const body = await req.json();
 
@@ -343,10 +342,10 @@ export async function POST(req: NextRequest) {
         data: application,
         message: "Application created successfully",
       });
-    } catch (error: any) {
-      console.error("Error creating application:", error.message, error.stack);
+    } catch{
+      console.error("Error creating application:");
       return NextResponse.json(
-        { success: false, error: error.message || "Internal server error" },
+        { success: false, error: "Internal server error" },
         { status: 500 }
       );
     }

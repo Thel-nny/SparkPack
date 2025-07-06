@@ -1,12 +1,11 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { AdvisorFilterSkeleton, AdvisorTableSkeleton } from './loading';
-
+import { AdvisorFilterSkeleton } from './loading';
 import FilterDropdowns from './AdvisorSubmittedApplications/components/FilterDropdowns';
 import ApplicationsTable from './AdvisorSubmittedApplications/components/ApplicationsTable';
 import PaginationControls from './AdvisorSubmittedApplications/components/PaginationControls';
-import { getCookie } from '@/lib/cookies';
+
 
 interface Application {
   id: string;
@@ -17,6 +16,17 @@ interface Application {
   coverageAmount: number;
   dateStarted: string;
   policyNumber: string;
+  customer: {
+    id: string;
+    firstName: string;
+    lastName: string;
+  };
+  pet?: {
+    id: string;
+    petName: string;
+  };
+  planType: string;
+  startDate?: string;
 }
 
 const AdvisorSubmittedApplications: React.FC = () => {
@@ -37,21 +47,22 @@ const AdvisorSubmittedApplications: React.FC = () => {
 
   const [activeFilterDropdown, setActiveFilterDropdown] = useState<string | null>(null);
 
-  const fetchApplications = async (page: number) => {
+  const fetchApplications = useMemo(() => {
+  return async (page: number) => {
     setLoading(true);
     setError(null);
     try {
       const params = new URLSearchParams();
       params.append('page', page.toString());
       params.append('limit', itemsPerPage.toString());
-
+       
       const response = await fetch(`/api/applications?${params.toString()}`);
       if (!response.ok) {
         throw new Error(`Error fetching applications: ${response.statusText}`);
       }
       const data = await response.json();
       if (data.success) {
-        const apps: Application[] = data.data.applications.map((app: any) => ({
+        const apps: Application[] = data.data.applications.map((app: Application) => ({
           id: app.id,
           status: app.status,
           ensured: app.customer ? `${app.customer.firstName} ${app.customer.lastName}` : 'N/A',
@@ -66,16 +77,16 @@ const AdvisorSubmittedApplications: React.FC = () => {
       } else {
         setError(data.error || 'Failed to fetch applications');
       }
-    } catch (err: any) {
-      setError(err.message || 'Failed to fetch applications');
+    } catch{
+      setError('Failed to fetch applications');
     } finally {
       setLoading(false);
     }
   };
-
+}, [itemsPerPage, setLoading, setError, setApplications, setTotalPages]); // Dependencies: itemsPerPage and all setter functions
   useEffect(() => {
     fetchApplications(currentPage);
-  }, [currentPage]);
+  }, [currentPage, fetchApplications]);
 
   const filteredApplications = useMemo(() => {
     let filtered = applications;
