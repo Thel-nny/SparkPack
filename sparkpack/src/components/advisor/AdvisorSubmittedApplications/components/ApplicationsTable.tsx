@@ -20,16 +20,6 @@ interface ApplicationsTableProps {
   error: string | null;
 }
 
-const getCookie = (name: string): string | null => {
-  console.log("Reading cookie:", name);
-  if (typeof document === 'undefined') return null;
-  console.log("Document cookie:", document.cookie);
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  console.log("Cookie parts:", parts);
-  if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
-  return null;
-};
 
 const ApplicationsTable: React.FC<ApplicationsTableProps> = ({
   currentApplications,
@@ -75,8 +65,8 @@ useEffect(() => {
         )
       );
       alert("Status updated successfully");
-    } catch (error: any) {
-      alert("Error updating status: " + error.message);
+    } catch {
+      alert("Error updating status: ");
     }
   };
 

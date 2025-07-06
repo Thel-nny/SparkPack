@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect} from 'react';
 import { Button } from '@/components/ui/button';
 
 // Import sub-components
@@ -11,11 +11,6 @@ import OptionalBenefitsAndDonation from './product-details-subcomponents/Optiona
 
 import { ProductDetails, AddOnDefinition, SelectedAddOn, ProductOption } from '@/types/formData'; 
 
-import {
-  ShieldCheck,
-  Award,
-  PlusCircle,
-} from 'lucide-react';
 
 interface ProductDetailsStepProps {
   formData: ProductDetails;
@@ -239,7 +234,7 @@ export const calculatePremium = (
 
 ): { baseAnnual: number; annualTotal: number; monthlyTotal: number; oneTimeTotal: number; donationAmount: number } => {
   let basePrice = 0;
-  let coverageFactor = 1;
+  const coverageFactor = 1;
   let deductibleFactor = 1;
   let reimbursementFactor = 1;
 
@@ -274,7 +269,7 @@ export const calculatePremium = (
       return { baseAnnual: 0, annualTotal: 0, monthlyTotal: 0, oneTimeTotal: 0, donationAmount: 0 };
   }
 
-  let calculatedBaseAnnualPremium = basePrice * coverageFactor * deductibleFactor * reimbursementFactor;
+  const calculatedBaseAnnualPremium = basePrice * coverageFactor * deductibleFactor * reimbursementFactor;
 
   let annualAddOnCost = 0;
   let oneTimeAddOnCost = 0;
@@ -289,7 +284,7 @@ export const calculatePremium = (
     }
   });
 
-  let totalAnnualPremiumBeforeDonation = calculatedBaseAnnualPremium + annualAddOnCost;
+const totalAnnualPremiumBeforeDonation = calculatedBaseAnnualPremium + annualAddOnCost;
   let calculatedDonationAmount = (totalAnnualPremiumBeforeDonation * (donationPercentage / 100));
   let finalAnnualTotalPremium = totalAnnualPremiumBeforeDonation + calculatedDonationAmount;
   const monthlySurchargeFactor = 1.05;

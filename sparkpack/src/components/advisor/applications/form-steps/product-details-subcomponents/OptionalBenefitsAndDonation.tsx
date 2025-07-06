@@ -1,6 +1,6 @@
 import React from 'react';
-import { Input } from '@/components/ui/input';
-import { AddOnDefinition, SelectedAddOn, ProductDetails } from '@/types/formData'; // Assuming these types are defined here
+
+import { AddOnDefinition, ProductDetails } from '@/types/formData'; // Assuming these types are defined here
 
 interface OptionalBenefitsAndDonationProps {
   localFormData: ProductDetails;

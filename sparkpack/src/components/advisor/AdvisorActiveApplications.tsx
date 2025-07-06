@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { AdvisorFilterSkeleton, AdvisorTableSkeleton } from './loading';
 import FilterControls from './AdvisorActiveApplications/FilterControls';
@@ -9,16 +9,6 @@ import PaginationControls from './AdvisorActiveApplications/PaginationControls';
 import useApplications from './AdvisorActiveApplications/useApplications';
 
 // Define the type for an individual application
-interface Application {
-  id: string;
-  status: 'Advisor Declaration Pending' | 'Signature Process Pending' | 'Signature In Process';
-  ensured: string;
-  owners: string[];
-  product: 'Medical Care Insurance' | 'Legacy Insurance';
-  coverageAmount: number; // Stored as a number, formatted for display
-  dateStarted: string; // Using string for simplicity, e.g., 'YYYY-MM-DD'
-  policyNumber: string; // 'N/A' for in-progress applications
-}
 
 const AdvisorActiveApplications: React.FC = () => {
   const [activeRowId, setActiveRowId] = useState<string | null>(null);

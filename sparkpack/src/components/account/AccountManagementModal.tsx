@@ -1,18 +1,37 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import ClientDetailsStep from "@/components/advisor/applications/form-steps/ClientDetailsStep";
+
 
 interface AccountManagementModalProps {
   userEmail: string | undefined;
   onClose: () => void;
 }
 
+interface FormData {
+  firstName: string;
+  middleName: string;
+  lastName: string;
+  dob: string;
+  pob: string;
+  gender: string;
+  email: string;
+  phoneNumber: string;
+  streetAddress: string;
+  country: string;
+  city: string;
+  province: string;
+  postalCode: string;
+  declarationAccuracy: boolean;
+  allowPhoneCollection: boolean;
+}
+
 export default function AccountManagementModal({
   userEmail,
   onClose,
 }: AccountManagementModalProps) {
-  const [formData, setFormData] = useState<any>({
+  const [formData, setFormData] = useState<FormData>({
     firstName: "",
     middleName: "",
     lastName: "",
@@ -27,27 +46,25 @@ export default function AccountManagementModal({
     province: "Iloilo",
     postalCode: "5000",
     declarationAccuracy: false,
+    allowPhoneCollection: false,
   });
 
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (userEmail) {
-      fetchUserData();
-    }
-  }, [userEmail]);
-
-  async function fetchUserData() {
+  const fetchUserData = useMemo(() => {
+  return async function() {
     setLoading(true);
     try {
-      const resUserList = await fetch(`/api/users?email=${encodeURIComponent(userEmail || "")}`);
+      const resUserList = await fetch(
+        `/api/users?email=${encodeURIComponent(userEmail || "")}`
+      );
       const userListJson = await resUserList.json();
 
       if (userListJson.success && userListJson.data.length > 0) {
         const user = userListJson.data[0];
 
         // Inject basic user registration data directly into formData
-        setFormData((prev: any) => ({
+        setFormData((prev) => ({
           ...prev,
           firstName: user.firstName || "",
           lastName: user.lastName || "",
@@ -62,10 +79,12 @@ export default function AccountManagementModal({
           if (clientJson.success) {
             const clientData = clientJson.data;
 
-            setFormData((prev: any) => ({
+            setFormData((prev) => ({
               ...prev,
               middleName: clientData.middleName || "",
-              dob: clientData.dob ? new Date(clientData.dob).toISOString().substring(0, 10) : "",
+              dob: clientData.dob
+                ? new Date(clientData.dob).toISOString().substring(0, 10)
+                : "",
               pob: clientData.pob || "",
               gender: clientData.gender || "",
               streetAddress: clientData.streetAddress || "",
@@ -79,15 +98,24 @@ export default function AccountManagementModal({
     } finally {
       setLoading(false);
     }
-  }
+  };
+}, [userEmail, setLoading, setFormData]); // Dependencies: userEmail and the setter functions
+
+  useEffect(() => {
+    if (userEmail) {
+      fetchUserData();
+    }
+  }, [userEmail, fetchUserData]);
 
   const handleUpdate = (data: Partial<typeof formData>) => {
-    setFormData((prev: any) => ({ ...prev, ...data }));
+    setFormData((prev) => ({ ...prev, ...data }));
   };
 
   const handleSubmit = async () => {
     try {
-      const resUserList = await fetch(`/api/users?email=${encodeURIComponent(userEmail || "")}`);
+      const resUserList = await fetch(
+        `/api/users?email=${encodeURIComponent(userEmail || "")}`
+      );
       const userListJson = await resUserList.json();
 
       if (!(userListJson.success && userListJson.data.length > 0)) {

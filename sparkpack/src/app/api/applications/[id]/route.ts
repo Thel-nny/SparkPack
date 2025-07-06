@@ -119,7 +119,7 @@ export async function PUT(req: NextRequest) {
           );
         }
 
-        const updateData: any = {};
+        const updateData:any= {};
 
         if (body.premiumAmount !== undefined)
           updateData.premiumAmount = parseFloat(body.premiumAmount);
@@ -228,10 +228,10 @@ export async function PUT(req: NextRequest) {
             ? "Application updated and temporary password sent"
             : "Application updated successfully",
         });
-      } catch (error: any) {
-        console.error("Error updating application:", error.message, error.stack);
+      } catch{
+        console.error("Error updating application:");
         return NextResponse.json(
-          { success: false, error: error.message || "Internal server error" },
+          { success: false, error: "Internal server error" },
           { status: 500 }
         );
       }

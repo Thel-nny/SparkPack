@@ -152,13 +152,14 @@ const NewApplicationForm: React.FC = () => {
 
       // After successful creation, update status to SUBMITTED
       // Assuming response.data.id is available and your API supports status updates
-      await updateApplication(response.data.id, { status: 'SUBMITTED' });
+      const status = {updateData: { status: 'SUBMITTED' }};
+      await updateApplication(response.data.id, status);
 
       alert('Application submitted successfully!');
       router.push('/advisor/applications/submitted'); // Redirect to submitted applications page
-    } catch (error: any) {
-      console.error('Error submitting application:', error);
-      alert(`Submission failed: ${error.message || 'An unknown error occurred.'}`);
+    } catch{
+      console.error('Error submitting application:');
+      alert(`Submission failed: ${'An unknown error occurred.'}`);
     } finally {
       setIsSubmitting(false);
     }

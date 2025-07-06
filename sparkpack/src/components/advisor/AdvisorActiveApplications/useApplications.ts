@@ -70,8 +70,8 @@ export default function useApplications(params: UseApplicationsParams): UseAppli
       } else {
         setError(data.error || 'Failed to fetch applications');
       }
-    } catch (err: any) {
-      setError(err.message || 'Failed to fetch applications');
+    } catch {
+      setError('Failed to fetch applications');
     } finally {
       setLoading(false);
     }

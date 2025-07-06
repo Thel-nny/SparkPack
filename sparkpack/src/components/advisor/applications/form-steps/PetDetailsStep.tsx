@@ -370,7 +370,7 @@ const PetDetailsStep: React.FC<PetDetailsStepProps> = ({ formData, onUpdate, onP
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 mb-6">
               <div>
                 <label htmlFor="vetName" className="block text-sm font-medium text-gray-700 mb-1">
-                  Veterinarian's Name <span className="text-red-500">*</span>
+                  Veterinarian&apos;s Name <span className="text-red-500">*</span>
                 </label>
                 <Input id="vetName" name="vetName" type="text" value={localFormData.vetName} onChange={handleChange} required className="shadow-sm" />
               </div>
@@ -431,7 +431,7 @@ const PetDetailsStep: React.FC<PetDetailsStepProps> = ({ formData, onUpdate, onP
                 localFormData.recurringConditions === 'Yes' ||
                 localFormData.onMedication === 'Yes') && (
                 <div className="flex flex-col space-y-4">
-                  <p className="text-sm font-medium text-gray-700">Please provide details for 'Yes' answers:</p>
+                  <p className="text-sm font-medium text-gray-700">Please provide details for &apos;Yes&apos; answers:</p>
                   {renderExplanationTextarea('chronicIllness', 'Chronic Illness Explanation')}
                   {renderExplanationTextarea('surgeryHistory', 'Surgery History Explanation')}
                   {renderExplanationTextarea('recurringConditions', 'Recurring Conditions Explanation')}

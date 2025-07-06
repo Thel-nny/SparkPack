@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
 import { getToken } from "next-auth/jwt";
+import { submittedstatus } from "@prisma/client";
 
 export async function POST(req: NextRequest) {
   try {
@@ -30,7 +31,7 @@ export async function POST(req: NextRequest) {
         // Check if there is a submitted application with this email
         const submittedApplication = await prisma.application.findFirst({
           where: {
-            status: "SUBMITTED" as any,
+            status: submittedstatus.SUBMITTED,
             customer: {
               email: email,
             },
