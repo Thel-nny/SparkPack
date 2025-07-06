@@ -48,6 +48,7 @@ const NewApplicationForm: React.FC = () => {
     pet: {
       petName: '',
       dobOrAdoptionDate: '',
+      weight: '',
       estimatedAge: '',
       gender: '',
       species: '',

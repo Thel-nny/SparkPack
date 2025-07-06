@@ -55,6 +55,12 @@ const AdvisorTopNavbar: React.FC<AdvisorTopNavbarProps> = ({ className = '' }) =
     setActiveDropdown(null);
   };
 
+  const handleSignOut = () => {
+    localStorage.clear();
+    setActiveDropdown(null);
+    window.location.href = '/auth/login';
+  };
+
   return (
     <nav className={`bg-[#f5f7f8] shadow-sm border-b border-gray-100 ${className} sticky top-0 z-50`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -193,6 +199,12 @@ const AdvisorTopNavbar: React.FC<AdvisorTopNavbarProps> = ({ className = '' }) =
                       >
                         Contact Support
                       </Link>
+                      <button
+                        onClick={handleSignOut}
+                        className="w-full text-left block px-4 py-2 text-sm text-[#342d47] hover:bg-[#f5f8f3] hover:text-[#7eb238] transition-colors duration-150"
+                      >
+                        Sign Out
+                      </button>
                     </div>
                   </div>
                 </>

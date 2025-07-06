@@ -91,7 +91,7 @@ export default function Login() {
     if (userRole === "ADMIN") {
       router.push("/advisor/dashboard");
     } else {
-      router.push("/");
+      router.push("/client/dashboard");
     }
     setIsLoading(false);
   };

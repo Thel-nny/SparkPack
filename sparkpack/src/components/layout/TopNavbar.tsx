@@ -81,6 +81,13 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ className = '' }) => {
     setActiveDropdown(null);
   };
 
+  // Signout handler: clear localStorage and redirect to login page
+  const handleSignOut = () => {
+    localStorage.clear();
+    setActiveDropdown(null);
+    window.location.href = '/auth/login';
+  };
+
   return (
     <nav className={`bg-[#f5f7f8] shadow-sm border-b border-gray-100 ${className} sticky top-0 z-50`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -188,7 +195,7 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ className = '' }) => {
                     onClick={handleClickOutside}
                     aria-hidden="true"
                   />
-                  <div className="absolute top-full right-0 mt-1 w-56 bg-white rounded-md shadow-lg border border-gray-200 z-20">
+                  <div className="absolute top-full right-0 mt-1 w-56 bg-white rounded-md shadow-lg border border-gray-200 z-20" onClick={(e) => e.stopPropagation()}>
                     <div className="py-1">
                       <Link
                         href="/auth/login"
@@ -218,6 +225,12 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ className = '' }) => {
                       >
                         Contact Support
                       </Link>
+                      <button
+                        onClick={handleSignOut}
+                        className="w-full text-left block px-4 py-2 text-sm text-[#342d47] hover:bg-[#f5f8f3] hover:text-[#7eb238] transition-colors duration-150"
+                      >
+                        Sign Out
+                      </button>
                     </div>
                   </div>
                 </>
