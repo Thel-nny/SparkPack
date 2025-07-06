@@ -1,45 +1,74 @@
-"use client";
+'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
 import { ClientDetails } from '@/types/formData';
 
 interface ClientDetailsStepProps {
   formData: ClientDetails;
   onUpdate: (data: Partial<ClientDetails>) => void;
   onNext: () => void;
+  onPrev: () => void;
 }
 
-const ClientDetailsStep: React.FC<ClientDetailsStepProps> = ({ formData, onUpdate, onNext }) => {
+const ClientDetailsStep: React.FC<ClientDetailsStepProps> = ({ formData, onUpdate, onNext, onPrev }) => {
   const [localFormData, setLocalFormData] = useState<ClientDetails>(formData);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type, checked } = e.target as HTMLInputElement;
+  // --- CHANGE MADE HERE ---
+  // Define errors state to hold string messages for each field
+  const [errors, setErrors] = useState<Partial<Record<keyof ClientDetails, string>>>({});
+  // --- END CHANGE ---
+
+  // Effect to sync formData from parent if it changes
+  useEffect(() => {
+    setLocalFormData(formData);
+  }, [formData]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
     setLocalFormData((prevData) => ({
       ...prevData,
       [name]: type === 'checkbox' ? checked : value,
     }));
   };
 
-  const handleNextClick = () => {
-    // Simplified validation based on new required fields
-    if (
-      !localFormData.firstName ||
-      !localFormData.lastName ||
-      !localFormData.dob ||
-      !localFormData.pob ||
-      !localFormData.gender ||
-      !localFormData.email ||
-      !localFormData.streetAddress ||
-      !localFormData.declarationAccuracy
-    ) {
-      alert('Please fill in all mandatory fields and confirm the declaration.');
-      return;
-    }
+  const handleCheckboxChange = (id: keyof ClientDetails, checked: boolean) => {
+    setLocalFormData((prevData) => ({
+      ...prevData,
+      [id]: checked,
+    }));
+  };
 
-    onUpdate({ ...localFormData }); 
-    onNext();
+  const validate = () => {
+    // --- CHANGE MADE HERE ---
+    // Define newErrors with the correct type
+    let newErrors: Partial<Record<keyof ClientDetails, string>> = {};
+    // --- END CHANGE ---
+
+    // Mandatory fields
+    if (!localFormData.firstName) newErrors.firstName = 'First Name is required.';
+    if (!localFormData.lastName) newErrors.lastName = 'Last Name is required.';
+    if (!localFormData.dob) newErrors.dob = 'Date of Birth is required.';
+    if (!localFormData.pob) newErrors.pob = 'Place of Birth is required.';
+    if (!localFormData.gender) newErrors.gender = 'Gender is required.';
+    if (!localFormData.email) newErrors.email = 'Email Address is required.';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(localFormData.email)) newErrors.email = 'Invalid email format.';
+    if (!localFormData.streetAddress) newErrors.streetAddress = 'Street Address is required.';
+    if (!localFormData.declarationAccuracy) newErrors.declarationAccuracy = 'You must confirm the declaration.';
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleNextClick = () => {
+    if (validate()) {
+      onUpdate(localFormData);
+      onNext();
+    } else {
+      alert('Please correct the highlighted errors before proceeding.');
+    }
   };
 
   return (
@@ -55,6 +84,7 @@ const ClientDetailsStep: React.FC<ClientDetailsStepProps> = ({ formData, onUpdat
               First Name <span className="text-red-500">*</span>
             </label>
             <Input id="firstName" name="firstName" type="text" value={localFormData.firstName} onChange={handleChange} required className="shadow-sm" />
+            {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
           </div>
           <div>
             <label htmlFor="middleName" className="block text-sm font-medium text-gray-700 mb-1">
@@ -67,6 +97,7 @@ const ClientDetailsStep: React.FC<ClientDetailsStepProps> = ({ formData, onUpdat
               Last Name <span className="text-red-500">*</span>
             </label>
             <Input id="lastName" name="lastName" type="text" value={localFormData.lastName} onChange={handleChange} required className="shadow-sm" />
+            {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
           </div>
         </div>
 
@@ -77,12 +108,14 @@ const ClientDetailsStep: React.FC<ClientDetailsStepProps> = ({ formData, onUpdat
               Date of Birth <span className="text-red-500">*</span>
             </label>
             <Input id="dob" name="dob" type="date" value={localFormData.dob} onChange={handleChange} required className="shadow-sm" />
+            {errors.dob && <p className="text-red-500 text-xs mt-1">{errors.dob}</p>}
           </div>
           <div>
             <label htmlFor="pob" className="block text-sm font-medium text-gray-700 mb-1">
               Place of Birth <span className="text-red-500">*</span>
             </label>
-            <Input id="pob" name="pob" type="text" value={localFormData.pob} onChange={handleChange} placeholder="Enter place of birth" required className="shadow-sm" />
+            <Input id="pob" name="pob" type="text" value={localFormData.pob || ''} onChange={handleChange} placeholder="Enter place of birth" required className="shadow-sm" />
+            {errors.pob && <p className="text-red-500 text-xs mt-1">{errors.pob}</p>}
           </div>
           <div className="flex flex-col justify-start">
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -98,6 +131,7 @@ const ClientDetailsStep: React.FC<ClientDetailsStepProps> = ({ formData, onUpdat
                 <label htmlFor="genderFemale" className="ml-2 block text-sm text-gray-900">Female</label>
               </div>
             </div>
+            {errors.gender && <p className="text-red-500 text-xs mt-1">{errors.gender}</p>}
           </div>
         </div>
 
@@ -108,6 +142,7 @@ const ClientDetailsStep: React.FC<ClientDetailsStepProps> = ({ formData, onUpdat
               Email Address <span className="text-red-500">*</span>
             </label>
             <Input id="email" name="email" type="email" value={localFormData.email} onChange={handleChange} placeholder="Enter email address" required className="shadow-sm" />
+            {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
           </div>
           <div>
             <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700 mb-1">
@@ -118,31 +153,31 @@ const ClientDetailsStep: React.FC<ClientDetailsStepProps> = ({ formData, onUpdat
         </div>
 
         {/* Fourth Row: Residential Address Section - Street Address and then Country/City/Province/Postal Code on one row */}
-        <div className="grid grid-cols-1 gap-y-4 mb-6"> {/* Main grid for address sections */}
-          <div> {/* Street Address takes full width */}
+        <div className="grid grid-cols-1 gap-y-4 mb-6">
+          <div>
             <label htmlFor="streetAddress" className="block text-sm font-medium text-gray-700 mb-1">
               Street Address <span className="text-red-500">*</span>
             </label>
             <Input id="streetAddress" name="streetAddress" type="text" value={localFormData.streetAddress} onChange={handleChange} placeholder="Enter street address" required className="shadow-sm" />
+            {errors.streetAddress && <p className="text-red-500 text-xs mt-1">{errors.streetAddress}</p>}
           </div>
 
-          {/* Fifth row: Country, City, Province, Postal Code - all in one row */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-4"> {/* Responsive grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-4">
               <div>
                 <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-1">Country</label>
-                <Input id="country" name="country" type="text" value="Philippines" disabled className="bg-gray-100 cursor-not-allowed shadow-sm" />
+                <Input id="country" name="country" type="text" value={localFormData.country} disabled className="bg-gray-100 cursor-not-allowed shadow-sm" />
               </div>
               <div>
                 <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-1">City</label>
-                <Input id="city" name="city" type="text" value="Iloilo City" disabled className="bg-gray-100 cursor-not-allowed shadow-sm" />
+                <Input id="city" name="city" type="text" value={localFormData.city} disabled className="bg-gray-100 cursor-not-allowed shadow-sm" />
               </div>
               <div>
                 <label htmlFor="province" className="block text-sm font-medium text-gray-700 mb-1">Province</label>
-                <Input id="province" name="province" type="text" value="Iloilo" disabled className="bg-gray-100 cursor-not-allowed shadow-sm" />
+                <Input id="province" name="province" type="text" value={localFormData.province} disabled className="bg-gray-100 cursor-not-allowed shadow-sm" />
               </div>
               <div>
                 <label htmlFor="postalCode" className="block text-sm font-medium text-gray-700 mb-1">Postal Code</label>
-                <Input id="postalCode" name="postalCode" type="text" value="5000" disabled className="bg-gray-100 cursor-not-allowed shadow-sm" />
+                <Input id="postalCode" name="postalCode" type="text" value={localFormData.postalCode} disabled className="bg-gray-100 cursor-not-allowed shadow-sm" />
               </div>
           </div>
         </div>
@@ -150,17 +185,30 @@ const ClientDetailsStep: React.FC<ClientDetailsStepProps> = ({ formData, onUpdat
         {/* Sixth Row: Confirmation and Button */}
         <div className="mb-6">
           <div className="flex items-start">
-            <input id="declarationAccuracy" name="declarationAccuracy" type="checkbox" checked={localFormData.declarationAccuracy} onChange={handleChange} className="h-4 w-4 text-[#8cc63f] focus:ring-[#8cc63f] border-gray-300 rounded mt-1" required />
+            <Checkbox
+              id="declarationAccuracy"
+              checked={localFormData.declarationAccuracy}
+              onCheckedChange={(checked) => handleCheckboxChange('declarationAccuracy', checked as boolean)}
+            />
             <label htmlFor="declarationAccuracy" className="ml-2 block text-sm text-gray-900">
               I confirm that all information provided is true and accurate to my best knowledge.{' '}
               <span className="text-red-500">*</span>
             </label>
           </div>
+          {errors.declarationAccuracy && <p className="text-red-500 text-xs mt-1 ml-6">{errors.declarationAccuracy}</p>}
         </div>
       </div>
 
-      {/* Navigation Button */}
-      <div className="flex justify-end mt-4">
+      {/* Navigation Buttons */}
+      <div className="flex justify-between mt-4">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onPrev}
+          className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded"
+        >
+          Back
+        </Button>
         <Button onClick={handleNextClick} className="bg-[#8cc63f] hover:bg-[#7eb238] text-white font-bold py-2 px-4 rounded">
           Next: Pet Details
         </Button>
