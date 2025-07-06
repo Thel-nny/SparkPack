@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -13,6 +12,27 @@ enum ApplicationStatus {
   SIGNATURE_PROCESS_PENDING
   SIGNATURE_IN_PROCESS
   SUBMITTED
+  APPROVED
+  REJECTED
+}
+
+enum applicationsstatus {
+  SUBMITTED
+  IN_PROGRESS
+  ACTIVE
+}
+
+enum submittedstatus {
+  SUBMITTED
+  APPROVED
+  DECLINED
+}
+
+enum ApplicationProgressStatus {
+  IN_PROGRESS
+  COMPLETED
+  ON_HOLD
+  CANCELLED
 }
 
 enum PlanType {
@@ -136,6 +156,7 @@ model Application {
   deductible         Float
   coverageAmount     Float?
   status             ApplicationStatus @default(ADVISOR_DECLERATION_PENDING)
+  progressStatus     ApplicationProgressStatus @default(IN_PROGRESS)
   startDate          DateTime
   endDate            DateTime?
   coverageLength     Int?
@@ -148,8 +169,11 @@ model Application {
   pet      Pet      @relation(fields: [petId], references: [id], onDelete: Cascade)
   claims   Claim[]
   payments Payment[]
+
   selectedAddOns SelectedAddOn[]
 }
+
+
 
 model SelectedAddOn {
   id            String      @id @default(uuid())

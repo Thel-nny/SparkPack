@@ -6,10 +6,11 @@ import { AdvisorFilterSkeleton, AdvisorTableSkeleton } from './loading';
 import FilterDropdowns from './AdvisorSubmittedApplications/components/FilterDropdowns';
 import ApplicationsTable from './AdvisorSubmittedApplications/components/ApplicationsTable';
 import PaginationControls from './AdvisorSubmittedApplications/components/PaginationControls';
+import { getCookie } from '@/lib/cookies';
 
 interface Application {
   id: string;
-  status: 'Submitted' | 'Approved' | 'Denied';
+  status: 'SUBMITTED' | 'APPROVED' | 'REJECTED' | 'SIGNATURE_PROCESS_PENDING' | 'SIGNATURE_IN_PROCESS';
   ensured: string;
   owners: string[];
   product: 'Medical Care Insurance' | 'Legacy Insurance';

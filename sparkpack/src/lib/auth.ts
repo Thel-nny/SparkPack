@@ -1,11 +1,10 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
+  // Remove this line: adapter: PrismaAdapter(prisma),
   providers: [
     CredentialsProvider({
       name: "credentials",
@@ -26,12 +25,10 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Email not found");
         }
 
-        // Check if user has a password (for existing users without passwords)
         if (!user.password) {
           throw new Error("Account setup incomplete. Please contact support.");
         }
 
-        // Verify password
         const isValidPassword = await bcrypt.compare(credentials.password, user.password);
         
         if (!isValidPassword) {
@@ -73,4 +70,5 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: "/auth/signin",
   },
+  secret: process.env.NEXTAUTH_SECRET, // Make sure this is set
 };

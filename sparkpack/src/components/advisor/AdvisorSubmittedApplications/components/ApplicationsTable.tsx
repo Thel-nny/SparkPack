@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 
 interface Application {
   id: string;
-  status: 'Submitted' | 'Approved' | 'Denied';
+  status: 'SUBMITTED' | 'APPROVED' | 'REJECTED' | 'SIGNATURE_PROCESS_PENDING' | 'SIGNATURE_IN_PROCESS';
   ensured: string;
   owners: string[];
   product: 'Medical Care Insurance' | 'Legacy Insurance';
@@ -19,14 +19,63 @@ interface ApplicationsTableProps {
   error: string | null;
 }
 
+const getCookie = (name: string): string | null => {
+  if (typeof document === 'undefined') return null;
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+  return null;
+};
+
 const ApplicationsTable: React.FC<ApplicationsTableProps> = ({
   currentApplications,
   formatCurrency,
   loading,
   error,
 }) => {
+  // Local state to track status updates for UI responsiveness
+  const [applications, setApplications] = useState(currentApplications);
+  const [userRole, setUserRole] = useState<string | null>(null);
+
+  // Sync local state when currentApplications prop changes
+  useEffect(() => {
+    setApplications(currentApplications);
+  }, [currentApplications]);
+
+  // Read userRole from cookies on mount
+  useEffect(() => {
+    const role = getCookie('userRole');
+    setUserRole(role ? role.trim().toUpperCase() : null);
+  }, []);
+
+  const handleStatusChange = async (appId: string, newStatus: string) => {
+    try {
+      const response = await fetch(`/api/applications/${appId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to update status");
+      }
+      // Update local state to reflect the new status
+      setApplications((prevApps) =>
+        prevApps.map((app) =>
+          app.id === appId ? { ...app, status: newStatus as Application['status'] } : app
+        )
+      );
+      alert("Status updated successfully");
+    } catch (error: any) {
+      alert("Error updating status: " + error.message);
+    }
+  };
+
   return (
     <Card className="p-0 rounded-lg shadow-sm overflow-hidden">
+      <div className="p-2 text-sm text-gray-700">Debug: userRole = {userRole ?? "null"}</div>
       {loading ? (
         <div>Loading...</div>
       ) : error ? (
@@ -60,12 +109,24 @@ const ApplicationsTable: React.FC<ApplicationsTableProps> = ({
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {currentApplications.map((app) => (
+              {applications.map((app) => (
                 <tr key={app.id} className="hover:bg-gray-50 transition-colors duration-150">
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    <span>
-                      {app.status}
-                    </span>
+                    <select
+                      value={app.status}
+                      onChange={async (e) => {
+                        const newStatus = e.target.value;
+                        await handleStatusChange(app.id, newStatus);
+                      }}
+                      className="border border-gray-300 rounded px-2 py-1"
+                      disabled={userRole !== "ADMIN"}
+                    >
+                      <option value="SUBMITTED">Submitted</option>
+                      <option value="APPROVED">Approved</option>
+                      <option value="REJECTED">Rejected</option>
+                      <option value="SIGNATURE_PROCESS_PENDING">Signature Process Pending</option>
+                      <option value="SIGNATURE_IN_PROCESS">Signature In Process</option>
+                    </select>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {app.ensured}
