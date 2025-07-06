@@ -73,7 +73,6 @@ useEffect(() => {
 
   return (
     <Card className="p-0 rounded-lg shadow-sm overflow-hidden">
-      <div className="p-2 text-sm text-gray-700">Debug: userRole = {userRole ?? "null"}</div>
       {loading ? (
         <div>Loading...</div>
       ) : error ? (
