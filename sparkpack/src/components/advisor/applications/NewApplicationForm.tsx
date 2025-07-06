@@ -156,10 +156,10 @@ const NewApplicationForm: React.FC = () => {
       await updateApplication(response.data.id, status);
 
       alert('Application submitted successfully!');
-      router.push('/advisor/dashboard'); // Redirect to advisor dashboard after successful submission
-    } catch{
-      console.error('Error submitting application:');
-      alert(`Submission failed: ${'An unknown error occurred.'}`);
+      await router.push('/advisor/dashboard'); // Await redirect to advisor dashboard after successful submission
+    } catch(error){
+      console.error('Error submitting application:', error);
+      alert(`Submission failed: ${error instanceof Error ? error.message : 'An unknown error occurred.'}`);
     } finally {
       setIsSubmitting(false);
     }
