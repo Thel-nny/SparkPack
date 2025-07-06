@@ -282,7 +282,7 @@ const AdvisorInProgressApplications: React.FC = () => {
                     >
                       All Statuses
                     </div>
-                    {['Advisor Declaration Pending', 'Signature Process Pending', 'Signature In Process'].map(
+                    {['Pending Review', 'Underwriting', 'Advisor Declaration Pending', 'Interview'].map(
                       (statusOption) => (
                         <div
                           key={statusOption}

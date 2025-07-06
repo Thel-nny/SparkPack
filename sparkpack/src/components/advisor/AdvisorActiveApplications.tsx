@@ -278,7 +278,7 @@ const AdvisorActiveApplications: React.FC = () => {
                     >
                       All Statuses
                     </div>
-                    {['Submitted', 'Approved', 'Denied'].map(
+                    {['Approved', 'Issued', 'Declined', 'Canceled/Withdrawn'].map(
                       (statusOption) => (
                         <div
                           key={statusOption}
