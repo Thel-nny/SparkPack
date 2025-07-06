@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
 import { getToken } from "next-auth/jwt";
+import { submittedstatus } from "@prisma/client";
 
 export async function POST(req: NextRequest) {
   try {
@@ -30,7 +31,7 @@ export async function POST(req: NextRequest) {
         // Check if there is a submitted application with this email
         const submittedApplication = await prisma.application.findFirst({
           where: {
-            status: "SUBMITTED" as any,
+            status: submittedstatus.SUBMITTED,
             customer: {
               email: email,
             },
@@ -49,7 +50,7 @@ export async function POST(req: NextRequest) {
       data: {
         firstName: username,
         email,
-        phoneNum,
+        phoneNum: phoneNum || "N/A",
         password: hashedPassword,
         role,
       },
@@ -76,18 +77,18 @@ export async function POST(req: NextRequest) {
       await prisma.clientDetails.create({
         data: {
           userId: user.id,
-          firstName: firstName || '',
-          lastName: lastName || '',
-          dob: dob ? new Date(dob) : new Date('1970-01-01'),
-          pob: pob || '',
-          gender: gender || '',
-          phoneNumber: phoneNumber || '',
-          email: clientEmail || '',
-          streetAddress: streetAddress || '',
-          country: country || '',
-          city: city || '',
-          province: province || '',
-          postalCode: postalCode || '',
+          firstName: firstName || "N/A",
+          lastName: lastName || "N/A",
+          dob: dob ? new Date(dob) : new Date("1970-01-01"),
+          pob: pob || "N/A",
+          gender: gender || "N/A",
+          phoneNumber: phoneNumber || "N/A",
+          email: clientEmail || "N/A",
+          streetAddress: streetAddress || "N/A",
+          country: country || "N/A",
+          city: city || "N/A",
+          province: province || "N/A",
+          postalCode: postalCode || "N/A",
           declarationAccuracy: declarationAccuracy || false,
         },
       });

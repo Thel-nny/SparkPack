@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ChevronDown, Search, User } from 'lucide-react';
+import { ChevronDown, User } from 'lucide-react';
 
 interface NavItem {
   label: string;
@@ -79,6 +79,13 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ className = '' }) => {
 
   const handleClickOutside = () => {
     setActiveDropdown(null);
+  };
+
+  // Signout handler: clear localStorage and redirect to login page
+  const handleSignOut = () => {
+    localStorage.clear();
+    setActiveDropdown(null);
+    window.location.href = '/auth/login';
   };
 
   return (
@@ -188,7 +195,7 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ className = '' }) => {
                     onClick={handleClickOutside}
                     aria-hidden="true"
                   />
-                  <div className="absolute top-full right-0 mt-1 w-56 bg-white rounded-md shadow-lg border border-gray-200 z-20">
+                  <div className="absolute top-full right-0 mt-1 w-56 bg-white rounded-md shadow-lg border border-gray-200 z-20" onClick={(e) => e.stopPropagation()}>
                     <div className="py-1">
                       <Link
                         href="/auth/login"
@@ -218,6 +225,12 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ className = '' }) => {
                       >
                         Contact Support
                       </Link>
+                      <button
+                        onClick={handleSignOut}
+                        className="w-full text-left block px-4 py-2 text-sm text-[#342d47] hover:bg-[#f5f8f3] hover:text-[#7eb238] transition-colors duration-150"
+                      >
+                        Sign Out
+                      </button>
                     </div>
                   </div>
                 </>

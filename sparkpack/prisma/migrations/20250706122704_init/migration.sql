@@ -1,5 +1,14 @@
 -- CreateEnum
-CREATE TYPE "ApplicationStatus" AS ENUM ('ADVISOR_DECLERATION_PENDING', 'SIGNATURE_PROCESS_PENDING', 'SIGNATURE_IN_PROCESS', 'SUBMITTED');
+CREATE TYPE "ApplicationStatus" AS ENUM ('ADVISOR_DECLERATION_PENDING', 'SIGNATURE_PROCESS_PENDING', 'SIGNATURE_IN_PROCESS', 'SUBMITTED', 'APPROVED', 'REJECTED');
+
+-- CreateEnum
+CREATE TYPE "applicationsstatus" AS ENUM ('SUBMITTED', 'IN_PROGRESS', 'ACTIVE');
+
+-- CreateEnum
+CREATE TYPE "submittedstatus" AS ENUM ('SUBMITTED', 'APPROVED', 'DECLINED');
+
+-- CreateEnum
+CREATE TYPE "ApplicationProgressStatus" AS ENUM ('IN_PROGRESS', 'COMPLETED', 'ON_HOLD', 'CANCELLED');
 
 -- CreateEnum
 CREATE TYPE "PlanType" AS ENUM ('MEDICAL_CARE_INSURANCE', 'LEGACY_INSURANCE', 'MEDICARE_AND_LEGACY_INSURANCE', 'SINGLE_PRODUCT');
@@ -12,6 +21,9 @@ CREATE TYPE "ClaimStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED', 'PROCESSIN
 
 -- CreateEnum
 CREATE TYPE "PetSpecies" AS ENUM ('DOG', 'CAT', 'OTHER');
+
+-- CreateEnum
+CREATE TYPE "VacStatus" AS ENUM ('UP_TO_DATE', 'NOT_VACCINATED', 'PARTIALLY_VACCINATED');
 
 -- CreateTable
 CREATE TABLE "User" (
@@ -32,6 +44,15 @@ CREATE TABLE "User" (
 CREATE TABLE "ClientDetails" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
+    "title" TEXT,
+    "firstName" TEXT NOT NULL,
+    "middleName" TEXT,
+    "lastName" TEXT NOT NULL,
+    "dob" TIMESTAMP(3) NOT NULL,
+    "pob" TEXT NOT NULL,
+    "gender" TEXT NOT NULL,
+    "phoneNumber" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
     "streetAddress" TEXT NOT NULL,
     "country" TEXT NOT NULL,
     "city" TEXT NOT NULL,
@@ -48,13 +69,33 @@ CREATE TABLE "ClientDetails" (
 CREATE TABLE "Pet" (
     "id" TEXT NOT NULL,
     "ownerId" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "species" "PetSpecies" NOT NULL,
-    "breed" TEXT,
-    "dateOfBirth" TIMESTAMP(3),
+    "petName" TEXT NOT NULL,
+    "dobOrAdoptionDate" TIMESTAMP(3),
+    "estimatedAge" INTEGER,
     "gender" TEXT,
+    "species" "PetSpecies" NOT NULL,
+    "otherSpecies" TEXT,
+    "breed" TEXT,
     "weight" DOUBLE PRECISION,
-    "medicalConditions" TEXT[],
+    "otherBreed" TEXT,
+    "microchipNumber" TEXT,
+    "colorMarkings" TEXT,
+    "spayedNeutered" BOOLEAN NOT NULL,
+    "vaccinationStatus" "VacStatus" NOT NULL,
+    "lifestyle" TEXT,
+    "chronicIllness" TEXT,
+    "chronicIllnessExplanation" TEXT,
+    "surgeryHistory" TEXT,
+    "surgeryHistoryExplanation" TEXT,
+    "recurringConditions" TEXT,
+    "recurringConditionsExplanation" TEXT,
+    "onMedication" TEXT,
+    "onMedicationExplanation" TEXT,
+    "vetName" TEXT,
+    "vetClinicName" TEXT,
+    "clinicPhoneNumber" TEXT,
+    "clinicAddress" TEXT,
+    "lastVetVisitDate" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -68,16 +109,31 @@ CREATE TABLE "Application" (
     "petId" TEXT NOT NULL,
     "policyNumber" TEXT NOT NULL,
     "planType" "PlanType" NOT NULL,
-    "premiumAmount" DOUBLE PRECISION NOT NULL,
+    "reimbursement" DOUBLE PRECISION NOT NULL,
     "deductible" DOUBLE PRECISION NOT NULL,
-    "coverageLimit" DOUBLE PRECISION,
+    "coverageAmount" DOUBLE PRECISION,
     "status" "ApplicationStatus" NOT NULL DEFAULT 'ADVISOR_DECLERATION_PENDING',
+    "progressStatus" "ApplicationProgressStatus" NOT NULL DEFAULT 'IN_PROGRESS',
     "startDate" TIMESTAMP(3) NOT NULL,
     "endDate" TIMESTAMP(3),
+    "coverageLength" INTEGER,
+    "donationPercentage" DOUBLE PRECISION,
+    "paymentFrequency" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Application_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "SelectedAddOn" (
+    "id" TEXT NOT NULL,
+    "applicationId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "price" DOUBLE PRECISION NOT NULL,
+    "type" TEXT NOT NULL,
+
+    CONSTRAINT "SelectedAddOn_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -107,6 +163,15 @@ CREATE TABLE "Payment" (
     "amount" DOUBLE PRECISION NOT NULL,
     "paymentDate" TIMESTAMP(3) NOT NULL,
     "paymentMethod" TEXT,
+    "cardNumber" TEXT,
+    "cardName" TEXT,
+    "expiryDate" TEXT,
+    "cvv" TEXT,
+    "bankName" TEXT,
+    "accountNumber" TEXT,
+    "accountName" TEXT,
+    "gcashNumber" TEXT,
+    "gcashName" TEXT,
     "transactionId" TEXT,
     "status" TEXT NOT NULL DEFAULT 'COMPLETED',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -184,6 +249,9 @@ ALTER TABLE "Application" ADD CONSTRAINT "Application_customerId_fkey" FOREIGN K
 
 -- AddForeignKey
 ALTER TABLE "Application" ADD CONSTRAINT "Application_petId_fkey" FOREIGN KEY ("petId") REFERENCES "Pet"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "SelectedAddOn" ADD CONSTRAINT "SelectedAddOn_applicationId_fkey" FOREIGN KEY ("applicationId") REFERENCES "Application"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Claim" ADD CONSTRAINT "Claim_applicationId_fkey" FOREIGN KEY ("applicationId") REFERENCES "Application"("id") ON DELETE CASCADE ON UPDATE CASCADE;

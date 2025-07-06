@@ -15,7 +15,7 @@ const PackageConfiguration: React.FC<PackageConfigurationProps> = ({
 }) => {
   if (!selectedProductData) {
     return (
-      <p className="text-red-500">Please go back to "Select Product" to choose a base package first.</p>
+      <p className="text-red-500">Please go back to &quot;Select Product&quot; to choose a base package first.</p>
     );
   }
 

@@ -94,13 +94,13 @@ export async function PUT(req: NextRequest) {
       const pet = await prisma.pet.update({
         where: { id: petId },
         data: {
-          name: body.name,
+          petName: body.name,
           species: body.species,
           breed: body.breed,
-          dateOfBirth: body.dateOfBirth,
+          dobOrAdoptionDate: body.dateOfBirth,
           gender: body.gender,
           weight: body.weight,
-          medicalConditions: body.medicalConditions,
+          // medicalConditions: body.medicalConditions,
         },
         include: {
           owner: {

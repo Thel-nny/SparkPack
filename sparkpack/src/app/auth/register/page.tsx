@@ -145,9 +145,9 @@ export default function Register() {
       window.location.href = "/auth/login?registered=true";
 
       console.log("Attempting to register with:", { firstName, lastName, phoneNumber, email, password, isPolicyholder, isAdvisor });
-    } catch (error: any) {
-      console.error("Simulated registration error:", error);
-      let submitMsg = "A simulated error occurred during registration.";
+    } catch {
+      console.error("Simulated registration error:");
+      const submitMsg = "A simulated error occurred during registration.";
       setErrors(prev => ({ ...prev, submit: submitMsg }));
     } finally {
       setIsLoading(false);

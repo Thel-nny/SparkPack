@@ -86,12 +86,13 @@ export default function Login() {
     }
 
     const session = await getSession();
+    console.log("Session data:", session);
     const userRole = session?.user?.role;
 
     if (userRole === "ADMIN") {
       router.push("/advisor/dashboard");
     } else {
-      router.push("/");
+      router.push("/client/dashboard");
     }
     setIsLoading(false);
   };

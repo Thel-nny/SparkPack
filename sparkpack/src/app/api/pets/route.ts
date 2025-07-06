@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { withAuth } from "@/lib/auth-guard";
 import { PetDetails } from "@/types/formData";
+import { VacStatus } from "@prisma/client";
 
 const PetSpecies = {
   DOG: "DOG",
@@ -69,7 +70,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  return await (await withAuth(async (req: NextRequest, userId: string, userRole: string) => {
+  return await (await withAuth(async (req: NextRequest, userId: string) => {
     try {
       const body: PetDetails = await req.json();
 
@@ -96,7 +97,7 @@ export async function POST(req: NextRequest) {
           microchipNumber: body.microchipNumber,
           colorMarkings: body.colorMarkings,
           spayedNeutered: body.spayedNeutered === 'Yes',
-          vaccinationStatus: body.vaccinationStatus as any,
+          vaccinationStatus: body.vaccinationStatus as VacStatus,
           lifestyle: body.lifestyle,
           chronicIllness: body.chronicIllness,
           chronicIllnessExplanation: body.chronicIllnessExplanation,

@@ -14,7 +14,7 @@ interface SubmitStepProps {
   isSubmitting: boolean; // To show loading state and disable button
 }
 
-const SubmitStep: React.FC<SubmitStepProps> = ({ formData, onPrev, onSubmit, isSubmitting }) => {
+const SubmitStep: React.FC<SubmitStepProps> = ({ onPrev, onSubmit, isSubmitting }) => {
   const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   const handleCheckboxChange = (checked: boolean) => {
@@ -34,7 +34,7 @@ const SubmitStep: React.FC<SubmitStepProps> = ({ formData, onPrev, onSubmit, isS
       <div>
         <h2 className="text-2xl font-bold mb-6 text-[#8cc63f]">Sign & Submit Application</h2>
         <p className="text-gray-700 mb-6">
-          You are almost done! Please read the declaration below and click "Submit Application" to finalize.
+          You are almost done! Please read the declaration below and click &quot;Submit Application&quot; to finalize.
         </p>
 
         {/* Final Declaration */}

@@ -1,18 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { withAuth } from "@/lib/auth-guard";
-import { ApplicationCreateInput } from "@/types";
+import { UserRole } from "@prisma/client"; // ✅ Import the enum
 
 export async function GET(req: NextRequest) {
-
   return (await withAuth(async (req: NextRequest, userId: string, userRole: string) => {
     try {
       const { searchParams } = new URL(req.url);
-      const page = parseInt(searchParams.get('page') || '1');
-      const limit = parseInt(searchParams.get('limit') || '10');
+
+      const page = parseInt(searchParams.get("page") || "1");
+      const limit = parseInt(searchParams.get("limit") || "10");
       const skip = (page - 1) * limit;
 
-      const whereClause = userRole === 'ADMIN' ? {} : { customerId: userId };
+      // ✅ Correct usage of Prisma enum
+      const whereClause =
+        userRole === "ADMIN"
+          ? { customer: { is: { role: UserRole.CUSTOMER } } }
+          : {
+              customerId: userId,
+              customer: { is: { role: UserRole.CUSTOMER } },
+            };
 
       const applications = await prisma.application.findMany({
         where: whereClause,
@@ -25,6 +32,7 @@ export async function GET(req: NextRequest) {
               firstName: true,
               lastName: true,
               email: true,
+              role: true,
             },
           },
           pet: {
@@ -38,7 +46,7 @@ export async function GET(req: NextRequest) {
           claims: true,
           payments: true,
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
       });
 
       const total = await prisma.application.count({ where: whereClause });
@@ -62,11 +70,11 @@ export async function GET(req: NextRequest) {
         { status: 500 }
       );
     }
-  }))(req); // <-- Call the returned function with req
+  }))(req); // ✅ Ensure to call the returned function with req
 }
 
 export async function POST(req: NextRequest) {
-  return await (await withAuth(async (req: NextRequest, userId: string, userRole: string) => {
+  return await (await withAuth(async (req: NextRequest) => {
     try {
       const body = await req.json();
 
@@ -334,10 +342,10 @@ export async function POST(req: NextRequest) {
         data: application,
         message: "Application created successfully",
       });
-    } catch (error: any) {
-      console.error("Error creating application:", error.message, error.stack);
+    } catch{
+      console.error("Error creating application:");
       return NextResponse.json(
-        { success: false, error: error.message || "Internal server error" },
+        { success: false, error: "Internal server error" },
         { status: 500 }
       );
     }
