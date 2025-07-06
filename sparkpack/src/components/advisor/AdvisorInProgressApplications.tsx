@@ -11,7 +11,10 @@ interface Application {
   id: string;
   status: string;
   ensured: string;
-  owners: string[];
+  customer: {
+    firstName: string;
+    lastName: string
+  }
   product: string;
   coverageAmount: number;
   dateStarted: string;

@@ -5,7 +5,10 @@ interface Application {
   id: string;
   status: string;
   ensured: string;
-  owners: string[];
+  customer: {
+    firstName: string;
+    lastName: string
+  }
   product: string;
   coverageAmount: number;
   dateStarted: string;
@@ -76,7 +79,7 @@ const AdvisorInProgressApplicationsTable: React.FC<TableProps> = ({
                 {app.ensured}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                {app.owners.join(', ')}
+                {app.customer.firstName} {app.customer.lastName}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                 {app.product}

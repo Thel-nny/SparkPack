@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
+import { useSession } from "next-auth/react";
 
 interface Application {
   id: string;
@@ -20,9 +21,12 @@ interface ApplicationsTableProps {
 }
 
 const getCookie = (name: string): string | null => {
+  console.log("Reading cookie:", name);
   if (typeof document === 'undefined') return null;
+  console.log("Document cookie:", document.cookie);
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
+  console.log("Cookie parts:", parts);
   if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
   return null;
 };
@@ -36,6 +40,7 @@ const ApplicationsTable: React.FC<ApplicationsTableProps> = ({
   // Local state to track status updates for UI responsiveness
   const [applications, setApplications] = useState(currentApplications);
   const [userRole, setUserRole] = useState<string | null>(null);
+  const { data: session } = useSession();
 
   // Sync local state when currentApplications prop changes
   useEffect(() => {
@@ -43,10 +48,12 @@ const ApplicationsTable: React.FC<ApplicationsTableProps> = ({
   }, [currentApplications]);
 
   // Read userRole from cookies on mount
-  useEffect(() => {
-    const role = getCookie('userRole');
-    setUserRole(role ? role.trim().toUpperCase() : null);
-  }, []);
+useEffect(() => {
+  console.log("session in Application table: ", session);
+  if (session?.user?.role) {
+    setUserRole(session.user.role);
+  }
+}, [session]);
 
   const handleStatusChange = async (appId: string, newStatus: string) => {
     try {
