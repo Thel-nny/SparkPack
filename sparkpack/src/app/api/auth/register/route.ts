@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
 import { getToken } from "next-auth/jwt";
 import { submittedstatus } from "@prisma/client";
+import { sendEmail } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
   try {
@@ -55,6 +56,18 @@ export async function POST(req: NextRequest) {
         role,
       },
     });
+
+    // Send welcome email after user creation
+    try {
+      await sendEmail(
+        email,
+        "Welcome to SparkPack",
+        `Hello ${username},\n\nThank you for registering at SparkPack! We're excited to have you on board.`,
+        `<p>Hello <strong>${username}</strong>,</p><p>Thank you for registering at SparkPack! We're excited to have you on board.</p>`
+      );
+    } catch (emailError) {
+      console.error("Failed to send welcome email:", emailError);
+    }
 
     // If role is CUSTOMER, create ClientDetails record
     if (role === "CUSTOMER") {

@@ -96,7 +96,7 @@ const NewApplicationForm: React.FC = () => {
   });
 
   const updateFormData = <T extends keyof ApplicationFormData>(field: T, data: Partial<ApplicationFormData[T]>) => {
-    setFormData((prevData) => ({
+    setFormData((prevData: ApplicationFormData) => ({
       ...prevData,
       [field]: { ...prevData[field], ...data },
     }));
@@ -156,7 +156,7 @@ const NewApplicationForm: React.FC = () => {
       await updateApplication(response.data.id, status);
 
       alert('Application submitted successfully!');
-      router.push('/advisor/applications/submitted'); // Redirect to submitted applications page
+      router.push('/advisor/dashboard'); // Redirect to advisor dashboard after successful submission
     } catch{
       console.error('Error submitting application:');
       alert(`Submission failed: ${'An unknown error occurred.'}`);

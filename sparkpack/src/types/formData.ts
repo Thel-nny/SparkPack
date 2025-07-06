@@ -110,3 +110,72 @@ export interface ClaimFormData {
   financialReimbursementDetails: FinancialReimbursementDetails;
   declarationsAuthorization: DeclarationsAuthorizationDetails;
 }
+
+export interface ApplicationFormData {
+  client: {
+    title: string;
+    firstName: string;
+    middleName?: string;
+    lastName: string;
+    dob: string;
+    pob?: string;
+    gender: string;
+    allowPhoneCollection: boolean;
+    phoneNumber: string;
+    email: string;
+    streetAddress: string;
+    country: string;
+    city: string;
+    province: string;
+    postalCode: string;
+    declarationAccuracy: boolean;
+  };
+  pet: {
+    petName: string;
+    dobOrAdoptionDate: string;
+    weight: string;
+    estimatedAge?: string;
+    gender: '' | 'Male' | 'Female';
+    species: string;
+    otherSpecies?: string;
+    breed: string;
+    otherBreed?: string;
+    microchipNumber?: string;
+    colorMarkings?: string;
+    spayedNeutered: '' | 'Yes' | 'No';
+    vaccinationStatus: '' | 'Up-to-date' | 'Not up-to-date' | 'Unknown';
+    lifestyle: '' | 'Indoor' | 'Outdoor' | 'Both';
+    chronicIllness: '' | 'Yes' | 'No';
+    chronicIllnessExplanation?: string;
+    surgeryHistory: '' | 'Yes' | 'No';
+    surgeryHistoryExplanation?: string;
+    recurringConditions: '' | 'Yes' | 'No';
+    recurringConditionsExplanation?: string;
+    onMedication: '' | 'Yes' | 'No';
+    onMedicationExplanation?: string;
+    vetName?: string;
+    vetClinicName?: string;
+    clinicPhoneNumber?: string;
+    clinicAddress?: string;
+    lastVetVisitDate?: string;
+  };
+  product: {
+    productName: string;
+    planType: string;
+    coverageAmount: string;
+    deductible: string;
+    reimbursementRate: string;
+    paymentFrequency: string;
+    startDate: string;
+    coverageLength: string;
+    selectedAddOns: string[];
+    donationPercentage: number;
+  };
+  payment: {
+    paymentMethod: string;
+    cardNumber: string;
+    cardName: string;
+    expiryDate: string;
+    cvv: string;
+  };
+}
