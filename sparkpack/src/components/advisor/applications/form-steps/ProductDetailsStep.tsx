@@ -39,18 +39,19 @@ const productIcons: { [key: string]: React.ReactNode } = {
 };
 
 // ==========================================================
-// Product and Add-on Definitions (Kept here)
+// Product and Add-on Definitions (Adjusted Pricing)
 // ==========================================================
 
 const productOptions: ProductOption[] = [
   {
     name: 'Medical Care Insurance',
     description: 'Basic Plan',
-    premiumRange: '₱800 - ₱1,500',
+    // REVISED premiumRange: reflect the new base price
+    premiumRange: '₱950 - ₱1,700',
     coverageRange: '₱20,000 - ₱30,000',
     details: [
       'Lasts for 1 year (renewable annually)',
-      'Premium payment starts from ₱800 - ₱1,500 per year (monthly options available)',
+      'Premium payment starts from ₱950 - ₱1,700 per year (monthly options available)', // REVISED
       'Coverage up to ₱20,000 - ₱30,000',
     ],
     iconKey: 'medicalCareIcon',
@@ -61,7 +62,7 @@ const productOptions: ProductOption[] = [
     fullDetails: {
       'Key Benefits': [
         'Coverage Term: 1 year, renewable annually.',
-        'Annual Premium: Starting from ₱800 - ₱1,500 per year (monthly options available).',
+        'Annual Premium: Starting from ₱950 - ₱1,700 per year (monthly options available).', // REVISED
         'Total Annual Coverage Limit: Up to ₱20,000 - ₱30,000 for covered accidental injuries and illnesses.',
       ],
       "What's Covered": [
@@ -82,11 +83,12 @@ const productOptions: ProductOption[] = [
   {
     name: 'Legacy Insurance',
     description: 'Protection & Peace of Mind',
-    premiumRange: '₱600 - ₱1,000',
+    // REVISED premiumRange
+    premiumRange: '₱700 - ₱1,100',
     coverageRange: '₱5,000 - ₱20,000',
     details: [
       'Lasts for 1 year (renewable annually)',
-      'Premium payment starts from ₱600 - ₱1,000 per year (monthly options available)',
+      'Premium payment starts from ₱700 - ₱1,100 per year (monthly options available)', // REVISED
       'Coverage up to ₱5,000 - ₱20,000'
     ],
     iconKey: 'legacyInsuranceIcon',
@@ -97,7 +99,7 @@ const productOptions: ProductOption[] = [
     fullDetails: {
       'Key Benefits': [
         'Coverage Term: 1 year, renewable annually.',
-        'Annual Premium: Starting from ₱600 - ₱1,000 per year (monthly options available).',
+        'Annual Premium: Starting from ₱700 - ₱1,100 per year (monthly options available).', // REVISED
         'Total Annual Coverage Limit: Up to ₱5,000 - ₱20,000 for covered incidents.',
       ],
       "What's Covered": [
@@ -116,11 +118,12 @@ const productOptions: ProductOption[] = [
   {
     name: 'Medicare and Legacy Insurance',
     description: 'Comprehensive Plan',
-    premiumRange: '₱1,500 - ₱3,000+',
+    // REVISED premiumRange
+    premiumRange: '₱1,800 - ₱4,500+',
     coverageRange: '₱7,500 - ₱100,000+',
     details: [
       'Lasts for 1 year (renewable annually)',
-      'Premium payment starts from ₱1,500 - ₱3,000+ per year (monthly options available, with potential discounts for combined coverage)',
+      'Premium payment starts from ₱1,800 - ₱4,500+ per year (monthly options available, with potential discounts for combined coverage)', // REVISED
       'Coverage up to ₱7,500 - ₱100,000+'
     ],
     iconKey: 'medicareLegacyIcon',
@@ -131,7 +134,7 @@ const productOptions: ProductOption[] = [
     fullDetails: {
       'Key Benefits': [
         'Coverage Term: 1 year, renewable annually.',
-        'Annual Premium: Starting from ₱1,500 - ₱3,000+ per year (or inquire about our convenient monthly payment options and potential discounts for combined coverage).',
+        'Annual Premium: Starting from ₱1,800 - ₱4,500+ per year (or inquire about our convenient monthly payment options and potential discounts for combined coverage).', // REVISED
         'Total Annual Coverage Limit: Up to ₱7,500 - ₱100,000+ for all covered benefits combined.',
       ],
       "What's Covered": [
@@ -223,7 +226,7 @@ const addOnDefinitions: AddOnDefinition[] = [
 
 const donationPercentages = [0, 1, 2, 3, 5];
 
-export const calculatePremium = ( 
+export const calculatePremium = (
   productName: string,
   coverageAmount: string,
   deductible: string,
@@ -244,26 +247,26 @@ export const calculatePremium = (
 
   switch (productName) {
     case 'Medical Care Insurance':
-      basePrice = 800;
-      if (cleanCoverage === 25000) basePrice = 1000;
-      if (cleanCoverage === 30000) basePrice = 1200;
-      if (cleanDeductible === 2000) deductibleFactor = 0.9;
-      if (cleanReimbursement === 0.70) reimbursementFactor = 0.95;
+      basePrice = 950; // Increased from 800
+      if (cleanCoverage === 25000) basePrice = 1200; // Increased from 1000
+      if (cleanCoverage === 30000) basePrice = 1500; // Increased from 1200
+      if (cleanDeductible === 2000) deductibleFactor = 0.93; // Was 0.9, now less of a discount (higher factor)
+      if (cleanReimbursement === 0.70) reimbursementFactor = 0.97; // Was 0.95, now less of a discount (higher factor)
       break;
     case 'Legacy Insurance':
-      basePrice = 600;
-      if (cleanCoverage === 10000) basePrice = 750;
-      if (cleanCoverage === 20000) basePrice = 900;
-      if (cleanDeductible === 500) deductibleFactor = 0.95;
+      basePrice = 700; // Increased from 600
+      if (cleanCoverage === 10000) basePrice = 850; // Increased from 750
+      if (cleanCoverage === 20000) basePrice = 1050; // Increased from 900
+      if (cleanDeductible === 500) deductibleFactor = 0.97; // Was 0.95, now less of a discount (higher factor)
       break;
     case 'Medicare and Legacy Insurance':
-      basePrice = 1500;
-      if (cleanCoverage === 25000) basePrice = 2000;
-      if (cleanCoverage === 50000) basePrice = 2800;
-      if (cleanCoverage === 100000) basePrice = 4000;
-      if (cleanDeductible === 2000) deductibleFactor = 0.9;
-      if (cleanDeductible === 3000) deductibleFactor = 0.85;
-      if (cleanReimbursement === 0.80) reimbursementFactor = 0.9;
+      basePrice = 1800; // Increased from 1500
+      if (cleanCoverage === 25000) basePrice = 2500; // Increased from 2000
+      if (cleanCoverage === 50000) basePrice = 3500; // Increased from 2800
+      if (cleanCoverage === 100000) basePrice = 4800; // Increased from 4000
+      if (cleanDeductible === 2000) deductibleFactor = 0.93; // Was 0.9, now less of a discount (higher factor)
+      if (cleanDeductible === 3000) deductibleFactor = 0.88; // Was 0.85, now less of a discount (higher factor)
+      if (cleanReimbursement === 0.80) reimbursementFactor = 0.93; // Was 0.9, now less of a discount (higher factor)
       break;
     default:
       return { baseAnnual: 0, annualTotal: 0, monthlyTotal: 0, oneTimeTotal: 0, donationAmount: 0 };
@@ -287,7 +290,7 @@ export const calculatePremium = (
 const totalAnnualPremiumBeforeDonation = calculatedBaseAnnualPremium + annualAddOnCost;
   let calculatedDonationAmount = (totalAnnualPremiumBeforeDonation * (donationPercentage / 100));
   let finalAnnualTotalPremium = totalAnnualPremiumBeforeDonation + calculatedDonationAmount;
-  const monthlySurchargeFactor = 1.05;
+  const monthlySurchargeFactor = 1.05; // Keeping this at 5% as previously discussed
   let finalMonthlyTotalPremium = (finalAnnualTotalPremium / 12) * monthlySurchargeFactor;
 
   finalAnnualTotalPremium = Math.round(finalAnnualTotalPremium);

@@ -1,13 +1,27 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { AdvisorFilterSkeleton } from './loading';
 import FilterDropdowns from './AdvisorSubmittedApplications/components/FilterDropdowns';
 import ApplicationsTable from './AdvisorSubmittedApplications/components/ApplicationsTable';
 import PaginationControls from './AdvisorSubmittedApplications/components/PaginationControls';
-
+import ApplicationSummaryModal from './applications/ApplicationSummaryModal';
 
 interface Application {
+  id: string;
+  status: string;
+  ensured: string;
+  customer: {
+    firstName: string;
+    lastName: string
+  }
+  product: string;
+  coverageAmount: number;
+  dateStarted: string;
+  policyNumber: string;
+}
+
+interface SimplifiedApplication {
   id: string;
   status: 'SUBMITTED' | 'APPROVED' | 'REJECTED' | 'SIGNATURE_PROCESS_PENDING' | 'SIGNATURE_IN_PROCESS';
   ensured: string;
@@ -16,26 +30,16 @@ interface Application {
   coverageAmount: number;
   dateStarted: string;
   policyNumber: string;
-  customer: {
-    id: string;
-    firstName: string;
-    lastName: string;
-  };
-  pet?: {
-    id: string;
-    petName: string;
-  };
-  planType: string;
-  startDate?: string;
 }
 
+import { ApplicationFormData } from '@/types/formData';
+
 const AdvisorSubmittedApplications: React.FC = () => {
-  const [applications, setApplications] = useState<Application[]>([]);
+  const [applications, setApplications] = useState<SimplifiedApplication[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const [statusFilter, setStatusFilter] = useState<Application['status'] | ''>('');
-  const [productFilter, setProductFilter] = useState<Application['product'] | ''>('');
+  const [statusFilter, setStatusFilter] = useState<string>('');
+  const [productFilter, setProductFilter] = useState<string>('');
   const [minCoverage, setMinCoverage] = useState<string>('');
   const [maxCoverage, setMaxCoverage] = useState<string>('');
   const [startDate, setStartDate] = useState<string>('');
@@ -47,22 +51,34 @@ const AdvisorSubmittedApplications: React.FC = () => {
 
   const [activeFilterDropdown, setActiveFilterDropdown] = useState<string | null>(null);
 
-  const fetchApplications = useMemo(() => {
-  return async (page: number) => {
+  // New state for modal and selected application
+  const [selectedApplicationData, setSelectedApplicationData] = useState<ApplicationFormData | null>(null);
+  const [isSummaryModalOpen, setIsSummaryModalOpen] = useState(false);
+
+  // Handlers for modal navigation
+  const handleModalPrev = () => {
+    // Implement previous logic if needed
+  };
+
+  const handleModalNext = () => {
+    // Implement next/submit logic if needed
+  };
+
+  const fetchApplications = useCallback(async (page: number) => {
     setLoading(true);
     setError(null);
     try {
       const params = new URLSearchParams();
       params.append('page', page.toString());
       params.append('limit', itemsPerPage.toString());
-       
+
       const response = await fetch(`/api/applications?${params.toString()}`);
       if (!response.ok) {
         throw new Error(`Error fetching applications: ${response.statusText}`);
       }
       const data = await response.json();
       if (data.success) {
-        const apps: Application[] = data.data.applications.map((app: Application) => ({
+        const apps: SimplifiedApplication[] = data.data.applications.map((app: any) => ({
           id: app.id,
           status: app.status,
           ensured: app.customer ? `${app.customer.firstName} ${app.customer.lastName}` : 'N/A',
@@ -77,13 +93,13 @@ const AdvisorSubmittedApplications: React.FC = () => {
       } else {
         setError(data.error || 'Failed to fetch applications');
       }
-    } catch{
+    } catch {
       setError('Failed to fetch applications');
     } finally {
       setLoading(false);
     }
-  };
-}, [itemsPerPage, setLoading, setError, setApplications, setTotalPages]); // Dependencies: itemsPerPage and all setter functions
+  }, [itemsPerPage]);
+
   useEffect(() => {
     fetchApplications(currentPage);
   }, [currentPage, fetchApplications]);
@@ -138,6 +154,35 @@ const AdvisorSubmittedApplications: React.FC = () => {
     setActiveFilterDropdown(null);
   };
 
+  // New function to fetch full application data by id
+  const fetchFullApplicationData = async (id: string): Promise<ApplicationFormData | null> => {
+    try {
+      const response = await fetch(`/api/applications/${id}`);
+      if (!response.ok) {
+        throw new Error(`Error fetching application data: ${response.statusText}`);
+      }
+      const data = await response.json();
+      if (data.success) {
+        return data.data as ApplicationFormData;
+      } else {
+        setError(data.error || 'Failed to fetch application data');
+        return null;
+      }
+    } catch (error) {
+      setError('Failed to fetch application data');
+      return null;
+    }
+  };
+
+  // Updated onSelectApplication handler to fetch full data
+  const handleSelectApplication = async (app: SimplifiedApplication) => {
+    const fullData = await fetchFullApplicationData(app.id);
+    if (fullData) {
+      setSelectedApplicationData(fullData);
+      setIsSummaryModalOpen(true);
+    }
+  };
+
   return (
     <div className="p-4 sm:p-6 lg:p-8">
       <div className="grid grid-cols-1 gap-6">
@@ -149,9 +194,9 @@ const AdvisorSubmittedApplications: React.FC = () => {
           ) : (
             <FilterDropdowns
               statusFilter={statusFilter}
-              setStatusFilter={setStatusFilter as (value: string) => void}
+              setStatusFilter={setStatusFilter}
               productFilter={productFilter}
-              setProductFilter={setProductFilter as (value: string) => void}
+              setProductFilter={setProductFilter}
               minCoverage={minCoverage}
               setMinCoverage={setMinCoverage}
               maxCoverage={maxCoverage}
@@ -180,6 +225,7 @@ const AdvisorSubmittedApplications: React.FC = () => {
           formatCurrency={formatCurrency}
           loading={loading}
           error={error}
+          onSelectApplication={handleSelectApplication}
         />
 
         <PaginationControls
@@ -191,6 +237,17 @@ const AdvisorSubmittedApplications: React.FC = () => {
           }}
         />
       </div>
+
+      {/* --- RENDER THE APPLICATION SUMMARY MODAL HERE --- */}
+      {selectedApplicationData && (
+        <ApplicationSummaryModal
+          isOpen={isSummaryModalOpen}
+          onClose={() => setIsSummaryModalOpen(false)}
+          formData={selectedApplicationData}
+          onPrev={handleModalPrev}
+          onNext={handleModalNext}
+        />
+      )}
     </div>
   );
 };

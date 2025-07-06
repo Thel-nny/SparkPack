@@ -18,6 +18,7 @@ interface ApplicationsTableProps {
   formatCurrency: (amount: number) => string;
   loading: boolean;
   error: string | null;
+  onSelectApplication?: (app: Application) => void;
 }
 
 

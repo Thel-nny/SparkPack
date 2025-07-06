@@ -17,7 +17,7 @@ const AdvisorTableSkeleton: React.FC = () => {
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {/* Skeletons for n rows of table data */}
-            {[...Array(7)].map((_, rowIndex) => (
+            {[...Array(5)].map((_, rowIndex) => (
               <tr key={rowIndex}>
                 {/* Skeletons for 7 cells per row */}
                 {[...Array(7)].map((_, colIndex) => (

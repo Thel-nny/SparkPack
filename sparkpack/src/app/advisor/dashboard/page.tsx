@@ -1,9 +1,15 @@
-"use client"
+'use client'; 
 
-import AdvisorTopNavbar from "@/components/advisor/AdvisorTopNavBar";
+import AdvisorDashboardHome from '@/components/advisor/AdvisorDashboardHome';
+import AdvisorTopNavbar from '@/components/advisor/AdvisorTopNavBar';
 
-export default function AdvisorDashboard() {
+export default function AdvisorDashboardPage() {
   return (
-    <AdvisorTopNavbar/>
+    <>
+      <AdvisorTopNavbar/>
+      <div className="p-4 sm:p-6 lg:p-8">
+        <AdvisorDashboardHome />
+      </div>
+    </>
   );
 }

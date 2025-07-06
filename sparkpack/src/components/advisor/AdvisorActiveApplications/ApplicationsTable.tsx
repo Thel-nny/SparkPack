@@ -11,6 +11,10 @@ interface Application {
   dateStarted: string;
   policyNumber: string;
   advisorName?: string;
+  customer: {
+    firstName: string;
+    lastName: string;
+  };
 }
 
 interface ApplicationsTableProps {
@@ -56,7 +60,7 @@ const ApplicationsTable: React.FC<ApplicationsTableProps> = ({
             >
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{app.status}</td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{app.ensured}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{app.owners.join(', ')}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{app.customer.firstName} {app.customer.lastName}</td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{app.product}</td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatCurrency(app.coverageAmount)}</td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{app.dateStarted}</td>
