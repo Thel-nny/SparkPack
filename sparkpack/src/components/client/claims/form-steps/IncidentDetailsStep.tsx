@@ -85,7 +85,7 @@ const IncidentDetailsStep: React.FC<IncidentDetailsStepProps> = ({ formData, onU
   };
 
   const validate = () => {
-    let newErrors: Partial<Record<keyof IncidentDetails, string>> = {};
+    const newErrors: Partial<Record<keyof IncidentDetails, string>> = {};
 
     if (!localFormData.incidentOrSymptomDate) {
       newErrors.incidentOrSymptomDate = 'Date of Incident/First Symptom is required.';

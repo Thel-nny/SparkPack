@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { PetDetails } from '@/types/formData';
 
 interface PetDetailsStepProps {
@@ -53,7 +52,7 @@ const PetDetailsStep: React.FC<PetDetailsStepProps> = ({ formData, onUpdate, onP
   const commonBreeds = ['Shih Tzus', 'Golden Retriever', 'Other', 'Mixed Breed'];
 
   const validate = () => {
-    let newErrors: Partial<Record<keyof PetDetails, string>> = {};
+    const newErrors: Partial<Record<keyof PetDetails, string>> = {};
 
     if (!localFormData.petName) newErrors.petName = 'Pet name is required.';
     if (!localFormData.estimatedAge) newErrors.estimatedAge = 'Estimated Age is required.';

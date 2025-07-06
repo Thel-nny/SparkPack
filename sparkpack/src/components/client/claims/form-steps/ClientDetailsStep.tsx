@@ -44,7 +44,7 @@ const ClientDetailsStep: React.FC<ClientDetailsStepProps> = ({ formData, onUpdat
   const validate = () => {
     // --- CHANGE MADE HERE ---
     // Define newErrors with the correct type
-    let newErrors: Partial<Record<keyof ClientDetails, string>> = {};
+    const newErrors: Partial<Record<keyof ClientDetails, string>> = {};
     // --- END CHANGE ---
 
     // Mandatory fields

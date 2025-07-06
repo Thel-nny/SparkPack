@@ -68,7 +68,7 @@ const FinancialReimbursementStep: React.FC<FinancialReimbursementStepProps> = ({
 
   // --- CHANGE 4: Implement detailed validation function ---
   const validate = () => {
-    let newErrors: Partial<Record<keyof FinancialReimbursementDetails, string>> = {};
+    const newErrors: Partial<Record<keyof FinancialReimbursementDetails, string>> = {};
 
     if (!localFormData.totalVetBillAmount || parseFloat(localFormData.totalVetBillAmount) <= 0) {
       newErrors.totalVetBillAmount = 'Total Amount of Vet Bill(s) for this Incident is required and must be greater than zero.';

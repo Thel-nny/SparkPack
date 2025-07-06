@@ -56,7 +56,7 @@ const DeclarationsAuthorizationStep: React.FC<DeclarationsAuthorizationStepProps
 
   // --- CHANGE 5: Implement detailed validation function ---
   const validate = () => {
-    let newErrors: Partial<Record<keyof DeclarationsAuthorizationDetails, string>> = {};
+    const newErrors: Partial<Record<keyof DeclarationsAuthorizationDetails, string>> = {};
 
     if (!localFormData.declarationTruthfulnessAccepted) {
       newErrors.declarationTruthfulnessAccepted = 'You must accept the declaration of truthfulness.';
@@ -156,7 +156,7 @@ const DeclarationsAuthorizationStep: React.FC<DeclarationsAuthorizationStepProps
             </label>
           </div>
           <p className="text-sm text-gray-600 pl-6">
-            I understand and consent to the collection, processing, and storage of my personal data and my pet&apos;s data by [Your Company Name] in accordance with the Data Privacy Act of 2012 (Republic Act No. 10173) of the Philippines. This data will be used solely for the purpose of processing and managing my insurance policy and claim, and will be protected with appropriate security measures. I affirm that I have read and understood [Your Company Name]'s Privacy Policy.
+            I understand and consent to the collection, processing, and storage of my personal data and my pet&apos;s data by [Your Company Name] in accordance with the Data Privacy Act of 2012 (Republic Act No. 10173) of the Philippines. This data will be used solely for the purpose of processing and managing my insurance policy and claim, and will be protected with appropriate security measures. I affirm that I have read and understood [Your Company Name]&apos;s Privacy Policy.
           </p>
           {errors.dataPrivacyConsentAccepted && <p className="text-red-500 text-xs mt-1 pl-6">{errors.dataPrivacyConsentAccepted}</p>}
         </div>
@@ -165,7 +165,7 @@ const DeclarationsAuthorizationStep: React.FC<DeclarationsAuthorizationStepProps
         <div className="mt-6 bg-gray-50 p-4 rounded-md shadow-sm">
           <Label htmlFor="policyholderSignatureName" className="block text-sm font-medium text-gray-700 mb-1">
             {/* --- FIX 10: Wrap label content in a fragment --- */}
-            <>Policyholder's Full Name (Digital Signature) <span className="text-red-500">*</span></>
+            <>Policyholder&apos;s Full Name (Digital Signature) <span className="text-red-500">*</span></>
           </Label>
           <Input
             id="policyholderSignatureName"

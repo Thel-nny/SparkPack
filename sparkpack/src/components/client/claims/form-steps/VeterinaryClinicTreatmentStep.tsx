@@ -63,7 +63,7 @@ const VeterinaryClinicTreatmentStep: React.FC<VeterinaryClinicTreatmentStepProps
   };
 
   const validate = () => {
-    let newErrors: Partial<Record<keyof VeterinaryClinicTreatmentDetails, string>> = {};
+    const newErrors: Partial<Record<keyof VeterinaryClinicTreatmentDetails, string>> = {};
 
     if (!localFormData.clinicName) {
       newErrors.clinicName = 'Clinic Name is required.';
@@ -164,7 +164,7 @@ const VeterinaryClinicTreatmentStep: React.FC<VeterinaryClinicTreatmentStepProps
               </div>
               <div>
                 <label htmlFor="attendingVetName" className="block text-sm font-medium text-gray-700 mb-1">
-                  <>Attending Veterinarian's Name <span className="text-red-500">*</span></>
+                  <>Attending Veterinarian&apos;s Name <span className="text-red-500">*</span></>
                 </label>
                 <Input
                   id="attendingVetName"

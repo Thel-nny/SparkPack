@@ -92,7 +92,7 @@ export default function LandingPage() {
             <Badge className="bg-[#8cc63f] text-white mb-4">Insurance Plans</Badge>
             <h2 className="text-4xl font-bold text-[#342d47] mb-4">Comprehensive Pet Insurance</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              From routine checkups to emergency care, we've got your pet covered with our locally-tailored insurance
+              From routine checkups to emergency care, we&apos;ve got your pet covered with our locally-tailored insurance
               plans.
             </p>
           </div>
@@ -253,9 +253,9 @@ export default function LandingPage() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <Badge className="bg-[#8cc63f] text-white mb-4">Memorial Services</Badge>
-            <h2 className="text-4xl font-bold text-[#342d47] mb-4">Honoring Your Pet's Memory</h2>
+            <h2 className="text-4xl font-bold text-[#342d47] mb-4">Honoring Your Pet&apos;s Memory</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              When the time comes to say goodbye, we provide compassionate memorial services that celebrate your pet's
+              When the time comes to say goodbye, we provide compassionate memorial services that celebrate your pet&apos;s
               life and create lasting memories.
             </p>
           </div>
@@ -278,7 +278,7 @@ export default function LandingPage() {
                 </div>
                 <CardTitle className="text-[#342d47]">Tree Planting Ceremony</CardTitle>
                 <CardDescription>
-                  Plant a tree in your pet's memory at our dedicated memorial forest in Iloilo
+                  Plant a tree in your pet&apos;s memory at our dedicated memorial forest in Iloilo
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -335,7 +335,7 @@ export default function LandingPage() {
             <Badge className="bg-[#8cc63f] text-white mb-4">Local Partners</Badge>
             <h2 className="text-4xl font-bold text-[#342d47] mb-4">Trusted Network in Iloilo</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              We've partnered with the best veterinarians and pet-friendly businesses across Iloilo to provide you with
+              We&apos;ve partnered with the best veterinarians and pet-friendly businesses across Iloilo to provide you with
               exceptional care and services.
             </p>
           </div>
@@ -498,12 +498,12 @@ export default function LandingPage() {
               <p className="text-gray-600 mb-4">
                 Sparkpack was founded in 2020 by a group of pet lovers in Iloilo who experienced the heartbreak of
                 losing beloved pets and the financial stress that comes with unexpected veterinary bills. We realized
-                that pet insurance in the Philippines was either too expensive, too complicated, or didn't truly
+                that pet insurance in the Philippines was either too expensive, too complicated, or didn&apos;t truly
                 understand the local needs.
               </p>
               <p className="text-gray-600 mb-6">
                 What makes us unique is our combination of comprehensive medical insurance with meaningful memorial
-                services. We believe that caring for your pet shouldn't end when they pass away – it should continue
+                services. We believe that caring for your pet shouldn&apos;t end when they pass away – it should continue
                 with dignity and love.
               </p>
               <div className="grid grid-cols-2 gap-4">
@@ -538,7 +538,7 @@ export default function LandingPage() {
                 </div>
                 <h4 className="font-bold text-[#342d47] mb-2">Local Expertise</h4>
                 <p className="text-gray-600">
-                  Deep understanding of Iloilo's pet care landscape and local veterinary network
+                  Deep understanding of Iloilo&apos;s pet care landscape and local veterinary network
                 </p>
               </Card>
               <Card className="text-center p-6 border-0 shadow-lg">
@@ -657,8 +657,8 @@ export default function LandingPage() {
                 ))}
               </div>
               <p className="text-gray-600 mb-4">
-                "When our Golden Retriever Max needed emergency surgery, Sparkpack covered everything. The claims
-                process was so easy, and the memorial tree planting ceremony gave us comfort during our grief."
+                &quot;When our Golden Retriever Max needed emergency surgery, Sparkpack covered everything. The claims
+                process was so easy, and the memorial tree planting ceremony gave us comfort during our grief.&quot;
               </p>
               <div className="flex items-center gap-3">
                 <UserRound className="h-24 w-24 text-gray-500" />
@@ -676,8 +676,8 @@ export default function LandingPage() {
                 ))}
               </div>
               <p className="text-gray-600 mb-4">
-                "The local network of vets is amazing. We can get appointments easily, and the quality of care is
-                excellent. Plus, knowing that memorial services are included gives us peace of mind."
+                &quot;The local network of vets is amazing. We can get appointments easily, and the quality of care is
+                excellent. Plus, knowing that memorial services are included gives us peace of mind.&quot;
               </p>
               <div className="flex items-center gap-3">
                 <UserRound className="h-24 w-24 text-gray-500" />
@@ -695,8 +695,8 @@ export default function LandingPage() {
                 ))}
               </div>
               <p className="text-gray-600 mb-4">
-                "Sparkpack truly understands pet parents in Iloilo. The pricing is fair, the service is exceptional, and
-                they really care about our pets' wellbeing throughout their entire lives."
+                &quot;Sparkpack truly understands pet parents in Iloilo. The pricing is fair, the service is exceptional, and
+                they really care about our pets&apos; wellbeing throughout their entire lives.&quot;
               </p>
               <div className="flex items-center gap-3">
                 <UserRound className="h-24 w-24 text-gray-500" />
@@ -749,7 +749,7 @@ export default function LandingPage() {
                 className="mb-4 brightness-0 invert"
               />
               <p className="text-gray-300 mb-4">
-                Your pet's lifetime companion in Iloilo. Comprehensive insurance and memorial services in one plan.
+                Your pet&apos;s lifetime companion in Iloilo. Comprehensive insurance and memorial services in one plan.
               </p>
               <div className="flex space-x-4">
                 <Link href="#" className="text-gray-300 hover:text-[#8cc63f]">
