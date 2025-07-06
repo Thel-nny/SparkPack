@@ -7,7 +7,11 @@ import { Input } from '@/components/ui/input';
 import { AdvisorFilterSkeleton, AdvisorTableSkeleton } from './loading';
 import { Filter, ChevronDown, XCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 
-// Define the type for an individual application
+// Import the ApplicationSummaryModal and ApplicationFormData type
+import ApplicationSummaryModal from '@/components/advisor/applications/ApplicationSummaryModal';
+import { ApplicationFormData } from '@/types/formData'; // Ensure this path is correct
+
+// Define the type for an individual application (minimal data for table)
 interface Application {
   id: string;
   status: 'Submitted' | 'Approved' | 'Denied';
@@ -18,6 +22,72 @@ interface Application {
   dateStarted: string; // Using string for simplicity, e.g., 'YYYY-MM-DD'
   policyNumber: string; // 'N/A' for in-progress applications
 }
+
+// --- MOCK DATA FOR FULL APPLICATION SUMMARY ---
+// This is crucial. In a real app, you would fetch this data from your backend
+// using the `id` of the clicked application.
+const mockFullApplicationData: { [key: string]: ApplicationFormData } = {
+  'sub-011': {
+    client: { title: 'Mr.', firstName: 'Frodo', middleName: '', lastName: 'Baggins', dob: '1980-01-01', pob: 'Shire', gender: 'Male', phoneNumber: '09171234567', email: 'frodo@example.com', streetAddress: 'Bag End, Hobbiton', city: 'Shire', province: 'Middle-earth', postalCode: '12345', country: 'The World', declarationAccuracy: true, allowPhoneCollection: true }, // Added allowPhoneCollection
+    pet: { petName: 'Pippin the Ferret', dobOrAdoptionDate: '2023-03-10', estimatedAge: '2 years', gender: 'Male', species: 'Ferret', otherSpecies: '', breed: 'Domestic Ferret', otherBreed: '', microchipNumber: '123456789012345', colorMarkings: 'Sable', spayedNeutered: 'Yes', vaccinationStatus: 'Up-to-date', lifestyle: 'Active', chronicIllness: 'No', chronicIllnessExplanation: '', surgeryHistory: 'No', surgeryHistoryExplanation: '', recurringConditions: 'No', recurringConditionsExplanation: '', onMedication: 'No', onMedicationExplanation: '', vetName: 'Dr. Samwise Gamgee', vetClinicName: 'Shire Animal Clinic', clinicPhoneNumber: '09187654321', clinicAddress: 'Green Dragon Road, Hobbiton', lastVetVisitDate: '2024-02-28', weight: '0.5 kg' }, // Added weight
+    product: { productName: 'Medical Care Insurance', coverageAmount: '40000', deductible: '2000', reimbursementRate: '80%', paymentFrequency: 'Monthly', startDate: '2024-01-05', coverageLength: '1 Year', selectedAddOns: [{ id: 'wellness', name: 'Wellness Package', price: 5000, type: 'annual' }], donationPercentage: 5, planType: 'Standard' }, // Added planType
+    payment: { paymentMethod: 'Credit/Debit Card', cardNumber: '1234567890123456', cardName: 'Frodo Baggins', expiryDate: '12/26', cvv: '123', bankName: '', accountNumber: '', accountName: '', gcashNumber: '', gcashName: '' }
+  },
+  'sub-012': {
+    client: { title: 'Mr.', firstName: 'Bilbo', middleName: '', lastName: 'Baggins', dob: '1960-09-22', pob: 'Shire', gender: 'Male', phoneNumber: '09198765432', email: 'bilbo@example.com', streetAddress: 'Bag End, Hobbiton', city: 'Shire', province: 'Middle-earth', postalCode: '12345', country: 'The World', declarationAccuracy: true, allowPhoneCollection: true }, // Added allowPhoneCollection
+    pet: { petName: 'Gandalf the Grey', dobOrAdoptionDate: '2022-01-15', estimatedAge: '3 years', gender: 'Male', species: 'Cat', otherSpecies: '', breed: 'Maine Coon', otherBreed: '', microchipNumber: '987654321098765', colorMarkings: 'Grey', spayedNeutered: 'Yes', vaccinationStatus: 'Up-to-date', lifestyle: 'Indoor', chronicIllness: 'No', chronicIllnessExplanation: '', surgeryHistory: 'No', surgeryHistoryExplanation: '', recurringConditions: 'No', recurringConditionsExplanation: '', onMedication: 'No', onMedicationExplanation: '', vetName: 'Dr. Elrond', vetClinicName: 'Rivendell Veterinary', clinicPhoneNumber: '09201234567', clinicAddress: 'Rivendell Valley', lastVetVisitDate: '2024-03-01', weight: '6 kg' }, // Added weight
+    product: { productName: 'Legacy Insurance', coverageAmount: '150000', deductible: '5000', reimbursementRate: '90%', paymentFrequency: 'Annually', startDate: '2024-01-10', coverageLength: '5 Years', selectedAddOns: [], donationPercentage: 10, planType: 'Premium' }, // Added planType
+    payment: { paymentMethod: 'Bank Transfer', cardNumber: '', cardName: '', expiryDate: '', cvv: '', bankName: 'Gringotts Bank', accountNumber: '123456789', accountName: 'Bilbo Baggins' }
+  },
+  'sub-013': {
+    client: { title: 'Mr.', firstName: 'Elrond', middleName: '', lastName: 'Half-elven', dob: '0001-01-01', pob: 'Valinor', gender: 'Male', phoneNumber: '09169876543', email: 'elrond@example.com', streetAddress: 'Last Homely House', city: 'Rivendell', province: 'Eriador', postalCode: 'ELV001', country: 'Middle-earth', declarationAccuracy: true, allowPhoneCollection: true },
+    pet: { petName: 'Legolas Greenleaf', dobOrAdoptionDate: '2021-05-20', estimatedAge: '4 years', gender: 'Male', species: 'Cat', otherSpecies: '', breed: 'Siamese', otherBreed: '', microchipNumber: '246813579024680', colorMarkings: 'Cream Point', spayedNeutered: 'Yes', vaccinationStatus: 'Up-to-date', lifestyle: 'Outdoor', chronicIllness: 'No', chronicIllnessExplanation: '', surgeryHistory: 'No', surgeryHistoryExplanation: '', recurringConditions: 'No', recurringConditionsExplanation: '', onMedication: 'No', onMedicationExplanation: '', vetName: 'Dr. Glorfindel', vetClinicName: 'Elven Vet Clinic', clinicPhoneNumber: '09170001111', clinicAddress: 'Misty Mountains', lastVetVisitDate: '2024-01-10', weight: '4 kg' },
+    product: { productName: 'Medical Care Insurance', coverageAmount: '70000', deductible: '3000', reimbursementRate: '70%', paymentFrequency: 'Quarterly', startDate: '2024-01-15', coverageLength: '2 Years', selectedAddOns: [{ id: 'dental', name: 'Dental Care', price: 3000, type: 'annual' }], donationPercentage: 2, planType: 'Basic' },
+    payment: { paymentMethod: 'GCash', cardNumber: '', cardName: '', expiryDate: '', cvv: '', bankName: '', accountNumber: '', accountName: '', gcashNumber: '09175551234', gcashName: 'Elrond H.' }
+  },
+  'sub-014': {
+    client: { title: 'Mr.', firstName: 'Aragorn', middleName: '', lastName: 'Strider', dob: '1987-03-01', pob: 'Gondor', gender: 'Male', phoneNumber: '09171112222', email: 'aragorn@example.com', streetAddress: 'Minas Tirith', city: 'Gondor', province: 'Middle-earth', postalCode: 'GNDR1', country: 'Middle-earth', declarationAccuracy: true, allowPhoneCollection: true },
+    pet: { petName: 'Arwen Evenstar', dobOrAdoptionDate: '2020-07-20', estimatedAge: '5 years', gender: 'Female', species: 'Dog', otherSpecies: '', breed: 'German Shepherd', otherBreed: '', microchipNumber: '112233445566778', colorMarkings: 'Black and Tan', spayedNeutered: 'Yes', vaccinationStatus: 'Up-to-date', lifestyle: 'Active', chronicIllness: 'No', chronicIllnessExplanation: '', surgeryHistory: 'No', surgeryHistoryExplanation: '', recurringConditions: 'No', recurringConditionsExplanation: '', onMedication: 'No', onMedicationExplanation: '', vetName: 'Dr. Faramir', vetClinicName: 'Gondor Pet Clinic', clinicPhoneNumber: '09182223333', clinicAddress: 'Pelennor Fields', lastVetVisitDate: '2024-04-05', weight: '30 kg' },
+    product: { productName: 'Legacy Insurance', coverageAmount: '200000', deductible: '10000', reimbursementRate: '85%', paymentFrequency: 'Annually', startDate: '2024-01-20', coverageLength: '10 Years', selectedAddOns: [{ id: 'estate', name: 'Estate Planning Rider', price: 10000, type: 'one-time' }], donationPercentage: 15, planType: 'Executive' },
+    payment: { paymentMethod: 'Bank Transfer', cardNumber: '', cardName: '', expiryDate: '', cvv: '', bankName: 'Bank of Gondor', accountNumber: '987654321', accountName: 'Aragorn Elessar' }
+  },
+  'sub-015': {
+    client: { title: 'Mr.', firstName: 'Gimli', middleName: '', lastName: 'Glóinsson', dob: '1950-02-10', pob: 'Lonely Mountain', gender: 'Male', phoneNumber: '09173334444', email: 'gimli@example.com', streetAddress: 'Erebor Dwarf Holds', city: 'Erebor', province: 'Rhûn', postalCode: 'DWRF1', country: 'Middle-earth', declarationAccuracy: true, allowPhoneCollection: true },
+    pet: { petName: 'Thorin Oakenshield', dobOrAdoptionDate: '2022-09-01', estimatedAge: '2 years', gender: 'Male', species: 'Dog', otherSpecies: '', breed: 'Bulldog', otherBreed: '', microchipNumber: '998877665544332', colorMarkings: 'Brindle', spayedNeutered: 'Yes', vaccinationStatus: 'Up-to-date', lifestyle: 'Calm', chronicIllness: 'No', chronicIllnessExplanation: '', surgeryHistory: 'No', surgeryHistoryExplanation: '', recurringConditions: 'No', recurringConditionsExplanation: '', onMedication: 'No', onMedicationExplanation: '', vetName: 'Dr. Balin', vetClinicName: 'Moria Vet Services', clinicPhoneNumber: '09194445555', clinicAddress: 'Moria Gate', lastVetVisitDate: '2024-05-12', weight: '25 kg' },
+    product: { productName: 'Medical Care Insurance', coverageAmount: '65000', deductible: '2500', reimbursementRate: '75%', paymentFrequency: 'Annually', startDate: '2024-01-25', coverageLength: '1 Year', selectedAddOns: [], donationPercentage: 7, planType: 'Silver' },
+    payment: { paymentMethod: 'Credit/Debit Card', cardNumber: '9988776655443322', cardName: 'Gimli Son of Gloin', expiryDate: '10/27', cvv: '456', bankName: '', accountNumber: '', accountName: '', gcashNumber: '', gcashName: '' }
+  },
+  'sub-016': {
+    client: { title: 'Mr.', firstName: 'Melkor', middleName: '', lastName: 'Bauglir', dob: '0000-00-01', pob: 'Void', gender: 'Male', phoneNumber: '09170000000', email: 'sauron@example.com', streetAddress: 'Barad-dûr', city: 'Mordor', province: 'Ash Mountains', postalCode: 'EVIL1', country: 'Middle-earth', declarationAccuracy: true, allowPhoneCollection: true },
+    pet: { petName: 'Sauron the Dark Lord', dobOrAdoptionDate: '2023-11-11', estimatedAge: '1 year', gender: 'Male', species: 'Lizard', otherSpecies: 'Dragon', breed: 'Wyvern', otherBreed: '', microchipNumber: '111100002222333', colorMarkings: 'Black', spayedNeutered: 'No', vaccinationStatus: 'None', lifestyle: 'Aggressive', chronicIllness: 'Yes', chronicIllnessExplanation: 'Dark Magic Affliction', surgeryHistory: 'No', surgeryHistoryExplanation: '', recurringConditions: 'Yes', recurringConditionsExplanation: 'Eye of Sauron Syndrome', onMedication: 'Yes', onMedicationExplanation: 'Morgoth\'s Potion', vetName: 'Dr. Wormtongue', vetClinicName: 'Isengard Lair', clinicPhoneNumber: '09180000000', clinicAddress: 'Orthanc Tower', lastVetVisitDate: '2024-06-01', weight: '1000 kg' },
+    product: { productName: 'Legacy Insurance', coverageAmount: '1000000', deductible: '50000', reimbursementRate: '100%', paymentFrequency: 'Monthly', startDate: '2024-02-01', coverageLength: 'Lifetime', selectedAddOns: [], donationPercentage: 0, planType: 'Platinum' },
+    payment: { paymentMethod: 'GCash', cardNumber: '', cardName: '', expiryDate: '', cvv: '', bankName: '', accountNumber: '', accountName: '', gcashNumber: '09179998888', gcashName: 'Melkor B.' }
+  },
+  'sub-017': {
+    client: { title: 'Mr.', firstName: 'Bard', middleName: '', lastName: 'the Bowman', dob: '1975-04-15', pob: 'Esgaroth', gender: 'Male', phoneNumber: '09175556666', email: 'bard@example.com', streetAddress: 'Lake-town Pier', city: 'Esgaroth', province: 'Dale', postalCode: 'LKETWN', country: 'Middle-earth', declarationAccuracy: true, allowPhoneCollection: true },
+    pet: { petName: 'Smaug the Dragon', dobOrAdoptionDate: '2023-01-01', estimatedAge: '2 years', gender: 'Male', species: 'Reptile', otherSpecies: 'Dragon', breed: 'Wyvern', otherBreed: '', microchipNumber: '000011112222333', colorMarkings: 'Red-Gold', spayedNeutered: 'No', vaccinationStatus: 'None', lifestyle: 'Territorial', chronicIllness: 'Yes', chronicIllnessExplanation: 'Fire Breath Exhaustion', surgeryHistory: 'No', surgeryHistoryExplanation: '', recurringConditions: 'No', recurringConditionsExplanation: '', onMedication: 'No', onMedicationExplanation: '', vetName: 'Dr. Dwalin', vetClinicName: 'Mountain Vet Clinic', clinicPhoneNumber: '09186667777', clinicAddress: 'Lonely Mountain Entrance', lastVetVisitDate: '2024-05-20', weight: '2000 kg' },
+    product: { productName: 'Medical Care Insurance', coverageAmount: '500000', deductible: '20000', reimbursementRate: '60%', paymentFrequency: 'Annually', startDate: '2024-02-05', coverageLength: '1 Year', selectedAddOns: [{ id: 'disaster_relief', name: 'Disaster Relief Add-on', price: 15000, type: 'annual' }], donationPercentage: 8, planType: 'Bronze' },
+    payment: { paymentMethod: 'Credit/Debit Card', cardNumber: '0000111122223333', cardName: 'Bard Bowman', expiryDate: '07/28', cvv: '789', bankName: '', accountNumber: '', accountName: '', gcashNumber: '', gcashName: '' }
+  },
+  'sub-018': {
+    client: { title: 'Mr.', firstName: 'Saruman', middleName: '', lastName: 'the White', dob: '1930-08-20', pob: 'Isengard', gender: 'Male', phoneNumber: '09177778888', email: 'saruman@example.com', streetAddress: 'Orthanc Tower', city: 'Isengard', province: 'Nan Curunír', postalCode: 'WIZRD1', country: 'Middle-earth', declarationAccuracy: true, allowPhoneCollection: true },
+    pet: { petName: 'Treebeard the Ent', dobOrAdoptionDate: '2021-02-01', estimatedAge: '4 years', gender: 'Male', species: 'Tree', otherSpecies: 'Ent', breed: 'Oak', otherBreed: '', microchipNumber: '987654321098765', colorMarkings: 'Bark', spayedNeutered: 'No', vaccinationStatus: 'None', lifestyle: 'Sedentary', chronicIllness: 'No', chronicIllnessExplanation: '', surgeryHistory: 'No', surgeryHistoryExplanation: '', recurringConditions: 'No', recurringConditionsExplanation: '', onMedication: 'No', onMedicationExplanation: '', vetName: 'Dr. Radagast', vetClinicName: 'Brown Lands Clinic', clinicPhoneNumber: '09188889999', clinicAddress: 'Brown Lands, East Emnet', lastVetVisitDate: '2024-01-01', weight: '5000 kg' },
+    product: { productName: 'Legacy Insurance', coverageAmount: '300000', deductible: '15000', reimbursementRate: '95%', paymentFrequency: 'Annually', startDate: '2024-02-10', coverageLength: '20 Years', selectedAddOns: [], donationPercentage: 12, planType: 'Gold' },
+    payment: { paymentMethod: 'Bank Transfer', cardNumber: '', cardName: '', expiryDate: '', cvv: '', bankName: 'Mordor Bank', accountNumber: '555444333', accountName: 'Saruman the White' }
+  },
+  'sub-019': {
+    client: { title: 'Mr.', firstName: 'Gollum', middleName: '', lastName: '', dob: '1000-01-01', pob: 'Misty Mountains', gender: 'Male', phoneNumber: '09179990000', email: 'gollum@example.com', streetAddress: 'Goblin Town Caves', city: 'Misty Mountains', province: 'Rhovanion', postalCode: 'CAVE1', country: 'Middle-earth', declarationAccuracy: true, allowPhoneCollection: true },
+    pet: { petName: 'Shelob the Spider', dobOrAdoptionDate: '2023-09-09', estimatedAge: '1 year', gender: 'Female', species: 'Arachnid', otherSpecies: 'Giant Spider', breed: 'Venomous', otherBreed: '', microchipNumber: '123123123123123', colorMarkings: 'Dark', spayedNeutered: 'No', vaccinationStatus: 'None', lifestyle: 'Aggressive', chronicIllness: 'No', chronicIllnessExplanation: '', surgeryHistory: 'No', surgeryHistoryExplanation: '', recurringConditions: 'No', recurringConditionsExplanation: '', onMedication: 'No', onMedicationExplanation: '', vetName: 'Dr. Uglúk', vetClinicName: 'Cirith Ungol Clinic', clinicPhoneNumber: '09180001111', clinicAddress: 'Cirith Ungol', lastVetVisitDate: '2024-06-15', weight: '200 kg' },
+    product: { productName: 'Medical Care Insurance', coverageAmount: '10000', deductible: '500', reimbursementRate: '100%', paymentFrequency: 'Monthly', startDate: '2024-02-15', coverageLength: '6 Months', selectedAddOns: [], donationPercentage: 1, planType: 'Economy' },
+    payment: { paymentMethod: 'GCash', cardNumber: '', cardName: '', expiryDate: '', cvv: '', bankName: '', accountNumber: '', accountName: '', gcashNumber: '09171239876', gcashName: 'Gollum S.' }
+  },
+  'sub-020': {
+    client: { title: 'Mr.', firstName: 'Theoden', middleName: '', lastName: 'King', dob: '1965-11-05', pob: 'Edoras', gender: 'Male', phoneNumber: '09172223333', email: 'theoden@example.com', streetAddress: 'Golden Hall', city: 'Edoras', province: 'Rohan', postalCode: 'ROHN1', country: 'Middle-earth', declarationAccuracy: true, allowPhoneCollection: true },
+    pet: { petName: 'Shadowfax the Horse', dobOrAdoptionDate: '2020-03-01', estimatedAge: '5 years', gender: 'Male', species: 'Horse', otherSpecies: '', breed: 'Mearas', otherBreed: '', microchipNumber: '444555666777888', colorMarkings: 'Grey', spayedNeutered: 'No', vaccinationStatus: 'Up-to-date', lifestyle: 'Active', chronicIllness: 'No', chronicIllnessExplanation: '', surgeryHistory: 'No', surgeryHistoryExplanation: '', recurringConditions: 'No', recurringConditionsExplanation: '', onMedication: 'No', onMedicationExplanation: '', vetName: 'Dr. Eomer', vetClinicName: 'Rohan Stables Vet', clinicPhoneNumber: '09183334444', clinicAddress: 'Rohan Fields', lastVetVisitDate: '2024-04-20', weight: '500 kg' },
+    product: { productName: 'Legacy Insurance', coverageAmount: '180000', deductible: '7500', reimbursementRate: '90%', paymentFrequency: 'Annually', startDate: '2024-02-20', coverageLength: '15 Years', selectedAddOns: [], donationPercentage: 10, planType: 'Standard' },
+    payment: { paymentMethod: 'Bank Transfer', cardNumber: '', cardName: '', expiryDate: '', cvv: '', bankName: 'Bank of Rohan', accountNumber: '777888999', accountName: 'Theoden King' }
+  }
+};
 
 // Mock data for in-progress applications (increased for pagination demonstration)
 const mockApplications: Application[] = [
@@ -126,6 +196,10 @@ const mockApplications: Application[] = [
 const AdvisorSubmittedApplications: React.FC = () => {
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // --- NEW STATE FOR MODAL ---
+  const [isSummaryModalOpen, setIsSummaryModalOpen] = useState(false);
+  const [selectedApplicationData, setSelectedApplicationData] = useState<ApplicationFormData | null>(null);
 
   // Filter states
   const [statusFilter, setStatusFilter] = useState<Application['status'] | ''>('');
@@ -244,10 +318,47 @@ const AdvisorSubmittedApplications: React.FC = () => {
     setMaxCoverage('');
     setStartDate('');
     setEndDate('');
-    setActiveFilterDropdown(null); 
+    setActiveFilterDropdown(null);
   };
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
+  // --- NEW: Function to handle row click and open modal ---
+  const handleRowClick = (applicationId: string) => {
+    // In a real application, you would fetch the full ApplicationFormData
+    // from your backend using applicationId.
+    // For this mock, we'll retrieve it from `mockFullApplicationData`.
+    const fullData = mockFullApplicationData[applicationId];
+    if (fullData) {
+      setSelectedApplicationData(fullData);
+      setIsSummaryModalOpen(true);
+    } else {
+      console.warn(`No full data found for application ID: ${applicationId}`);
+      // Optionally show an alert or toast message
+    }
+  };
+
+  // --- NEW: Functions to handle modal navigation (dummy for this context) ---
+  // These are passed to the SummaryDetailsStep inside the modal.
+  // In this context (viewing a submitted application), these might not
+  // actually navigate steps, but you need to provide them as props.
+  // The "Sign & Submit" button in the summary would simply close the modal here.
+  const handleModalPrev = () => {
+    console.log("Modal Previous clicked (no actual step change in summary view)");
+    // If you had multiple "pages" within the summary, you could manage that here.
+    // For a simple summary, it might do nothing or close the modal.
+    setIsSummaryModalOpen(false); // Close the modal for simplicity on "Prev"
+  };
+
+  const handleModalNext = () => {
+    console.log("Modal Next/Sign & Submit clicked (closes modal in summary view)");
+    // In a "submitted applications" context, this button wouldn't submit.
+    // It would simply acknowledge review and close the modal.
+    setIsSummaryModalOpen(false);
+    // You could potentially trigger a status update if an admin was "approving" here,
+    // but the current design implies a readonly summary.
+  };
+
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
@@ -435,7 +546,11 @@ const AdvisorSubmittedApplications: React.FC = () => {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {currentApplications.map((app) => (
-                    <tr key={app.id} className="hover:bg-gray-50 transition-colors duration-150">
+                    <tr
+                      key={app.id}
+                      className="hover:bg-gray-50 transition-colors duration-150 cursor-pointer" // Add cursor-pointer
+                      onClick={() => handleRowClick(app.id)} // Add onClick handler
+                    >
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         <span>
                           {app.status}
@@ -504,6 +619,17 @@ const AdvisorSubmittedApplications: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* --- RENDER THE APPLICATION SUMMARY MODAL HERE --- */}
+      {selectedApplicationData && ( // Only render if data is available
+        <ApplicationSummaryModal
+          isOpen={isSummaryModalOpen}
+          onClose={() => setIsSummaryModalOpen(false)} // Close button in modal will call this
+          formData={selectedApplicationData}
+          onPrev={handleModalPrev} // Define what 'Previous' does in the modal context
+          onNext={handleModalNext} // Define what 'Next/Submit' does in the modal context
+        />
+      )}
     </div>
   );
 };
