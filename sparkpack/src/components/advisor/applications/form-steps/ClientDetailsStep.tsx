@@ -38,7 +38,7 @@ const ClientDetailsStep: React.FC<ClientDetailsStepProps> = ({ formData, onUpdat
       return;
     }
 
-    onUpdate({ ...localFormData, allowPhoneCollection: true }); 
+    onUpdate({ ...localFormData }); 
     onNext();
   };
 
