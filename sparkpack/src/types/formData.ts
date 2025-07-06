@@ -1,16 +1,11 @@
-// sparkpack/src/types/formData.ts
-
-// Client Details Interface
 export interface ClientDetails {
-  title?: string;
   firstName: string;
   middleName?: string;
   lastName: string;
   dob: string;
-  pob: string; // Place of Birth
+  pob?: string;
   gender: string;
-  allowPhoneCollection: boolean;
-  phoneNumber?: string;
+  phoneNumber: string;
   email: string;
   streetAddress: string;
   country: string;
@@ -20,105 +15,98 @@ export interface ClientDetails {
   declarationAccuracy: boolean;
 }
 
-// Pet Details Interface
 export interface PetDetails {
   petName: string;
   dobOrAdoptionDate: string;
-  estimatedAge: string;
+  estimatedAge?: string;
   weight: string;
-  gender: string;
+  gender: '' | 'Male' | 'Female'; // Ensure it can be an empty string initially, or Male/Female
   species: string;
   otherSpecies?: string;
   breed: string;
   otherBreed?: string;
   microchipNumber?: string;
-  colorMarkings: string;
-  spayedNeutered: string;
-  vaccinationStatus: string;
-  lifestyle: string;
-  chronicIllness: string;
+  colorMarkings?: string;
+  spayedNeutered: '' | 'Yes' | 'No';
+  vaccinationStatus: '' | 'Up-to-date' | 'Not up-to-date' | 'Unknown';
+  lifestyle: '' | 'Indoor' | 'Outdoor' | 'Both';
+  chronicIllness: '' | 'Yes' | 'No';
   chronicIllnessExplanation?: string;
-  surgeryHistory: string;
+  surgeryHistory: '' | 'Yes' | 'No';
   surgeryHistoryExplanation?: string;
-  recurringConditions: string;
+  recurringConditions: '' | 'Yes' | 'No';
   recurringConditionsExplanation?: string;
-  onMedication: string;
+  onMedication: '' | 'Yes' | 'No';
   onMedicationExplanation?: string;
-  vetName: string;
-  vetClinicName: string;
-  clinicPhoneNumber: string;
+  vetName?: string;
+  vetClinicName?: string;
+  clinicPhoneNumber?: string;
+  clinicAddress?: string;
+  lastVetVisitDate?: string;
+}
+
+export interface IncidentDetails {
+  incidentOrSymptomDate: string;
+  vetVisitDate: string;
+  incidentType: '' | 'Accident' | 'Illness';
+  previousRelatedConditions: '' | 'Yes' | 'No';
+  reasonForClaim: '' | 'Illness' | 'Injury' | 'Wellness';
+  // *** FIX: Add | undefined to optional string properties ***
+  accidentDescription?: string | undefined;
+  accidentLocation?: string | undefined;
+  accidentWitnesses?: string | undefined;
+  symptomsDescription?: string | undefined;
+  symptomsFirstAppearance?: string | undefined;
+  symptomsDuration?: string | undefined;
+  affectedBodyPart?: string | undefined; // This was the problematic one
+  previousConditionDetails?: string | undefined;
+}
+
+export interface VeterinaryClinicTreatmentDetails {
+  clinicName: string;
   clinicAddress: string;
-  lastVetVisitDate: string;
+  clinicPhoneNumber: string;
+  attendingVetName: string;
+  treatmentDates: string;
+  diagnosis: string;
+  treatmentProvided: string;
+  prognosis?: string | undefined; // *** FIX: Add | undefined ***
+  isEmergency: '' | 'Yes' | 'No';
 }
 
-// Interface for a single selected add-on
-export interface SelectedAddOn {
-  id: string; // Unique identifier for the add-on
-  name: string;
-  price: number;
-  type: 'one-time' | 'annual';
+export interface FinancialReimbursementDetails {
+  totalVetBillAmount: string;
+  itemizedBillAttached: '' | 'Yes' | 'No';
+  officialReceiptsAttached: '' | 'Yes' | 'No';
+  reimbursementMethod: '' | 'Credit/Debit Card' | 'Bank Transfer' | 'GCash' | 'Cash/Cheque';
+  preferredContactForUpdates: '' | 'Email' | 'SMS';
+  // *** FIX: Add | undefined to optional string properties ***
+  cardNumber?: string | undefined;
+  cardName?: string | undefined;
+  expiryDate?: string | undefined;
+  cvv?: string | undefined;
+  bankName?: string | undefined;
+  accountNumber?: string | undefined;
+  accountName?: string | undefined;
+  gcashNumber?: string | undefined;
+  gcashName?: string | undefined;
+  reimbursementDescription?: string | undefined;
 }
 
-// Product Details Interface 
-export interface ProductDetails {
-  productName: string;
-  planType: string;  // Added planType property
-  coverageAmount: string;
-  deductible: string;
-  reimbursementRate: string;
-  paymentFrequency: string;
-  startDate: string;
-  coverageLength: string;
-  selectedAddOns: SelectedAddOn[];
-  donationPercentage: number;
+export interface DeclarationsAuthorizationDetails {
+  declarationTruthfulnessAccepted: boolean;
+  medicalRecordsAuthorizationAccepted: boolean;
+  dataPrivacyConsentAccepted: boolean;
+  policyholderSignatureName: string;
+  signatureDate: string;
 }
 
-// Interface for Add-on Definitions (used internally in ProductDetailsStep.tsx)
-export interface AddOnDefinition {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  type: 'one-time' | 'annual'; // Is it a one-time charge or adds to annual premium?
-  availableFor: string[]; // Which base products can this add-on be selected for?
-}
-
-// This interface is specific to the productOptions array in ProductDetailsStep
-export interface ProductOption {
-  name: string;
-  description: string;
-  premiumRange: string;
-  coverageRange: string;
-  details: string[]; 
-  iconKey: string;
-  coverageOptions?: string[];
-  deductibleOptions?: string[];
-  reimbursementOptions?: string[];
-  paymentFreqOptions?: string[];
-  fullDetails: {
-    [key: string]: string[]; // For accordion content, e.g., 'Key Benefits': ['...']
-  };
-}
-
-export interface PaymentDetails {
-  paymentMethod: 'Credit/Debit Card' | 'Bank Transfer' | 'GCash' | 'Cash/Cheque' | '';
-  cardNumber?: string;
-  cardName?: string;
-  expiryDate?: string;
-  cvv?: string;
-  bankName?: string;
-  accountNumber?: string;
-  accountName?: string;
-  gcashNumber?: string;
-  gcashName?: string;
-}
-
-// Define the overall ApplicationFormData interface to include all steps
-export interface ApplicationFormData {
+export interface ClaimFormData {
+  policyNumber: string;
   client: ClientDetails;
-  pet: PetDetails;
-  product: ProductDetails;
-  payment: PaymentDetails;
-  // summary?: SummaryDetails;
-  // signSubmit?: SignSubmitDetails;
+  petDetails: PetDetails;
+  incidentDetails: IncidentDetails;
+  veterinaryClinicTreatmentDetails: VeterinaryClinicTreatmentDetails;
+  financialReimbursementDetails: FinancialReimbursementDetails;
+  declarationsAuthorization: DeclarationsAuthorizationDetails;
 }
