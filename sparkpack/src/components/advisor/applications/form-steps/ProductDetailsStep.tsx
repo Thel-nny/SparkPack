@@ -11,12 +11,6 @@ import OptionalBenefitsAndDonation from './product-details-subcomponents/Optiona
 
 import { ProductDetails, AddOnDefinition, SelectedAddOn, ProductOption } from '@/types/formData'; 
 
-import {
-  ShieldCheck,
-  Award,
-  PlusCircle,
-} from 'lucide-react';
-
 interface ProductDetailsStepProps {
   formData: ProductDetails;
   onUpdate: (data: Partial<ProductDetails>) => void;

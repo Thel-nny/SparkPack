@@ -10,7 +10,7 @@ import { Filter, ChevronDown, XCircle, ChevronLeft, ChevronRight } from 'lucide-
 // Define the type for an individual application
 interface Application {
   id: string;
-  status: 'Advisor Declaration Pending' | 'Signature Process Pending' | 'Signature In Process';
+  status: 'Pending Review' | 'Underwriting' |'Advisor Declaration Pending' | 'Interview' ;
   ensured: string;
   owners: string[];
   product: 'Medical Care Insurance' | 'Legacy Insurance';
@@ -23,7 +23,7 @@ interface Application {
 const mockApplications: Application[] = [
   {
     id: 'app-001',
-    status: 'Advisor Declaration Pending',
+    status: 'Pending Review',
     ensured: 'Raven the Dog',
     owners: ['Raine Christine Perez'],
     product: 'Medical Care Insurance',
@@ -33,7 +33,7 @@ const mockApplications: Application[] = [
   },
   {
     id: 'app-002',
-    status: 'Signature Process Pending',
+    status: 'Underwriting',
     ensured: 'Guri the Cat',
     owners: ['Thelanny Maguillano'],
     product: 'Legacy Insurance',
@@ -43,7 +43,7 @@ const mockApplications: Application[] = [
   },
   {
     id: 'app-003',
-    status: 'Signature In Process',
+    status: 'Interview',
     ensured: 'Shawn the Sheep',
     owners: ['Shawn Barza', 'Timothy Barza'],
     product: 'Medical Care Insurance',
@@ -53,7 +53,7 @@ const mockApplications: Application[] = [
   },
   {
     id: 'app-004',
-    status: 'Advisor Declaration Pending',
+    status: 'Interview',
     ensured: 'Bacon the Cat',
     owners: ['Althea Diaz'],
     product: 'Legacy Insurance',
@@ -63,7 +63,7 @@ const mockApplications: Application[] = [
   },
   {
     id: 'app-005',
-    status: 'Signature Process Pending',
+    status: 'Advisor Declaration Pending',
     ensured: 'Feline the Cat',
     owners: ['Lani Agapito Ledesma'],
     product: 'Medical Care Insurance',
@@ -83,7 +83,7 @@ const mockApplications: Application[] = [
   },
   {
     id: 'app-007',
-    status: 'Signature In Process',
+    status: 'Underwriting',
     ensured: 'Milo the Ulugtasan Dog',
     owners: ['Abigail Sotoy'],
     product: 'Legacy Insurance',
@@ -103,7 +103,7 @@ const mockApplications: Application[] = [
   },
   {
     id: 'app-009',
-    status: 'Signature Process Pending',
+    status: 'Pending Review',
     ensured: 'Kafeslak the Dog',
     owners: ['Vee Aliguin'],
     product: 'Legacy Insurance',
@@ -113,7 +113,7 @@ const mockApplications: Application[] = [
   },
   {
     id: 'app-010',
-    status: 'Signature In Process',
+    status: 'Underwriting',
     ensured: 'Ccino the Dog',
     owners: ['Joeb Aliguin'],
     product: 'Medical Care Insurance',
@@ -141,7 +141,7 @@ const AdvisorInProgressApplications: React.FC = () => {
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(7); // You can adjust items per page
+  const [itemsPerPage] = useState(5); // You can adjust items per page
 
   // Dropdown visibility states
   const [activeFilterDropdown, setActiveFilterDropdown] = useState<string | null>(null);
@@ -226,20 +226,6 @@ const AdvisorInProgressApplications: React.FC = () => {
       currency: 'PHP',
       minimumFractionDigits: 2, // Ensure two decimal places
     }).format(amount);
-  };
-
-  // Helper function to determine status text color based on status (keeping for potential future use)
-  const getStatusTextColor = (status: Application['status']): string => {
-    switch (status) {
-      case 'Advisor Declaration Pending':
-        return 'text-yellow-800';
-      case 'Signature Process Pending':
-        return 'text-blue-800';
-      case 'Signature In Process':
-        return 'text-purple-800';
-      default:
-        return 'text-gray-800';
-    }
   };
 
   // Check if any filter is active

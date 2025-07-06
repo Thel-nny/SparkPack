@@ -10,7 +10,7 @@ import { Filter, ChevronDown, XCircle, ChevronLeft, ChevronRight } from 'lucide-
 // Define the type for an individual application
 interface Application {
   id: string;
-  status: 'Advisor Declaration Pending' | 'Signature Process Pending' | 'Signature In Process';
+  status: 'Approved' | 'Issued' | 'Declined' | 'Canceled/Withdrawn' ;
   ensured: string;
   owners: string[];
   product: 'Medical Care Insurance' | 'Legacy Insurance';
@@ -22,114 +22,110 @@ interface Application {
 // Mock data for in-progress applications (increased for pagination demonstration)
 const mockApplications: Application[] = [
   {
-    id: 'app-001',
-    status: 'Advisor Declaration Pending',
-    ensured: 'Raven the Dog',
-    owners: ['Raine Christine Perez'],
+    id: 'sub-011',
+    status: 'Approved',
+    ensured: 'Pippin the Ferret',
+    owners: ['Frodo Baggins'],
     product: 'Medical Care Insurance',
-    coverageAmount: 50000, // PHP
-    dateStarted: '2023-01-15',
-    policyNumber: 'N/A',
+    coverageAmount: 40000, // PHP
+    dateStarted: '2024-01-05',
+    policyNumber: 'MCP-2024-0011',
   },
   {
-    id: 'app-002',
-    status: 'Signature Process Pending',
-    ensured: 'Guri the Cat',
-    owners: ['Thelanny Maguillano'],
+    id: 'sub-012',
+    status: 'Issued',
+    ensured: 'Gandalf the Grey',
+    owners: ['Bilbo Baggins'],
     product: 'Legacy Insurance',
-    coverageAmount: 100000, // PHP
-    dateStarted: '2023-02-01',
+    coverageAmount: 150000, // PHP
+    dateStarted: '2024-01-10',
     policyNumber: 'N/A',
   },
   {
-    id: 'app-003',
-    status: 'Signature In Process',
-    ensured: 'Shawn the Sheep',
-    owners: ['Shawn Barza', 'Timothy Barza'],
+    id: 'sub-013',
+    status: 'Declined',
+    ensured: 'Legolas Greenleaf',
+    owners: ['Elrond Half-elven'],
     product: 'Medical Care Insurance',
-    coverageAmount: 25000, // PHP
-    dateStarted: '2023-02-10',
+    coverageAmount: 70000, // PHP
+    dateStarted: '2024-01-15',
     policyNumber: 'N/A',
   },
   {
-    id: 'app-004',
-    status: 'Advisor Declaration Pending',
-    ensured: 'Bacon the Cat',
-    owners: ['Althea Diaz'],
+    id: 'sub-014',
+    status: 'Approved',
+    ensured: 'Aragorn Strider',
+    owners: ['Arwen Evenstar'],
     product: 'Legacy Insurance',
-    coverageAmount: 75000, // PHP
-    dateStarted: '2023-03-01',
-    policyNumber: 'N/A',
+    coverageAmount: 200000, // PHP
+    dateStarted: '2024-01-20',
+    policyNumber: 'LGY-2024-0003',
   },
   {
-    id: 'app-005',
-    status: 'Signature Process Pending',
-    ensured: 'Feline the Cat',
-    owners: ['Lani Agapito Ledesma'],
+    id: 'sub-015',
+    status: 'Approved',
+    ensured: 'Gimli Son of Glóin',
+    owners: ['Thorin Oakenshield'],
     product: 'Medical Care Insurance',
-    coverageAmount: 120000, // PHP
-    dateStarted: '2023-03-15',
-    policyNumber: 'N/A',
+    coverageAmount: 65000, // PHP
+    dateStarted: '2024-01-25',
+    policyNumber: 'MCP-2024-0012',
   },
   {
-    id: 'app-006',
-    status: 'Advisor Declaration Pending',
-    ensured: 'Ted the Senior Dog',
-    owners: ['Chescka So'],
-    product: 'Medical Care Insurance',
-    coverageAmount: 30000, // PHP
-    dateStarted: '2023-04-01',
-    policyNumber: 'N/A',
-  },
-  {
-    id: 'app-007',
-    status: 'Signature In Process',
-    ensured: 'Milo the Ulugtasan Dog',
-    owners: ['Abigail Sotoy'],
+    id: 'sub-016',
+    status: 'Canceled/Withdrawn',
+    ensured: 'Sauron the Dark Lord',
+    owners: ['Melkor Bauglir'],
     product: 'Legacy Insurance',
-    coverageAmount: 90000, // PHP
-    dateStarted: '2023-04-20',
+    coverageAmount: 1000000, // PHP
+    dateStarted: '2024-02-01',
     policyNumber: 'N/A',
   },
   {
-    id: 'app-008',
-    status: 'Advisor Declaration Pending',
-    ensured: 'Mocha the Dog',
-    owners: ['Joevany Aliguin Jr.'],
+    id: 'sub-017',
+    status: 'Declined',
+    ensured: 'Smaug the Dragon',
+    owners: ['Bard the Bowman'],
     product: 'Medical Care Insurance',
-    coverageAmount: 45000, // PHP
-    dateStarted: '2023-05-01',
+    coverageAmount: 500000, // PHP
+    dateStarted: '2024-02-05',
     policyNumber: 'N/A',
   },
   {
-    id: 'app-009',
-    status: 'Signature Process Pending',
-    ensured: 'Kafeslak the Dog',
-    owners: ['Vee Aliguin'],
+    id: 'sub-018',
+    status: 'Approved',
+    ensured: 'Treebeard the Ent',
+    owners: ['Saruman the White'],
     product: 'Legacy Insurance',
-    coverageAmount: 110000, // PHP
-    dateStarted: '2023-05-10',
-    policyNumber: 'N/A',
+    coverageAmount: 300000, // PHP
+    dateStarted: '2024-02-10',
+    policyNumber: 'LGY-2024-0004',
   },
   {
-    id: 'app-010',
-    status: 'Signature In Process',
-    ensured: 'Ccino the Dog',
-    owners: ['Joeb Aliguin'],
+    id: 'sub-019',
+    status: 'Approved',
+    ensured: 'Shelob the Spider',
+    owners: ['Gollum'],
     product: 'Medical Care Insurance',
-    coverageAmount: 60000, // PHP
-    dateStarted: '2023-05-20',
-    policyNumber: 'N/A',
+    coverageAmount: 10000, // PHP
+    dateStarted: '2024-02-15',
+    policyNumber: 'MCP-2024-0013',
   },
+  {
+    id: 'sub-020',
+    status: 'Approved',
+    ensured: 'Shadowfax the Horse',
+    owners: ['Theoden King'],
+    product: 'Legacy Insurance',
+    coverageAmount: 180000, // PHP
+    dateStarted: '2024-02-20',
+    policyNumber: 'LGY-2024-0005',
+  }
 ];
 
-const AdvisorInProgressApplications: React.FC = () => {
+const AdvisorActiveApplications: React.FC = () => {
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
-  const [advisorNames, setAdvisorNames] = useState<Record<string, string>>({});
-
-  // State to track which row is currently active/editing
-  const [activeRowId, setActiveRowId] = useState<string | null>(null);
 
   // Filter states
   const [statusFilter, setStatusFilter] = useState<Application['status'] | ''>('');
@@ -141,7 +137,7 @@ const AdvisorInProgressApplications: React.FC = () => {
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(7); // You can adjust items per page
+  const [itemsPerPage] = useState(5); // You can adjust items per page
 
   // Dropdown visibility states
   const [activeFilterDropdown, setActiveFilterDropdown] = useState<string | null>(null);
@@ -228,20 +224,6 @@ const AdvisorInProgressApplications: React.FC = () => {
     }).format(amount);
   };
 
-  // Helper function to determine status text color based on status (keeping for potential future use)
-  const getStatusTextColor = (status: Application['status']): string => {
-    switch (status) {
-      case 'Advisor Declaration Pending':
-        return 'text-yellow-800';
-      case 'Signature Process Pending':
-        return 'text-blue-800';
-      case 'Signature In Process':
-        return 'text-purple-800';
-      default:
-        return 'text-gray-800';
-    }
-  };
-
   // Check if any filter is active
   const areFiltersActive =
     statusFilter !== '' ||
@@ -296,7 +278,7 @@ const AdvisorInProgressApplications: React.FC = () => {
                     >
                       All Statuses
                     </div>
-                    {['Advisor Declaration Pending', 'Signature Process Pending', 'Signature In Process'].map(
+                    {['Submitted', 'Approved', 'Denied'].map(
                       (statusOption) => (
                         <div
                           key={statusOption}
@@ -449,22 +431,15 @@ const AdvisorInProgressApplications: React.FC = () => {
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-[#7eb238] uppercase tracking-wider">
                       Policy Number
                     </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-[#7eb238] uppercase tracking-wider">
-                      Advisor
-                    </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {currentApplications.map((app) => (
-                    <tr
-                      key={app.id}
-                      className={`hover:bg-gray-50 transition-colors duration-150 cursor-pointer ${
-                        activeRowId === app.id ? 'bg-gray-100' : ''
-                      }`}
-                      onClick={() => setActiveRowId(activeRowId === app.id ? null : app.id)}
-                    >
+                    <tr key={app.id} className="hover:bg-gray-50 transition-colors duration-150">
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        <span>{app.status}</span>
+                        <span>
+                          {app.status}
+                        </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {app.ensured}
@@ -483,60 +458,6 @@ const AdvisorInProgressApplications: React.FC = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {app.policyNumber}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {activeRowId === app.id ? (
-                          <div className="flex items-center space-x-2">
-                            <Input
-                              type="text"
-                              value={advisorNames[app.id] || ''}
-                              onChange={(e) =>
-                                setAdvisorNames((prev) => ({
-                                  ...prev,
-                                  [app.id]: e.target.value,
-                                }))
-                              }
-                              onClick={(e) => e.stopPropagation()} // Prevent row toggle when clicking input
-                              autoFocus
-                              placeholder="Assign advisor"
-                              className="w-full"
-                            />
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setActiveRowId(null);
-                              }}
-                              className="text-green-600 hover:text-green-800"
-                              aria-label="Submit advisor name"
-                            >
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                strokeWidth={2}
-                                stroke="currentColor"
-                                className="w-5 h-5"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  d="M5 13l4 4L19 7"
-                                />
-                              </svg>
-                            </button>
-                          </div>
-                          ) : (
-                            advisorNames[app.id] ? (
-                              <span
-                                title={advisorNames[app.id]}
-                                className="inline-block max-w-[10ch] truncate"
-                              >
-                                {advisorNames[app.id]}
-                              </span>
-                            ) : (
-                              <span>Click to assign</span>
-                            )
-                          )}
                       </td>
                     </tr>
                   ))}
@@ -587,4 +508,4 @@ const AdvisorInProgressApplications: React.FC = () => {
   );
 };
 
-export default AdvisorInProgressApplications;
+export default AdvisorActiveApplications;

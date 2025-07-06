@@ -123,7 +123,7 @@ const mockApplications: Application[] = [
   }
 ];
 
-const AdvisorInProgressApplications: React.FC = () => {
+const AdvisorSubmittedApplications: React.FC = () => {
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -137,7 +137,7 @@ const AdvisorInProgressApplications: React.FC = () => {
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(7); // You can adjust items per page
+  const [itemsPerPage] = useState(5); // You can adjust items per page
 
   // Dropdown visibility states
   const [activeFilterDropdown, setActiveFilterDropdown] = useState<string | null>(null);
@@ -508,4 +508,4 @@ const AdvisorInProgressApplications: React.FC = () => {
   );
 };
 
-export default AdvisorInProgressApplications;
+export default AdvisorSubmittedApplications;

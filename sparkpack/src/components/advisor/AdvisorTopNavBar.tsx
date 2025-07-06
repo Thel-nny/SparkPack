@@ -1,14 +1,15 @@
+// sparkpack/src/components/advisor/AdvisorTopNavbar.tsx
 'use client';
 
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ChevronDown, User } from 'lucide-react';
-import { usePathname } from 'next/navigation'; 
+import { usePathname } from 'next/navigation';
 
 interface NavItem {
   label: string;
-  href?: string;
+  href?: string; // Optional href for items that are just parents of dropdowns
   hasDropdown: boolean;
   items?: (
     | { label: string; href: string; type?: 'link' }
@@ -24,28 +25,22 @@ const AdvisorTopNavbar: React.FC<AdvisorTopNavbarProps> = ({ className = '' }) =
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
   const pathname = usePathname(); // Get the current path
 
+  // --- UPDATED NAVIGATION ITEMS ---
   const navItems: NavItem[] = [
     {
       label: 'Home',
-      href: '/advisor/dashboard',
+      href: '/advisor/dashboard', // Points to the new dashboard overview page
       hasDropdown: false,
     },
     {
-      label: 'Submitted Applications',
-      href: '/advisor/applications/submitted',
-      hasDropdown: false,
+      label: 'Manage Applications', // Consolidated link
+      href: '/advisor/applications', // Points to the new tabbed applications page
+      hasDropdown: false, // No dropdown directly from this item, tabs are internal
     },
-    {
-      label: 'Applications in Progress',
-      href: '/advisor/applications/in-progress',
-      hasDropdown: false,
-    },
-    {
-      label: 'Active Applications',
-      href: '/advisor/applications/active',
-      hasDropdown: false,
-    }
+    // Removed 'Submitted Applications', 'Applications in Progress', 'Active Applications'
+    // as they are now tabs within '/advisor/applications'
   ];
+  // --- END UPDATED NAVIGATION ITEMS ---
 
   const handleDropdownToggle = (index: number) => {
     setActiveDropdown(activeDropdown === index ? null : index);
@@ -54,6 +49,18 @@ const AdvisorTopNavbar: React.FC<AdvisorTopNavbarProps> = ({ className = '' }) =
   const handleClickOutside = () => {
     setActiveDropdown(null);
   };
+
+  // Helper function to determine if a link is active based on current pathname
+  const isActiveLink = (href: string) => {
+    // For 'Manage Applications', check if the path starts with '/advisor/applications'
+    // but exclude '/advisor/applications/new' as it's a separate action
+    if (href === '/advisor/applications') {
+      return pathname.startsWith('/advisor/applications') && !pathname.startsWith('/advisor/applications/new');
+    }
+    // For other links like 'Home', exact match is usually sufficient
+    return pathname === href;
+  };
+
 
   return (
     <nav className={`bg-[#f5f7f8] shadow-sm border-b border-gray-100 ${className} sticky top-0 z-50`}>
@@ -76,8 +83,8 @@ const AdvisorTopNavbar: React.FC<AdvisorTopNavbarProps> = ({ className = '' }) =
           <div>
             <div className="ml-10 flex items-baseline space-x-8">
               {navItems.map((item, index) => {
-                // Determine if the current item is active
-                const isActive = item.href === pathname;
+                // Determine if the current item is active using the new helper
+                const isActive = isActiveLink(item.href || ''); // Pass an empty string if href is undefined
                 const linkClasses = `px-3 py-2 text-sm font-medium transition-colors duration-200 ${
                   isActive ? 'text-[#7eb238] border-b-2 border-[#7eb238]' : 'text-[#342d47] hover:text-[#7eb238]'
                 }`;
@@ -87,7 +94,7 @@ const AdvisorTopNavbar: React.FC<AdvisorTopNavbarProps> = ({ className = '' }) =
                     {item.hasDropdown ? (
                       <button
                         onClick={() => handleDropdownToggle(index)}
-                        className={`flex items-center ${linkClasses}`} // Apply linkClasses here
+                        className={`flex items-center ${linkClasses}`}
                         aria-expanded={activeDropdown === index}
                         aria-haspopup={item.hasDropdown}
                       >
@@ -100,8 +107,8 @@ const AdvisorTopNavbar: React.FC<AdvisorTopNavbarProps> = ({ className = '' }) =
                       </button>
                     ) : (
                       <Link
-                        href={item.href || '#'} // Fallback to '#' if href is undefined
-                        className={linkClasses} // Apply linkClasses here
+                        href={item.href || '#'}
+                        className={linkClasses}
                       >
                         {item.label}
                       </Link>
@@ -147,15 +154,20 @@ const AdvisorTopNavbar: React.FC<AdvisorTopNavbarProps> = ({ className = '' }) =
           <div className="flex items-center space-x-4">
             {/* Start New Application Button */}
             <Link
-              href="/advisor/applications/new" 
-              className="flex items-center bg-[#8cc63f] hover:bg-[#7eb238] text-white px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+              href="/advisor/applications/new"
+              // Apply active styling if the current path specifically matches the new application path
+              className={`flex items-center bg-[#8cc63f] hover:bg-[#7eb238] text-white px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
+                pathname === '/advisor/applications/new' ? 'ring-2 ring-[#7eb238] ring-offset-2' : '' // Add a distinct active style for the button
+              }`}
             >
               Start New Application
             </Link>
 
             {/* Account Dropdown */}
+            {/* The index for the Account dropdown needs to be after the last regular nav item's index */}
             <div className="relative">
               <button
+                // Use navItems.length for the account dropdown index
                 onClick={() => handleDropdownToggle(navItems.length)}
                 className="flex items-center text-[#342d47] hover:text-[#7eb238] px-3 py-2 text-sm font-medium transition-colors duration-200"
                 aria-expanded={activeDropdown === navItems.length}
