@@ -41,7 +41,7 @@ export default function InsuranceSection() {
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle className="h-4 w-4 text-[#8cc63f]" />
-                  <span>Emergency care up to ₱50,000</span>
+                  <span>Emergency care up to ₱30,000</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle className="h-4 w-4 text-[#8cc63f]" />

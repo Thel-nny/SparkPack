@@ -20,7 +20,7 @@ export default function AboutSection() {
           <div>
             <h3 className="text-2xl font-bold text-[#342d47] mb-6">Founded with Love in Iloilo</h3>
             <p className="text-gray-600 mb-4">
-              Sparkpack was founded in 2020 by a group of pet lovers in Iloilo who experienced the heartbreak of
+              Sparkpack was founded in 2025 by a group of engineering college students in Iloilo who experienced the heartbreak of
               losing beloved pets and the financial stress that comes with unexpected veterinary bills. We realized
               that pet insurance in the Philippines was either too expensive, too complicated, or didn&apos;t truly
               understand the local needs.
@@ -30,7 +30,7 @@ export default function AboutSection() {
               services. We believe that caring for your pet shouldn&apos;t end when they pass away – it should continue
               with dignity and love.
             </p>
-            <div className="grid grid-cols-2 gap-4">
+            {/* <div className="grid grid-cols-2 gap-4">
               <div className="text-center p-4 bg-white rounded-lg">
                 <div className="text-2xl font-bold text-[#8cc63f]">5,000+</div>
                 <div className="text-sm text-gray-600">Pets Insured</div>
@@ -39,7 +39,7 @@ export default function AboutSection() {
                 <div className="text-2xl font-bold text-[#8cc63f]">98%</div>
                 <div className="text-sm text-gray-600">Customer Satisfaction</div>
               </div>
-            </div>
+            </div> */}
           </div>
           <div>
             <Image

@@ -46,7 +46,7 @@ export default function TeamSection() {
           </Card>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 mt-8">
+        <div className="grid md:grid-cols-2 gap-8 mt-8">
           {/* Row 2 */}
           <Card className="text-center p-6 border-0 shadow-lg">
             <Image

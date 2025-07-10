@@ -11,21 +11,21 @@ export default function ClaimsProcess() {
             <FileText className="h-8 w-8 text-white" />
           </div>
           <h4 className="font-semibold text-[#342d47] mb-2">1. Submit Claim</h4>
-          <p className="text-gray-600">File your claim online or through our mobile app</p>
+          <p className="text-gray-600">File your claim online</p>
         </div>
         <div className="text-center">
           <div className="h-16 w-16 bg-[#8cc63f] rounded-full flex items-center justify-center mx-auto mb-4">
             <Clock className="h-8 w-8 text-white" />
           </div>
           <h4 className="font-semibold text-[#342d47] mb-2">2. Quick Review</h4>
-          <p className="text-gray-600">Our team reviews your claim within 24 hours</p>
+          <p className="text-gray-600">Our team reviews your claim within 48 hours</p>
         </div>
         <div className="text-center">
           <div className="h-16 w-16 bg-[#8cc63f] rounded-full flex items-center justify-center mx-auto mb-4">
             <UserCheck className="h-8 w-8 text-white" />
           </div>
           <h4 className="font-semibold text-[#342d47] mb-2">3. Approval</h4>
-          <p className="text-gray-600">Get approval notification via SMS and email</p>
+          <p className="text-gray-600">Get approval notification via SMS or email</p>
         </div>
         <div className="text-center">
           <div className="h-16 w-16 bg-[#8cc63f] rounded-full flex items-center justify-center mx-auto mb-4">
