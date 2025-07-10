@@ -14,6 +14,7 @@ export const PUT = withAuth(async (req: NextRequest, authenticatedUserId: string
 
     const body = await req.json();
 
+    // Update ClientDetails with advisor field
     const updatedClientDetails = await prisma.clientDetails.update({
       where: { userId: targetUserId },
       data: {
@@ -30,8 +31,39 @@ export const PUT = withAuth(async (req: NextRequest, authenticatedUserId: string
         province: body.province,
         postalCode: body.postalCode,
         declarationAccuracy: body.declarationAccuracy,
+       advisor: body.advisor ? body.advisor.trim() : null,
       },
     });
+
+    // If advisor is assigned (not null, not empty, not "N/A"), update related applications' status to APPROVED
+    // Otherwise, set status to APPROVED (or appropriate in-progress status)
+    const advisorAssigned = body.advisor && body.advisor.trim() !== "" && body.advisor.trim().toUpperCase() !== "N/A";
+
+    if (advisorAssigned) {
+      // Update all applications for this user with in-progress statuses to APPROVED (active)
+      await prisma.application.updateMany({
+        where: {
+          customerId: targetUserId,
+          status: {
+            in: ["SUBMITTED", "ACTIVE"],
+          },
+        },
+        data: {
+          status: "APPROVED",
+        },
+      });
+    } else {
+      // Set applications back to in-progress statuses if advisor removed
+      await prisma.application.updateMany({
+        where: {
+          customerId: targetUserId,
+          status: "APPROVED",
+        },
+        data: {
+          status: "ACTIVE",
+        },
+      });
+    }
 
     return NextResponse.json({
       success: true,

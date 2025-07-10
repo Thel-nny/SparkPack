@@ -59,6 +59,7 @@ CREATE TABLE "ClientDetails" (
     "province" TEXT NOT NULL,
     "postalCode" TEXT NOT NULL,
     "declarationAccuracy" BOOLEAN NOT NULL,
+    "advisor" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 

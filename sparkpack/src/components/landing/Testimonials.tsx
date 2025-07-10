@@ -22,8 +22,8 @@ export default function Testimonials() {
               ))}
             </div>
             <p className="text-gray-600 mb-4">
-              "When our Golden Retriever Max needed emergency surgery, Sparkpack covered everything. The claims
-              process was so easy, and the memorial tree planting ceremony gave us comfort during our grief."
+              &quot;When our Golden Retriever Max needed emergency surgery, Sparkpack covered everything. The claims
+              process was so easy, and the memorial tree planting ceremony gave us comfort during our grief.&quot;
             </p>
             <div className="flex items-center gap-3">
               <UserRound className="h-24 w-24 text-gray-500" />
@@ -41,8 +41,8 @@ export default function Testimonials() {
               ))}
             </div>
             <p className="text-gray-600 mb-4">
-              "The local network of vets is amazing. We can get appointments easily, and the quality of care is
-              excellent. Plus, knowing that memorial services are included gives us peace of mind."
+              &quot;The local network of vets is amazing. We can get appointments easily, and the quality of care is
+              excellent. Plus, knowing that memorial services are included gives us peace of mind.&quot;
             </p>
             <div className="flex items-center gap-3">
               <UserRound className="h-24 w-24 text-gray-500" />
@@ -60,8 +60,8 @@ export default function Testimonials() {
               ))}
             </div>
             <p className="text-gray-600 mb-4">
-              "Sparkpack truly understands pet parents in Iloilo. The pricing is fair, the service is exceptional, and
-              they really care about our pets&apos; wellbeing throughout their entire lives."
+              &quot;Sparkpack truly understands pet parents in Iloilo. The pricing is fair, the service is exceptional, and
+              they really care about our pets&apos; wellbeing throughout their entire lives.&quot;
             </p>
             <div className="flex items-center gap-3">
               <UserRound className="h-24 w-24 text-gray-500" />

@@ -29,7 +29,7 @@ const AdvisorInProgressApplications: React.FC = () => {
   const [advisorNames, setAdvisorNames] = useState<Record<string, string>>({});
 
   // Filter states
-  const [statusFilter, setStatusFilter] = useState<string>('');
+  const [statusFilter, setStatusFilter] = useState<string>('APPROVED'); // default to APPROVED and related statuses
   const [productFilter, setProductFilter] = useState<string>('');
   const [minCoverage, setMinCoverage] = useState<string>('');
   const [maxCoverage, setMaxCoverage] = useState<string>('');
@@ -71,9 +71,17 @@ const AdvisorInProgressApplications: React.FC = () => {
   const filteredApplications = useMemo(() => {
     let filtered = applications;
 
-    if (statusFilter) {
+    // Filter for multiple in-progress statuses
+    const inProgressStatuses = ['APPROVED', 'SIGNATURE_PROCESS_PENDING', 'SIGNATURE_IN_PROCESS'];
+
+    if (statusFilter && !inProgressStatuses.includes(statusFilter)) {
+      // If statusFilter is set but not in inProgressStatuses, filter by it
       filtered = filtered.filter(app => app.status === statusFilter);
+    } else {
+      // Otherwise, filter by all in-progress statuses
+      filtered = filtered.filter(app => inProgressStatuses.includes(app.status));
     }
+
     if (productFilter) {
       filtered = filtered.filter(app => app.product === productFilter);
     }
@@ -116,7 +124,7 @@ const AdvisorInProgressApplications: React.FC = () => {
     endDate !== '';
 
   const clearFilters = () => {
-    setStatusFilter('');
+    setStatusFilter('APPROVED'); // reset to APPROVED and related statuses on clear
     setProductFilter('');
     setMinCoverage('');
     setMaxCoverage('');
