@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { ChevronDown, User, Menu, X } from 'lucide-react';
+import React, { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { ChevronDown, User, Menu, X } from "lucide-react";
 
 interface NavItem {
   label: string;
   href?: string;
   hasDropdown: boolean;
   items?: (
-    | { label: string; href: string; type?: 'link' }
-    | { label: string; type: 'heading' }
+    | { label: string; href: string; type?: "link" }
+    | { label: string; type: "heading" }
   )[];
 }
 
@@ -19,57 +19,57 @@ interface TopNavbarProps {
   className?: string;
 }
 
-const TopNavbar: React.FC<TopNavbarProps> = ({ className = '' }) => {
+const TopNavbar: React.FC<TopNavbarProps> = ({ className = "" }) => {
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navItems: NavItem[] = [
     {
-      label: 'Insurance',
+      label: "Insurance",
       hasDropdown: true,
       items: [
-        { label: 'Medical Care Insurance', type: 'heading' },
-        { label: 'Our Packages', href: '#insurance-packages' },
-        { label: 'Coverage Details', href: '#insurance-packages' },
-        { label: 'Add-On Services', href: '#insurance-packages' },
-        { label: 'Compare Plans', href: '#insurance-packages' },
-        { label: 'Legacy Insurance', type: 'heading' },
-        { label: 'Our Packages', href: '#insurance-packages' },
-        { label: 'Coverage Details', href: '#insurance-packages' },
-        { label: 'Compare Plans', href: '#insurance-packages' },
-        { label: 'Claims Process', href: '#insurance-packages' },
+        { label: "Medical Care Insurance", type: "heading" },
+        { label: "Our Packages", href: "#insurance-packages" },
+        { label: "Coverage Details", href: "#insurance-packages" },
+        { label: "Add-On Services", href: "#insurance-packages" },
+        { label: "Compare Plans", href: "#insurance-packages" },
+        { label: "Legacy Insurance", type: "heading" },
+        { label: "Our Packages", href: "#insurance-packages" },
+        { label: "Coverage Details", href: "#insurance-packages" },
+        { label: "Compare Plans", href: "#insurance-packages" },
+        { label: "Claims Process", href: "#insurance-packages" },
       ],
     },
     {
-      label: 'Memorial Services',
+      label: "Memorial Services",
       hasDropdown: true,
       items: [
-        { label: 'Cremation Services', href: '#cremation-services' },
-        { label: 'Tree Planting Ceremony', href: '#cremation-services' },
-        { label: 'Memorial Options', href: '#cremation-services' },
-        { label: 'Tree Care & Maintenance', href: '#cremation-services' },
-        { label: 'Memorial Gallery', href: '#cremation-services' },
-        { label: 'Grief Support', href: '#cremation-services' },
+        { label: "Cremation Services", href: "#cremation-services" },
+        { label: "Tree Planting Ceremony", href: "#cremation-services" },
+        { label: "Memorial Options", href: "#cremation-services" },
+        { label: "Tree Care & Maintenance", href: "#cremation-services" },
+        { label: "Memorial Gallery", href: "#cremation-services" },
+        { label: "Grief Support", href: "#cremation-services" },
       ],
     },
     {
-      label: 'Local Partners',
+      label: "Local Partners",
       hasDropdown: true,
       items: [
-        { label: 'Partner Veterinarians', href: '#partner-vets' },
-        { label: 'Pet-Friendly Businesses', href: '#partner-businesses' },
-        { label: 'Community Impact', href: '#partner-vets' },
-        { label: 'Local Events', href: '#partner-vets' },
-        { label: 'Adoption Partners', href: '#partner-vets' },
+        { label: "Partner Veterinarians", href: "#partner-vets" },
+        { label: "Pet-Friendly Businesses", href: "#partner-businesses" },
+        { label: "Community Impact", href: "#partner-vets" },
+        { label: "Local Events", href: "#partner-vets" },
+        { label: "Adoption Partners", href: "#partner-vets" },
       ],
     },
     {
-      label: 'About',
+      label: "About",
       hasDropdown: true,
       items: [
-        { label: 'Our Story', href: '#our-story' },
-        { label: 'Why Sparkpack', href: '#why-sparkpack' },
-        { label: 'Team', href: '#our-story' },
+        { label: "Our Story", href: "#our-story" },
+        { label: "Why Sparkpack", href: "#why-sparkpack" },
+        { label: "Team", href: "#our-story" },
       ],
     },
   ];
@@ -86,7 +86,7 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ className = '' }) => {
   const handleSignOut = () => {
     localStorage.clear();
     setActiveDropdown(null);
-    window.location.href = '/auth/login';
+    window.location.href = "/auth/login";
   };
 
   const toggleMobileMenu = () => {
@@ -95,7 +95,9 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ className = '' }) => {
   };
 
   return (
-    <nav className={`bg-[#f5f7f8] shadow-sm border-b border-gray-100 ${className} sticky top-0 z-50`}>
+    <nav
+      className={`bg-[#f5f7f8] shadow-sm border-b border-gray-100 ${className} sticky top-0 z-50`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -125,7 +127,7 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ className = '' }) => {
                   {item.hasDropdown && (
                     <ChevronDown
                       className={`ml-1 h-4 w-4 transition-transform duration-200 ${
-                        activeDropdown === index ? 'rotate-180' : ''
+                        activeDropdown === index ? "rotate-180" : ""
                       }`}
                     />
                   )}
@@ -141,9 +143,12 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ className = '' }) => {
                     />
                     <div className="absolute top-full left-0 mt-1 w-56 bg-white rounded-md shadow-lg border border-gray-200 z-20">
                       <div className="py-1">
-                        {item.items?.map((subItem, subIndex) => (
-                          subItem.type === 'heading' ? (
-                            <div key={subIndex} className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider mt-2">
+                        {item.items?.map((subItem, subIndex) =>
+                          subItem.type === "heading" ? (
+                            <div
+                              key={subIndex}
+                              className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider mt-2"
+                            >
                               {subItem.label}
                             </div>
                           ) : (
@@ -156,7 +161,7 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ className = '' }) => {
                               {subItem.label}
                             </Link>
                           )
-                        ))}
+                        )}
                       </div>
                     </div>
                   </>
@@ -173,7 +178,11 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ className = '' }) => {
               aria-expanded={mobileMenuOpen}
               aria-label="Toggle menu"
             >
-              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              {mobileMenuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
             </button>
           </div>
 
@@ -197,7 +206,7 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ className = '' }) => {
                 Login/Account
                 <ChevronDown
                   className={`ml-1 h-4 w-4 transition-transform duration-200 ${
-                    activeDropdown === navItems.length ? 'rotate-180' : ''
+                    activeDropdown === navItems.length ? "rotate-180" : ""
                   }`}
                 />
               </button>
@@ -264,7 +273,9 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ className = '' }) => {
             {navItems.map((item, index) => (
               <div key={index} className="relative">
                 <button
-                  onClick={() => setActiveDropdown(activeDropdown === index ? null : index)}
+                  onClick={() =>
+                    setActiveDropdown(activeDropdown === index ? null : index)
+                  }
                   className="w-full flex items-center justify-between text-[#342d47] hover:text-[#7eb238] px-4 py-2 text-sm font-medium transition-colors duration-200"
                   aria-expanded={activeDropdown === index}
                   aria-haspopup={item.hasDropdown}
@@ -273,17 +284,31 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ className = '' }) => {
                   {item.hasDropdown && (
                     <ChevronDown
                       className={`ml-1 h-4 w-4 transition-transform duration-200 ${
-                        activeDropdown === index ? 'rotate-180' : ''
+                        activeDropdown === index ? "rotate-180" : ""
                       }`}
                     />
                   )}
                 </button>
+                <Link
+                  href="/auth/login"
+                  className="block px-4 py-2 text-sm text-[#342d47] hover:bg-[#f5f8f3] hover:text-[#7eb238] transition-colors duration-150"
+                  onClick={() => setActiveDropdown(null)}
+                >
+                  Policyholder Login
+                </Link>
+                <Link
+                  href="/claims/file"
+                  className="block px-4 py-2 text-sm text-[#342d47] hover:bg-[#f5f8f3] hover:text-[#7eb238] transition-colors duration-150"
+                  onClick={() => setActiveDropdown(null)}
+                >
+                  File a Claim
+                </Link>
 
                 {/* Dropdown Menu */}
                 {item.hasDropdown && activeDropdown === index && (
                   <div className="pl-4">
                     {item.items?.map((subItem, subIndex) =>
-                      subItem.type === 'heading' ? (
+                      subItem.type === "heading" ? (
                         <div
                           key={subIndex}
                           className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider mt-2"
