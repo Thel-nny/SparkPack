@@ -1,20 +1,35 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card } from '@/components/ui/card';
 import { AdvisorFilterSkeleton, AdvisorTableSkeleton } from './loading';
-import FilterControls from './AdvisorActiveApplications/FilterControls';
-import ApplicationsTable from './AdvisorActiveApplications/ApplicationsTable';
-import PaginationControls from './AdvisorActiveApplications/PaginationControls';
+
+import ApplicationFilters from '@/components/advisor/common/ApplicationFilters';
+import ApplicationsTable from '@/components/advisor/common/ApplicationsTable';
+import PaginationControls from '@/components/advisor/common/PaginationControls';
+
 import useApplications from './AdvisorActiveApplications/useApplications';
 
-// Define the type for an individual application
+interface Application {
+  id: string;
+  status: 'ACTIVE' | 'INACTIVE' | string;
+  ensured: string;
+  owners: string[];
+  product: string;
+  coverageAmount: number;
+  dateStarted: string;
+  policyNumber: string;
+  customer?: {
+    firstName: string;
+    lastName: string;
+  };
+  advisorName?: string;
+}
 
 const AdvisorActiveApplications: React.FC = () => {
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
   const [advisorNames, setAdvisorNames] = useState<Record<string, string>>({});
 
-  // Filter states
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [productFilter, setProductFilter] = useState<string>('');
   const [minCoverage, setMinCoverage] = useState<string>('');
@@ -22,10 +37,8 @@ const AdvisorActiveApplications: React.FC = () => {
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
 
-  // Dropdown visibility state
   const [activeFilterDropdown, setActiveFilterDropdown] = useState<string | null>(null);
 
-  // Pagination state
   const itemsPerPage = 7;
 
   const {
@@ -46,12 +59,11 @@ const AdvisorActiveApplications: React.FC = () => {
     endDate,
   });
 
-  // Reset page to 1 when filters change
   useEffect(() => {
     setPage(1);
   }, [statusFilter, productFilter, minCoverage, maxCoverage, startDate, endDate, setPage]);
 
-  const clearFilters = () => {
+  const clearFilters = useCallback(() => {
     setStatusFilter('');
     setProductFilter('');
     setMinCoverage('');
@@ -59,7 +71,7 @@ const AdvisorActiveApplications: React.FC = () => {
     setStartDate('');
     setEndDate('');
     setActiveFilterDropdown(null);
-  };
+  }, []);
 
   const areFiltersActive =
     statusFilter !== '' ||
@@ -69,13 +81,18 @@ const AdvisorActiveApplications: React.FC = () => {
     startDate !== '' ||
     endDate !== '';
 
-  const formatCurrency = (amount: number): string => {
+  const formatCurrency = useCallback((amount: number): string => {
     return new Intl.NumberFormat('en-PH', {
       style: 'currency',
       currency: 'PHP',
       minimumFractionDigits: 2,
     }).format(amount);
-  };
+  }, []);
+
+  const activeStatusOptions = [
+    'Active',
+    'Inactive'
+  ];
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
@@ -84,7 +101,7 @@ const AdvisorActiveApplications: React.FC = () => {
           {loading ? (
             <AdvisorFilterSkeleton />
           ) : (
-            <FilterControls
+            <ApplicationFilters
               statusFilter={statusFilter}
               setStatusFilter={setStatusFilter}
               productFilter={productFilter}
@@ -101,34 +118,37 @@ const AdvisorActiveApplications: React.FC = () => {
               setActiveFilterDropdown={setActiveFilterDropdown}
               clearFilters={clearFilters}
               areFiltersActive={areFiltersActive}
+              statusOptions={activeStatusOptions}
+              allStatusesLabel="All Active Statuses"
             />
           )}
         </div>
 
         <Card className="p-0 rounded-lg shadow-sm overflow-hidden">
-          {loading ? (
+          {loading && applications.length === 0 ? (
             <AdvisorTableSkeleton />
           ) : error ? (
             <div className="p-4 text-red-600">Error loading applications: {error}</div>
           ) : (
             <ApplicationsTable
-              applications={applications}
+              applications={applications as Application[]}
               activeRowId={activeRowId}
               setActiveRowId={setActiveRowId}
               advisorNames={advisorNames}
               setAdvisorNames={setAdvisorNames}
               formatCurrency={formatCurrency}
+              showAdvisorAssignment={true}
+              loading={loading}
+              error={error}
             />
           )}
         </Card>
 
-        {!loading && !error && applications.length > itemsPerPage && (
-          <PaginationControls
-            currentPage={currentPage}
-            totalPages={totalPages}
-            paginate={setPage}
-          />
-        )}
+        <PaginationControls
+          currentPage={currentPage}
+          totalPages={totalPages}
+          paginate={setPage}
+        />
       </div>
     </div>
   );
