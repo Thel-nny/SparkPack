@@ -277,6 +277,15 @@ const NewApplicationForm: React.FC = () => {
   };
 
   const renderStepContent = () => {
+    // Derive pet-specific risk factors from formData.pet
+    const petAge = parseInt(formData.pet.estimatedAge || '0', 10);
+    const petBreed = formData.pet.breed;
+    const hasPreExistingConditions = 
+      formData.pet.chronicIllness === 'Yes' ||
+      formData.pet.surgeryHistory === 'Yes' ||
+      formData.pet.recurringConditions === 'Yes' ||
+      formData.pet.onMedication === 'Yes';
+
     switch (currentStep) {
       case 1:
         return (
@@ -305,6 +314,10 @@ const NewApplicationForm: React.FC = () => {
             onUpdate={(data) => updateFormData('product', data)}
             onNext={handleNextStep}
             onPrev={handlePrevStep}
+            // Pass the derived pet-specific risk factors
+            petAge={petAge}
+            petBreed={petBreed}
+            hasPreExistingConditions={hasPreExistingConditions}
           />
         );
       case 4:

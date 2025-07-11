@@ -1,7 +1,7 @@
 // sparkpack/src/types/formData.ts
 
 // Import shared types from applicationFormData.ts
-import { ClientDetails, PetDetails, ProductDetails, PaymentDetails, SelectedAddOn, AddOnDefinition, ProductOption } from './applicationFormData';
+import { ClientDetails, PetDetails } from './applicationFormData';
 
 // Claim-specific interfaces
 export interface IncidentDetails {

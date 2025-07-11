@@ -18,6 +18,10 @@ interface ProductDetailsStepProps {
   onUpdate: (data: Partial<ProductDetails>) => void;
   onPrev: () => void;
   onNext: () => void;
+  // NEW PROPS: Pet-specific risk factors passed from parent (NewApplicationForm)
+  petAge: number; // Assuming age in years
+  petBreed: string; // Assuming breed string
+  hasPreExistingConditions: boolean; // Assuming boolean
 }
 
 const productIcons: { [key: string]: React.ReactNode } = { 
@@ -225,51 +229,93 @@ export const calculatePremium = (
   coverageAmount: string,
   deductible: string,
   reimbursementRate: string,
-  _paymentFrequency: string,
+  paymentFrequency: string,
   selectedAddOns: SelectedAddOn[],
   donationPercentage: number,
-
+  // NEW PARAMETERS for risk assessment
+  petAge: number, // Assuming age in years
+  petBreed: string, // Assuming breed string
+  hasPreExistingConditions: boolean // Assuming boolean
 ): { baseAnnual: number; annualTotal: number; monthlyTotal: number; oneTimeTotal: number; donationAmount: number } => {
-  let basePrice = 0;
-  const coverageFactor = 1; // Keeping this at 1 as it's not explicitly used as a multiplier
-  let deductibleFactor = 1;
-  let reimbursementFactor = 1;
-
+  let basePremium = 0; // Renamed from basePrice for clarity
   const cleanCoverage = parseFloat(coverageAmount?.replace(/[₱,]/g, '') || '0');
   const cleanDeductible = parseFloat(deductible?.replace(/[₱,]/g, '') || '0');
   const cleanReimbursement = parseFloat(reimbursementRate?.replace(/%/g, '') || '0') / 100;
 
+  // 1. Determine Base Premium based on Product and Coverage
   switch (productName) {
     case 'Medical Care Insurance':
-      basePrice = 950;
-      if (cleanCoverage === 25000) basePrice = 1200;
-      if (cleanCoverage === 30000) basePrice = 1500;
-      if (cleanDeductible === 2000) deductibleFactor = 0.93;
-      if (cleanReimbursement === 0.70) reimbursementFactor = 0.97;
+      if (cleanCoverage === 20000) basePremium = 1000; // Adjusted for illustrative purposes
+      if (cleanCoverage === 25000) basePremium = 1300;
+      if (cleanCoverage === 30000) basePremium = 1600;
       break;
     case 'Legacy Insurance':
-      basePrice = 700;
-      if (cleanCoverage === 10000) basePrice = 850;
-      if (cleanCoverage === 20000) basePrice = 1050;
-      if (cleanDeductible === 500) deductibleFactor = 0.97;
+      if (cleanCoverage === 5000) basePremium = 750;
+      if (cleanCoverage === 10000) basePremium = 900;
+      if (cleanCoverage === 20000) basePremium = 1150;
       break;
     case 'Medicare and Legacy Insurance':
-      basePrice = 1800;
-      if (cleanCoverage === 25000) basePrice = 2500;
-      if (cleanCoverage === 50000) basePrice = 3500;
-      // Adjusted for new max coverage ₱80,000
-      if (cleanCoverage === 80000) basePrice = 4500; // New base price for ₱80,000 coverage
-      // Deductible adjustments for new options ₱3,000 and ₱5,000
-      if (cleanDeductible === 3000) deductibleFactor = 0.88;
-      if (cleanDeductible === 5000) deductibleFactor = 0.85; // New deductible factor for ₱5,000
-      if (cleanReimbursement === 0.80) reimbursementFactor = 0.93;
+      if (cleanCoverage === 7500) basePremium = 2000;
+      if (cleanCoverage === 25000) basePremium = 2800;
+      if (cleanCoverage === 50000) basePremium = 3800;
+      if (cleanCoverage === 80000) basePremium = 4800;
       break;
     default:
       return { baseAnnual: 0, annualTotal: 0, monthlyTotal: 0, oneTimeTotal: 0, donationAmount: 0 };
   }
 
-  const calculatedBaseAnnualPremium = basePrice * coverageFactor * deductibleFactor * reimbursementFactor;
+  // 2. Apply Policy Design Factors (Deductible, Reimbursement)
+  // These are now *multipliers* on the base premium
+  let deductibleMultiplier = 1;
+  if (productName === 'Medical Care Insurance') {
+    if (cleanDeductible === 1000) deductibleMultiplier = 1.0; // No discount for lower deductible
+    if (cleanDeductible === 2000) deductibleMultiplier = 0.95; // 5% discount for higher deductible
+  } else if (productName === 'Legacy Insurance') {
+    if (cleanDeductible === 0) deductibleMultiplier = 1.0;
+    if (cleanDeductible === 500) deductibleMultiplier = 0.98;
+  } else if (productName === 'Medicare and Legacy Insurance') {
+    if (cleanDeductible === 3000) deductibleMultiplier = 1.0;
+    if (cleanDeductible === 5000) deductibleMultiplier = 0.92; // 8% discount for higher deductible
+  }
 
+  let reimbursementMultiplier = 1;
+  if (productName === 'Medical Care Insurance') {
+    if (cleanReimbursement === 0.70) reimbursementMultiplier = 0.98; // 2% discount for lower reimbursement
+    if (cleanReimbursement === 0.80) reimbursementMultiplier = 1.0;
+  } else if (productName === 'Medicare and Legacy Insurance') {
+    if (cleanReimbursement === 0.80) reimbursementMultiplier = 0.95; // 5% discount for lower reimbursement
+    if (cleanReimbursement === 0.90) reimbursementMultiplier = 1.0;
+  }
+  // Legacy Insurance has 100% reimbursement, so no multiplier needed there based on current options
+
+  basePremium *= deductibleMultiplier * reimbursementMultiplier;
+
+  // 3. Apply Pet-Specific Risk Factors (Illustrative placeholders)
+  let ageRiskFactor = 1.0;
+  if (petAge > 8) ageRiskFactor = 1.2; // 20% surcharge for older pets
+  else if (petAge < 1) ageRiskFactor = 1.05; // 5% surcharge for very young pets (initial health checks)
+  else if (petAge >= 1 && petAge <= 8) ageRiskFactor = 1.0; // Base for prime age
+
+  let breedRiskFactor = 1.0;
+  // This would ideally come from a lookup table mapping breeds to risk levels
+  // For demonstration, let's assume some high-risk breeds
+  const highRiskBreeds = ['Bulldog', 'Pug', 'German Shepherd', 'Labrador Retriever']; // Example breeds prone to certain issues
+  if (highRiskBreeds.includes(petBreed)) {
+    breedRiskFactor = 1.15; // 15% surcharge for high-risk breeds
+  }
+
+  let preExistingConditionSurcharge = 0;
+  if (hasPreExistingConditions) {
+    // This is often an exclusion, or a significant surcharge if covered at all
+    // For this calculator, let's assume a fixed surcharge or a very high multiplier
+    preExistingConditionSurcharge = 500; // Example fixed annual surcharge
+    // Or, a multiplier: basePremium *= 1.5; // 50% increase
+  }
+
+  // Apply pet-specific factors to the base premium
+  basePremium = basePremium * ageRiskFactor * breedRiskFactor + preExistingConditionSurcharge;
+
+  // 4. Calculate Add-on Costs
   let annualAddOnCost = 0;
   let oneTimeAddOnCost = 0;
   selectedAddOns.forEach(addOn => {
@@ -283,18 +329,25 @@ export const calculatePremium = (
     }
   });
 
-const totalAnnualPremiumBeforeDonation = calculatedBaseAnnualPremium + annualAddOnCost;
+  // 5. Calculate Donation Amount
+  const totalAnnualPremiumBeforeDonation = basePremium + annualAddOnCost;
   let calculatedDonationAmount = (totalAnnualPremiumBeforeDonation * (donationPercentage / 100));
   let finalAnnualTotalPremium = totalAnnualPremiumBeforeDonation + calculatedDonationAmount;
-  const monthlySurchargeFactor = 1.05; // Keeping this at 5% as previously discussed
-  let finalMonthlyTotalPremium = (finalAnnualTotalPremium / 12) * monthlySurchargeFactor;
 
+  // 6. Apply Monthly Surcharge if applicable
+  const monthlySurchargeFactor = 1.05; // 5% surcharge for monthly payments
+  let finalMonthlyTotalPremium = (finalAnnualTotalPremium / 12);
+  if (paymentFrequency === 'Monthly') {
+      finalMonthlyTotalPremium *= monthlySurchargeFactor;
+  }
+
+  // Rounding
   finalAnnualTotalPremium = Math.round(finalAnnualTotalPremium);
-  finalMonthlyTotalPremium = Math.round(finalMonthlyTotalPremium * 100) / 100;
+  finalMonthlyTotalPremium = Math.round(finalMonthlyTotalPremium * 100) / 100; // Keep 2 decimal places for monthly
   calculatedDonationAmount = Math.round(calculatedDonationAmount * 100) / 100;
 
   return {
-    baseAnnual: Math.round(calculatedBaseAnnualPremium),
+    baseAnnual: Math.round(basePremium), // This now reflects the base premium with policy design and pet risk factors
     annualTotal: finalAnnualTotalPremium,
     monthlyTotal: finalMonthlyTotalPremium,
     oneTimeTotal: oneTimeAddOnCost,
