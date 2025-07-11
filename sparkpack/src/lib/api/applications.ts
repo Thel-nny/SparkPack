@@ -50,6 +50,4 @@ export async function updateApplication(id: string, applicationData: any) {
     console.error('Error updating application:', error);
     throw error;
   }
-
-  return await response.json();
 }
