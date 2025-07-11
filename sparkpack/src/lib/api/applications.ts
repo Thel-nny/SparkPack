@@ -1,5 +1,4 @@
-// Create a new application
-import { type ApplicationFormData } from "@/types/formData";
+import { type ApplicationFormData } from "@/types/applicationFormData";
 
 interface updateApplicationData {
   updateData: {

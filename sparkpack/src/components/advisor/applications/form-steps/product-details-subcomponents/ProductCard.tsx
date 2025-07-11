@@ -1,5 +1,5 @@
 import React from 'react';
-import { ProductOption } from '@/types/formData'; // Assuming ProductOption is defined here
+import { ProductOption } from '@/types/applicationFormData'; // Updated import path
 
 interface ProductCardProps {
   product: ProductOption;

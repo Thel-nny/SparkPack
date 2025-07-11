@@ -1,65 +1,23 @@
-export interface ClientDetails {
-  firstName: string;
-  middleName?: string;
-  lastName: string;
-  dob: string;
-  pob?: string;
-  gender: string;
-  phoneNumber: string;
-  email: string;
-  streetAddress: string;
-  country: string;
-  city: string;
-  province: string;
-  postalCode: string;
-  declarationAccuracy: boolean;
-}
+// sparkpack/src/types/formData.ts
 
-export interface PetDetails {
-  petName: string;
-  dobOrAdoptionDate: string;
-  estimatedAge?: string;
-  weight: string;
-  gender: '' | 'Male' | 'Female'; // Ensure it can be an empty string initially, or Male/Female
-  species: string;
-  otherSpecies?: string;
-  breed: string;
-  otherBreed?: string;
-  microchipNumber?: string;
-  colorMarkings?: string;
-  spayedNeutered: '' | 'Yes' | 'No';
-  vaccinationStatus: '' | 'Up-to-date' | 'Not up-to-date' | 'Unknown';
-  lifestyle: '' | 'Indoor' | 'Outdoor' | 'Both';
-  chronicIllness: '' | 'Yes' | 'No';
-  chronicIllnessExplanation?: string;
-  surgeryHistory: '' | 'Yes' | 'No';
-  surgeryHistoryExplanation?: string;
-  recurringConditions: '' | 'Yes' | 'No';
-  recurringConditionsExplanation?: string;
-  onMedication: '' | 'Yes' | 'No';
-  onMedicationExplanation?: string;
-  vetName?: string;
-  vetClinicName?: string;
-  clinicPhoneNumber?: string;
-  clinicAddress?: string;
-  lastVetVisitDate?: string;
-}
+// Import shared types from applicationFormData.ts
+import { ClientDetails, PetDetails, ProductDetails, PaymentDetails, SelectedAddOn, AddOnDefinition, ProductOption } from './applicationFormData';
 
+// Claim-specific interfaces
 export interface IncidentDetails {
   incidentOrSymptomDate: string;
   vetVisitDate: string;
   incidentType: '' | 'Accident' | 'Illness';
   previousRelatedConditions: '' | 'Yes' | 'No';
   reasonForClaim: '' | 'Illness' | 'Injury' | 'Wellness';
-  // *** FIX: Add | undefined to optional string properties ***
-  accidentDescription?: string | undefined;
-  accidentLocation?: string | undefined;
-  accidentWitnesses?: string | undefined;
-  symptomsDescription?: string | undefined;
-  symptomsFirstAppearance?: string | undefined;
-  symptomsDuration?: string | undefined;
-  affectedBodyPart?: string | undefined; // This was the problematic one
-  previousConditionDetails?: string | undefined;
+  accidentDescription?: string;
+  accidentLocation?: string;
+  accidentWitnesses?: string;
+  symptomsDescription?: string;
+  symptomsFirstAppearance?: string;
+  symptomsDuration?: string;
+  affectedBodyPart?: string;
+  previousConditionDetails?: string;
 }
 
 export interface VeterinaryClinicTreatmentDetails {
@@ -70,7 +28,7 @@ export interface VeterinaryClinicTreatmentDetails {
   treatmentDates: string;
   diagnosis: string;
   treatmentProvided: string;
-  prognosis?: string | undefined; // *** FIX: Add | undefined ***
+  prognosis?: string;
   isEmergency: '' | 'Yes' | 'No';
 }
 
@@ -80,17 +38,16 @@ export interface FinancialReimbursementDetails {
   officialReceiptsAttached: '' | 'Yes' | 'No';
   reimbursementMethod: '' | 'Credit/Debit Card' | 'Bank Transfer' | 'GCash' | 'Cash/Cheque';
   preferredContactForUpdates: '' | 'Email' | 'SMS';
-  // *** FIX: Add | undefined to optional string properties ***
-  cardNumber?: string | undefined;
-  cardName?: string | undefined;
-  expiryDate?: string | undefined;
-  cvv?: string | undefined;
-  bankName?: string | undefined;
-  accountNumber?: string | undefined;
-  accountName?: string | undefined;
-  gcashNumber?: string | undefined;
-  gcashName?: string | undefined;
-  reimbursementDescription?: string | undefined;
+  cardNumber?: string;
+  cardName?: string;
+  expiryDate?: string;
+  cvv?: string;
+  bankName?: string;
+  accountNumber?: string;
+  accountName?: string;
+  gcashNumber?: string;
+  gcashName?: string;
+  reimbursementDescription?: string;
 }
 
 export interface DeclarationsAuthorizationDetails {
@@ -101,81 +58,17 @@ export interface DeclarationsAuthorizationDetails {
   signatureDate: string;
 }
 
+// ClaimFormData now uses imported ClientDetails and PetDetails
 export interface ClaimFormData {
   policyNumber: string;
-  client: ClientDetails;
-  petDetails: PetDetails;
+  client: ClientDetails; // Imported from applicationFormData
+  petDetails: PetDetails; // Imported from applicationFormData
   incidentDetails: IncidentDetails;
   veterinaryClinicTreatmentDetails: VeterinaryClinicTreatmentDetails;
   financialReimbursementDetails: FinancialReimbursementDetails;
   declarationsAuthorization: DeclarationsAuthorizationDetails;
 }
 
-export interface ApplicationFormData {
-  client: {
-    title: string;
-    firstName: string;
-    middleName?: string;
-    lastName: string;
-    dob: string;
-    pob?: string;
-    gender: string;
-    allowPhoneCollection: boolean;
-    phoneNumber: string;
-    email: string;
-    streetAddress: string;
-    country: string;
-    city: string;
-    province: string;
-    postalCode: string;
-    declarationAccuracy: boolean;
-  };
-  pet: {
-    petName: string;
-    dobOrAdoptionDate: string;
-    weight: string;
-    estimatedAge?: string;
-    gender: '' | 'Male' | 'Female';
-    species: string;
-    otherSpecies?: string;
-    breed: string;
-    otherBreed?: string;
-    microchipNumber?: string;
-    colorMarkings?: string;
-    spayedNeutered: '' | 'Yes' | 'No';
-    vaccinationStatus: '' | 'Up-to-date' | 'Not up-to-date' | 'Unknown';
-    lifestyle: '' | 'Indoor' | 'Outdoor' | 'Both';
-    chronicIllness: '' | 'Yes' | 'No';
-    chronicIllnessExplanation?: string;
-    surgeryHistory: '' | 'Yes' | 'No';
-    surgeryHistoryExplanation?: string;
-    recurringConditions: '' | 'Yes' | 'No';
-    recurringConditionsExplanation?: string;
-    onMedication: '' | 'Yes' | 'No';
-    onMedicationExplanation?: string;
-    vetName?: string;
-    vetClinicName?: string;
-    clinicPhoneNumber?: string;
-    clinicAddress?: string;
-    lastVetVisitDate?: string;
-  };
-  product: {
-    productName: string;
-    planType: string;
-    coverageAmount: string;
-    deductible: string;
-    reimbursementRate: string;
-    paymentFrequency: string;
-    startDate: string;
-    coverageLength: string;
-    selectedAddOns: string[];
-    donationPercentage: number;
-  };
-  payment: {
-    paymentMethod: string;
-    cardNumber: string;
-    cardName: string;
-    expiryDate: string;
-    cvv: string;
-  };
-}
+// NOTE: ApplicationFormData and its direct sub-interfaces (ClientDetails, PetDetails, ProductDetails, PaymentDetails)
+// are now exclusively defined in sparkpack/src/types/applicationFormData.ts to prevent type conflicts.
+// This file (formData.ts) should only contain types specific to claims or other distinct forms.

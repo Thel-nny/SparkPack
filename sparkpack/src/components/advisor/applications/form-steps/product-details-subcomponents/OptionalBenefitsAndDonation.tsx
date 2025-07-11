@@ -1,25 +1,29 @@
 import React from 'react';
+import { Label } from '@/components/ui/label'; // Assuming Label component exists
 
-import { AddOnDefinition, ProductDetails } from '@/types/formData'; // Assuming these types are defined here
+// Updated import paths to use applicationFormData.ts
+import { AddOnDefinition, ProductDetails, SelectedAddOn } from '@/types/applicationFormData'; 
 
 interface OptionalBenefitsAndDonationProps {
-  localFormData: ProductDetails;
+  formData: ProductDetails; // Changed from localFormData
   filteredAddOns: AddOnDefinition[];
   oneTimeAddOns: AddOnDefinition[];
   annualAddOns: AddOnDefinition[];
   donationPercentages: number[];
   handleAddOnToggle: (addOn: AddOnDefinition) => void;
   handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+  errors: Record<string, string>; // Added errors prop
 }
 
 const OptionalBenefitsAndDonation: React.FC<OptionalBenefitsAndDonationProps> = ({
-  localFormData,
+  formData, // Changed from localFormData
   filteredAddOns,
   oneTimeAddOns,
   annualAddOns,
   donationPercentages,
   handleAddOnToggle,
   handleChange,
+  errors, // Destructure errors
 }) => {
   return (
     <>
@@ -37,7 +41,7 @@ const OptionalBenefitsAndDonation: React.FC<OptionalBenefitsAndDonationProps> = 
                   <div
                     key={addOn.id}
                     className={`p-4 border rounded-lg flex justify-between items-center transition-all duration-200
-                      ${localFormData.selectedAddOns.some(item => item.id === addOn.id)
+                      ${formData.selectedAddOns.some(item => item.id === addOn.id)
                         ? 'border-[#8cc63f] bg-[#e6f4d9]'
                         : 'border-gray-200 bg-white hover:shadow-sm'
                       }`}
@@ -50,7 +54,7 @@ const OptionalBenefitsAndDonation: React.FC<OptionalBenefitsAndDonationProps> = 
                     <input
                       type="checkbox"
                       className="form-checkbox h-5 w-5 text-[#8cc63f] rounded"
-                      checked={localFormData.selectedAddOns.some(item => item.id === addOn.id)}
+                      checked={formData.selectedAddOns.some(item => item.id === addOn.id)}
                       onChange={() => handleAddOnToggle(addOn)}
                     />
                   </div>
@@ -67,7 +71,7 @@ const OptionalBenefitsAndDonation: React.FC<OptionalBenefitsAndDonationProps> = 
                   <div
                     key={addOn.id}
                     className={`p-4 border rounded-lg flex justify-between items-center transition-all duration-200
-                      ${localFormData.selectedAddOns.some(item => item.id === addOn.id)
+                      ${formData.selectedAddOns.some(item => item.id === addOn.id)
                         ? 'border-[#8cc63f] bg-[#e6f4d9]'
                         : 'border-gray-200 bg-white hover:shadow-sm'
                       }`}
@@ -80,7 +84,7 @@ const OptionalBenefitsAndDonation: React.FC<OptionalBenefitsAndDonationProps> = 
                     <input
                       type="checkbox"
                       className="form-checkbox h-5 w-5 text-[#8cc63f] rounded"
-                      checked={localFormData.selectedAddOns.some(item => item.id === addOn.id)}
+                      checked={formData.selectedAddOns.some(item => item.id === addOn.id)}
                       onChange={() => handleAddOnToggle(addOn)}
                     />
                   </div>
@@ -94,23 +98,24 @@ const OptionalBenefitsAndDonation: React.FC<OptionalBenefitsAndDonationProps> = 
       )}
 
       <div className="mt-8">
-        <label htmlFor="donationPercentage" className="block text-lg font-bold text-[#342d47] mb-2">
+        <Label htmlFor="donationPercentage" className="block text-lg font-bold text-[#342d47] mb-2">
           Make a Donation to Pet Charities
-        </label>
+        </Label>
         <p className="text-gray-700 mb-4">
           Support local pet shelters and rescue organizations by adding a small percentage to your annual premium. Every peso helps!
         </p>
         <select
           id="donationPercentage"
           name="donationPercentage"
-          value={localFormData.donationPercentage}
+          value={formData.donationPercentage}
           onChange={handleChange}
-          className="mt-1 block w-full md:w-1/2 lg:w-1/3 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-[#8cc63f] focus:border-[#8cc63f] sm:text-sm rounded-md shadow-sm"
+          className={`mt-1 block w-full md:w-1/2 lg:w-1/3 pl-3 pr-10 py-2 text-base border ${errors.donationPercentage ? 'border-red-500' : 'border-gray-300'} focus:outline-none focus:ring-[#8cc63f] focus:border-[#8cc63f] sm:text-sm rounded-md shadow-sm`}
         >
           {donationPercentages.map(percentage => (
             <option key={percentage} value={percentage}>{percentage}%</option>
           ))}
         </select>
+        {errors.donationPercentage && <p className="mt-1 text-sm text-red-500">{errors.donationPercentage}</p>}
         <p className="text-sm text-gray-500 mt-2">
           Your selected donation percentage will be added to your annual premium.
         </p>

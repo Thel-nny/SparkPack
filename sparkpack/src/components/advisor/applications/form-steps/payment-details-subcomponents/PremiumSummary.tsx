@@ -1,4 +1,5 @@
 import React from 'react';
+import { ProductDetails } from '@/types/applicationFormData'; // Updated import path
 
 interface PremiumSummaryProps {
   premiumCalculation: {
@@ -8,7 +9,7 @@ interface PremiumSummaryProps {
     oneTimeTotal: number;
     donationAmount: number;
   };
-  selectedPaymentFrequency: string;
+  selectedPaymentFrequency: ProductDetails['paymentFrequency']; // Use the specific type from ProductDetails
 }
 
 const PremiumSummary: React.FC<PremiumSummaryProps> = ({ premiumCalculation, selectedPaymentFrequency }) => {
