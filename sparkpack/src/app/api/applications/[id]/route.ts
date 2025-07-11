@@ -213,6 +213,11 @@ export async function PUT(req: NextRequest) {
               { status: 400 }
             );
           }
+          // If status is updated to APPROVED, also update progressStatus to ACTIVE
+          if (body.status === "APPROVED") {
+            updateData.progressStatus = "ACTIVE";
+          }
+          updateData.status = body.status;
         }
 
         const application = await prisma.application.update({

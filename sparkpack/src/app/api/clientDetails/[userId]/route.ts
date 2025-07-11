@@ -40,16 +40,16 @@ export const PUT = withAuth(async (req: NextRequest, authenticatedUserId: string
     const advisorAssigned = body.advisor && body.advisor.trim() !== "" && body.advisor.trim().toUpperCase() !== "N/A";
 
     if (advisorAssigned) {
-      // Update all applications for this user with in-progress statuses to APPROVED (active)
+      // Update all applications for this user with in-progress statuses to ACTIVE (active)
       await prisma.application.updateMany({
         where: {
           customerId: targetUserId,
           status: {
-            in: ["SUBMITTED", "ACTIVE"],
+            in: ["SUBMITTED", "APPROVED"],
           },
         },
         data: {
-          status: "APPROVED",
+          status: "ACTIVE",
         },
       });
     } else {
@@ -57,10 +57,10 @@ export const PUT = withAuth(async (req: NextRequest, authenticatedUserId: string
       await prisma.application.updateMany({
         where: {
           customerId: targetUserId,
-          status: "APPROVED",
+          status: "ACTIVE",
         },
         data: {
-          status: "ACTIVE",
+          status: "APPROVED",
         },
       });
     }
