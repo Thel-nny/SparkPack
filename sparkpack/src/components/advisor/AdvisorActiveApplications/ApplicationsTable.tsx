@@ -66,43 +66,12 @@ const ApplicationsTable: React.FC<ApplicationsTableProps> = ({
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{app.dateStarted}</td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{app.policyNumber}</td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                {activeRowId === app.id ? (
-                  <div className="flex items-center space-x-2">
-                    <Input
-                      type="text"
-                      value={advisorNames[app.id] || ''}
-                      onChange={(e) => setAdvisorNames((prev) => ({ ...prev, [app.id]: e.target.value }))}
-                      onClick={(e) => e.stopPropagation()}
-                      autoFocus
-                      placeholder="Assign advisor"
-                      className="w-full"
-                    />
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setActiveRowId(null);
-                      }}
-                      className="text-green-600 hover:text-green-800"
-                      aria-label="Submit advisor name"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth={2}
-                        stroke="currentColor"
-                        className="w-5 h-5"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
-                    </button>
-                  </div>
-                ) : advisorNames[app.id] ? (
+                {advisorNames[app.id] ? (
                   <span title={advisorNames[app.id]} className="inline-block max-w-[10ch] truncate">
                     {advisorNames[app.id]}
                   </span>
                 ) : (
-                  <span>Click to assign</span>
+                  <span>N/A</span>
                 )}
               </td>
             </tr>

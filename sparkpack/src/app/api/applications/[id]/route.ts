@@ -2,14 +2,48 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { withAuth } from "@/lib/auth-guard";
 import bcrypt from "bcryptjs";
-import { sendEmail } from "@/lib/email";
+import nodemailer from "nodemailer";
+
+function generateTempPassword(length = 10) {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let password = "";
+  for (let i = 0; i < length; i++) {
+    password += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return password;
+}
+
+async function sendTempPasswordEmail(toEmail: string, tempPassword: string, firstName: string) {
+  // Configure the transporter with your SMTP settings
+  const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT) || 587,
+    secure: false, // true for 465, false for other ports
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
+
+  const mailOptions = {
+    from: `"SparkPack Support" <${process.env.SMTP_USER}>`,
+    to: toEmail,
+    subject: "Your Temporary Password",
+    text: `Hello ${firstName},\n\nYour application has been received. Your temporary password is: ${tempPassword}\n\nPlease log in and change your password as soon as possible.\n\nBest regards,\nSparkPack Team`,
+  };
+
+  await transporter.sendMail(mailOptions);
+}
 
 export async function GET(req: NextRequest) {
   return (
     await withAuth(
       async (req: NextRequest, userId: string, userRole: string) => {
         try {
-          const applicationId = req.url.split("/").pop();
+          // Extract applicationId from URL pathname to avoid query params or trailing slashes issues
+          const url = new URL(req.url);
+          const paths = url.pathname.split("/");
+          const applicationId = paths[paths.length - 1] || paths[paths.length - 2];
           if (!applicationId) {
             return NextResponse.json(
               { success: false, error: "Missing application ID" },
@@ -74,21 +108,15 @@ export async function GET(req: NextRequest) {
   )(req);
 }
 
-function generateFakePassword(length = 12) {
-  const chars =
-    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+";
-  let password = "";
-  for (let i = 0; i < length; i++) {
-    password += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return password;
-}
 
 export async function PUT(req: NextRequest) {
   return withAuth(
     async (req: NextRequest, userId: string, userRole: string) => {
       try {
-        const applicationId = req.url.split("/").pop();
+        // Extract applicationId from URL pathname to avoid query params or trailing slashes issues
+        const url = new URL(req.url);
+        const paths = url.pathname.split("/");
+        const applicationId = paths[paths.length - 1] || paths[paths.length - 2];
         if (!applicationId) {
           return NextResponse.json(
             { success: false, error: "Missing application ID" },
@@ -119,24 +147,58 @@ export async function PUT(req: NextRequest) {
           );
         }
 
-        const updateData:any= {};
+        const updateData: any = {};
 
-        if (body.premiumAmount !== undefined)
-          updateData.premiumAmount = parseFloat(body.premiumAmount);
-        if (body.deductible !== undefined)
-          updateData.deductible = parseFloat(body.deductible);
-        if (body.coverageLimit !== undefined)
-          updateData.coverageLimit = parseFloat(body.coverageLimit);
-        if (body.endDate !== undefined)
-          updateData.endDate = new Date(body.endDate);
+        // Validate and parse numeric fields
+        if (body.premiumAmount !== undefined) {
+          const premium = parseFloat(body.premiumAmount);
+          if (isNaN(premium)) {
+            return NextResponse.json(
+              { success: false, error: "Invalid premiumAmount value" },
+              { status: 400 }
+            );
+          }
+          updateData.premiumAmount = premium;
+        }
+        if (body.deductible !== undefined) {
+          const deductible = parseFloat(body.deductible);
+          if (isNaN(deductible)) {
+            return NextResponse.json(
+              { success: false, error: "Invalid deductible value" },
+              { status: 400 }
+            );
+          }
+          updateData.deductible = deductible;
+        }
+        if (body.coverageLimit !== undefined) {
+          const coverageLimit = parseFloat(body.coverageLimit);
+          if (isNaN(coverageLimit)) {
+            return NextResponse.json(
+              { success: false, error: "Invalid coverageLimit value" },
+              { status: 400 }
+            );
+          }
+          updateData.coverageLimit = coverageLimit;
+        }
+        if (body.endDate !== undefined) {
+          const date = new Date(body.endDate);
+          if (isNaN(date.getTime())) {
+            return NextResponse.json(
+              { success: false, error: "Invalid endDate value" },
+              { status: 400 }
+            );
+          }
+          updateData.endDate = date;
+        }
 
         if (userRole === "ADMIN" && body.status !== undefined) {
-          // Restrict status updates for submitted applications to SUBMITTED, SIGNATURE_PROCESS_PENDING, SIGNATURE_IN_PROCESS only
+          // Restrict status updates for submitted applications to allowed statuses
           const allowedStatusesForSubmitted = [
             "SUBMITTED",
             "APPROVED",
-            "SIGNATURE_PROCESS_PENDING",
-            "SIGNATURE_IN_PROCESS",
+            "DECLINED",
+            "ACTIVE",
+            "INACTIVE",
           ];
           // Check current status before restricting
           if (
@@ -151,54 +213,11 @@ export async function PUT(req: NextRequest) {
               { status: 400 }
             );
           }
+          // If status is updated to APPROVED, also update progressStatus to ACTIVE
+          if (body.status === "APPROVED") {
+            updateData.progressStatus = "ACTIVE";
+          }
           updateData.status = body.status;
-
-          // Additional logic: if status becomes COMPLETED in applicationssubmitted, change applicationStatus to IN_PROGRESS
-          if (
-            existingApplication.progressStatus === "COMPLETED" &&
-            body.status === "COMPLETED"
-          ) {
-            updateData.progressStatus = "IN_PROGRESS";
-          }
-        }
-
-        let tempPassword: string | null = null;
-
-        if (updateData.status === "SUBMITTED") {
-          tempPassword = generateFakePassword();
-          const hashedPassword = await bcrypt.hash(tempPassword, 10);
-
-          await prisma.user.update({
-            where: { id: existingApplication.customerId },
-            data: { password: hashedPassword },
-          });
-
-          const crypto = await import("crypto");
-          const verificationToken = crypto.randomBytes(32).toString("hex");
-          const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
-
-          await prisma.verificationToken.create({
-            data: {
-              identifier: existingApplication.customerId,
-              token: verificationToken,
-              expires,
-            },
-          });
-
-          const customer = await prisma.user.findUnique({
-            where: { id: existingApplication.customerId },
-          });
-
-          if (customer?.email) {
-            const verificationUrl = `${process.env.NEXTAUTH_URL}/verify-email?token=${verificationToken}&id=${customer.id}`;
-            const emailText = `Dear ${customer.firstName || "Customer"},\n\nYour application has been submitted successfully. Your temporary password is:\n\n${tempPassword}\n\nPlease verify your email by clicking the following link:\n${verificationUrl}\n\nBest regards,\nYour Company`;
-
-            await sendEmail(
-              customer.email,
-              "Your Temporary Password and Email Verification",
-              emailText
-            );
-          }
         }
 
         const application = await prisma.application.update({
@@ -221,15 +240,32 @@ export async function PUT(req: NextRequest) {
           },
         });
 
+        // Generate temporary password
+        const tempPassword = generateTempPassword();
+
+        // Hash the temporary password
+        const hashedPassword = await bcrypt.hash(tempPassword, 10);
+
+        // Update the user's password in the database
+        await prisma.user.update({
+          where: { id: application.customer.id },
+          data: { password: hashedPassword },
+        });
+
+        // Send the temporary password email
+        await sendTempPasswordEmail(
+          application.customer.email,
+          tempPassword,
+          application.customer.firstName || ""
+        );
+
         return NextResponse.json({
           success: true,
           data: application,
-          message: tempPassword
-            ? "Application updated and temporary password sent"
-            : "Application updated successfully",
+          message: "Application updated and temporary password sent",
         });
-      } catch{
-        console.error("Error updating application:");
+      } catch (error) {
+        console.error("Error updating application:", error);
         return NextResponse.json(
           { success: false, error: "Internal server error" },
           { status: 500 }

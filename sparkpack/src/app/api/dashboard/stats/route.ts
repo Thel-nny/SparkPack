@@ -13,15 +13,41 @@ export async function GET(req: NextRequest) {
           totalClaims,
           pendingClaims,
           totalPayments,
+          underwritingApplications,
+          declinedApplications,
+          pendingRenewals,
           recentApplications,
           recentClaims,
         ] = await Promise.all([
           prisma.user.count(),
           prisma.pet.count(),
-          prisma.application.count(),
-          prisma.claim.count(),
+          prisma.application.count({
+            where: {
+              status: { in: ['APPROVED','SUBMITTED', 'DECLINED', 'ACTIVE', 'INACTIVE'] } },
+            }
+          ),
+          prisma.claim.count({
+            where: {
+              status: { in: ['APPROVED', 'PENDING', 'REJECTED','PROCESSING'] }
+            }
+          }),
           prisma.claim.count({ where: { status: 'PENDING' } }),
           prisma.payment.aggregate({ _sum: { amount: true } }),
+          prisma.application.count({
+            where: {
+              status: 'SUBMITTED'
+            }
+          }),
+          prisma.application.count({
+            where: {
+              status: 'DECLINED'
+            }
+          }),
+          prisma.application.count({
+            where: {
+              status: 'INACTIVE'
+            }
+          }),
           prisma.application.findMany({
             take: 5,
             orderBy: { createdAt: 'desc' },
@@ -54,6 +80,9 @@ export async function GET(req: NextRequest) {
               totalClaims,
               pendingClaims,
               totalPayments: totalPayments._sum.amount || 0,
+              underwritingApplications,
+              declinedApplications,
+              pendingRenewals,
             },
             recentApplications,
             recentClaims,
@@ -66,16 +95,45 @@ export async function GET(req: NextRequest) {
           userApplications,
           userClaims,
           userPayments,
+          underwritingApplications,
+          declinedApplications,
+          pendingRenewals,
           recentClaims,
         ] = await Promise.all([
           prisma.pet.count({ where: { ownerId: userId } }),
-          prisma.application.count({ where: { customerId: userId } }),
+          prisma.application.count({
+            where: {
+              customerId: userId,
+              status: { in: ['APPROVED','SUBMITTED', 'DECLINED', 'ACTIVE', 'INACTIVE'] }
+            }
+          }),
           prisma.claim.count({
-            where: { application: { customerId: userId } },
+            where: {
+              application: { customerId: userId },
+              status: { in: ['APPROVED', 'PENDING', 'REJECTED','PROCESSING'] }
+            }
           }),
           prisma.payment.aggregate({
             where: { application: { customerId: userId } },
             _sum: { amount: true },
+          }),
+          prisma.application.count({
+            where: {
+              customerId: userId,
+              status: 'SUBMITTED'
+            }
+          }),
+          prisma.application.count({
+            where: {
+              customerId: userId,
+              status: 'DECLINED'
+            }
+          }),
+          prisma.application.count({
+            where: {
+              customerId: userId,
+              status: 'INACTIVE'
+            }
           }),
           prisma.claim.findMany({
             where: { application: { customerId: userId } },
@@ -99,6 +157,9 @@ export async function GET(req: NextRequest) {
               totalApplications: userApplications,
               totalClaims: userClaims,
               totalPayments: userPayments._sum.amount || 0,
+              underwritingApplications,
+              declinedApplications,
+              pendingRenewals,
             },
             recentClaims,
           },

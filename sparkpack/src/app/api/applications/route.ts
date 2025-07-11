@@ -133,25 +133,26 @@ export async function POST(req: NextRequest) {
             lastName: client.lastName,
             phoneNum: client.phoneNumber,
             role: 'CUSTOMER',
-            clientDetails: {
-              create: {
-                title: client.title, // Assuming title is part of client object
-                firstName: client.firstName,
-                middleName: client.middleName,
-                lastName: client.lastName,
-                dob: new Date(client.dob),
-                pob: client.pob,
-                gender: client.gender,
-                phoneNumber: client.phoneNumber,
-                email: client.email,
-                streetAddress: client.streetAddress,
-                country: client.country,
-                city: client.city,
-                province: client.province,
-                postalCode: client.postalCode,
-                declarationAccuracy: client.declarationAccuracy,
+              clientDetails: {
+                create: {
+                  title: client.title, // Assuming title is part of client object
+                  firstName: client.firstName,
+                  middleName: client.middleName,
+                  lastName: client.lastName,
+                  dob: new Date(client.dob),
+                  pob: client.pob,
+                  gender: client.gender,
+                  phoneNumber: client.phoneNumber,
+                  email: client.email,
+                  streetAddress: client.streetAddress,
+                  country: client.country,
+                  city: client.city,
+                  province: client.province,
+                  postalCode: client.postalCode,
+                  declarationAccuracy: client.declarationAccuracy,
+                  advisor: "N/A", // Set advisor to "N/A" by default
+                },
               },
-            },
           },
         });
       } else {

@@ -38,7 +38,7 @@ const AdvisorSubmittedApplications: React.FC = () => {
   const [applications, setApplications] = useState<SimplifiedApplication[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [statusFilter, setStatusFilter] = useState<string>('');
+  const [statusFilter, setStatusFilter] = useState<string>('SUBMITTED'); // Default to SUBMITTED
   const [productFilter, setProductFilter] = useState<string>('');
   const [minCoverage, setMinCoverage] = useState<string>('');
   const [maxCoverage, setMaxCoverage] = useState<string>('');
@@ -145,7 +145,7 @@ const AdvisorSubmittedApplications: React.FC = () => {
   };
 
   const clearFilters = () => {
-    setStatusFilter('');
+    setStatusFilter('SUBMITTED'); // Reset to SUBMITTED on clear
     setProductFilter('');
     setMinCoverage('');
     setMaxCoverage('');

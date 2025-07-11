@@ -7,32 +7,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum ApplicationStatus {
-  ADVISOR_DECLERATION_PENDING
-  SIGNATURE_PROCESS_PENDING
-  SIGNATURE_IN_PROCESS
-  SUBMITTED
-  APPROVED
-  REJECTED
-}
-
-enum applicationsstatus {
-  SUBMITTED
-  IN_PROGRESS
-  ACTIVE
-}
-
-enum submittedstatus {
+enum ApplicationStatusSimplified {
   SUBMITTED
   APPROVED
   DECLINED
-}
-
-enum ApplicationProgressStatus {
-  IN_PROGRESS
-  COMPLETED
-  ON_HOLD
-  CANCELLED
+  ACTIVE
+  INACTIVE
 }
 
 enum PlanType {
@@ -103,6 +83,7 @@ model ClientDetails {
   province           String
   postalCode         String
   declarationAccuracy Boolean
+  advisor            String?  // Added advisor field
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
@@ -155,8 +136,8 @@ model Application {
   reimbursement      Float
   deductible         Float
   coverageAmount     Float?
-  status             ApplicationStatus @default(ADVISOR_DECLERATION_PENDING)
-  progressStatus     ApplicationProgressStatus @default(IN_PROGRESS)
+  status             ApplicationStatusSimplified @default(SUBMITTED)
+  progressStatus     ApplicationStatusSimplified @default(ACTIVE)
   startDate          DateTime
   endDate            DateTime?
   coverageLength     Int?

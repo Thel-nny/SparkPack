@@ -2,8 +2,30 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
 import { getToken } from "next-auth/jwt";
-import { submittedstatus } from "@prisma/client";
-import { sendEmail } from "@/lib/email";
+import { ApplicationStatusSimplified } from "@prisma/client";
+import nodemailer from "nodemailer";
+
+async function sendWelcomeEmail(toEmail: string, username: string) {
+  const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT) || 587,
+    secure: false,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
+
+  const mailOptions = {
+    from: `"SparkPack Support" <${process.env.SMTP_USER}>`,
+    to: toEmail,
+    subject: "Welcome to SparkPack",
+    text: `Hello ${username},\n\nThank you for registering at SparkPack! We're excited to have you on board.`,
+    html: `<p>Hello <strong>${username}</strong>,</p><p>Thank you for registering at SparkPack! We're excited to have you on board.</p>`,
+  };
+
+  await transporter.sendMail(mailOptions);
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -32,7 +54,7 @@ export async function POST(req: NextRequest) {
         // Check if there is a submitted application with this email
         const submittedApplication = await prisma.application.findFirst({
           where: {
-            status: submittedstatus.SUBMITTED,
+        status: ApplicationStatusSimplified.SUBMITTED,
             customer: {
               email: email,
             },
@@ -59,12 +81,7 @@ export async function POST(req: NextRequest) {
 
     // Send welcome email after user creation
     try {
-      await sendEmail(
-        email,
-        "Welcome to SparkPack",
-        `Hello ${username},\n\nThank you for registering at SparkPack! We're excited to have you on board.`,
-        `<p>Hello <strong>${username}</strong>,</p><p>Thank you for registering at SparkPack! We're excited to have you on board.</p>`
-      );
+      await sendWelcomeEmail(email, username);
     } catch (emailError) {
       console.error("Failed to send welcome email:", emailError);
     }
