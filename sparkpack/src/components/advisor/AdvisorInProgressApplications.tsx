@@ -24,12 +24,50 @@ interface Application {
   advisorName?: string;
 }
 
+const ITEMS_PER_PAGE = 7;
+
+
 const AdvisorInProgressApplications: React.FC = () => {
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [advisorNames, setAdvisorNames] = useState<Record<string, string>>({});
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
+
+  // Handler to update advisor in backend
+  const updateAdvisor = async (applicationId: string, advisorName: string) => {
+    try {
+      // Find the application to get customerId
+      const application = applications.find(app => app.id === applicationId);
+      if (!application) return;
+
+      // Fix: customer is an object with firstName and lastName, no id property
+      // We need to find customerId from the application object itself
+      // Assuming application has customerId property, else fallback to undefined
+      const customerId = (application as any).customerId || undefined;
+      if (!customerId) {
+        console.error('Customer ID not found for application:', applicationId);
+        return;
+      }
+
+      // Call API to update clientDetails with new advisor
+      const response = await fetch(`/api/clientDetails/${customerId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ advisor: advisorName }),
+      });
+      const result = await response.json();
+      if (result.success) {
+        // Optionally refresh applications list or update state
+        // For simplicity, update advisorNames state
+        setAdvisorNames(prev => ({ ...prev, [applicationId]: advisorName }));
+      } else {
+        console.error('Failed to update advisor:', result.error);
+      }
+    } catch (error) {
+      console.error('Error updating advisor:', error);
+    }
+  };
 
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [productFilter, setProductFilter] = useState<string>('');

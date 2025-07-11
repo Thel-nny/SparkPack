@@ -76,12 +76,22 @@ export default function InsuranceSection() {
             </CardHeader>
             <CardContent>
               <ul className="space-y-3">
-                {productOptions[0].details.map((detail, index) => (
-                  <li key={index} className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-[#8cc63f]" />
-                    <span>{detail}</span>
-                  </li>
-                ))}
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-[#8cc63f]" />
+                  <span>Annual checkups</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-[#8cc63f]" />
+                  <span>Vaccinations</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-[#8cc63f]" />
+                  <span>Emergency care up to ₱50,000</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-[#8cc63f]" />
+                  <span>24/7 vet hotline</span>
+                </li>
               </ul>
               <Button className="w-full mt-6 bg-[#8cc63f] hover:bg-[#7eb238]">Choose Plan</Button>
             </CardContent>

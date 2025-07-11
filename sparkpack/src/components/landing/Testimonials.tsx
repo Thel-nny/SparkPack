@@ -60,8 +60,8 @@ export default function Testimonials() {
               ))}
             </div>
             <p className="text-gray-600 mb-4">
-              &quot;Sparkpack truly understands pet parents in Iloilo. The pricing is fair, the service is exceptional, and
-              they really care about our pets&apos; wellbeing throughout their entire lives.&quot;
+              &quote;Sparkpack truly understands pet parents in Iloilo. The pricing is fair, the service is exceptional, and
+              they really care about our pets&apos; wellbeing throughout their entire lives."
             </p>
             <div className="flex items-center gap-3">
               <UserRound className="h-24 w-24 text-gray-500" />
