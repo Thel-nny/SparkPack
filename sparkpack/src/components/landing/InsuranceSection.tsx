@@ -1,9 +1,69 @@
+"use client"
+
+import React, { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { CheckCircle, Shield, Heart, Stethoscope } from "lucide-react"
+import { fetchApplications } from "@/lib/api/applications"
+
+interface Application {
+  id: string
+  planType: string
+  reimbursement: number
+  deductible: number
+  coverageAmount: number
+  startDate: string
+  coverageLength?: number
+  donationPercentage?: number
+  paymentFrequency?: string
+  selectedAddOns?: { name: string; price: number; type: string }[]
+}
 
 export default function InsuranceSection() {
+  const [applications, setApplications] = useState<Application[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    async function loadApplications() {
+      try {
+        setLoading(true)
+        const data = await fetchApplications()
+        if (data.success) {
+          setApplications(data.data.applications)
+        } else {
+          setError("Failed to load insurance plans")
+        }
+      } catch (err) {
+        setError("Failed to load insurance plans")
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadApplications()
+  }, [])
+
+  if (loading) {
+    return (
+      <section id="insurance-packages" className="py-20 bg-white">
+        <div className="container mx-auto px-4 text-center">
+          <p>Loading insurance plans...</p>
+        </div>
+      </section>
+    )
+  }
+
+  if (error) {
+    return (
+      <section id="insurance-packages" className="py-20 bg-white">
+        <div className="container mx-auto px-4 text-center text-red-600">
+          <p>{error}</p>
+        </div>
+      </section>
+    )
+  }
+
   return (
     <section id="insurance-packages" className="py-20 bg-white">
       <div className="container mx-auto px-4">
@@ -17,117 +77,44 @@ export default function InsuranceSection() {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-          {/* Medical Care Insurance */}
-          <Card className="border-2 hover:border-[#8cc63f] transition-colors">
-            <CardHeader>
-              <div className="h-12 w-12 bg-[#8cc63f]/10 rounded-lg flex items-center justify-center mb-4">
-                <Stethoscope className="h-6 w-6 text-[#8cc63f]" />
-              </div>
-              <CardTitle className="text-[#342d47]">Essential Care</CardTitle>
-              <CardDescription>Perfect for young pets and basic coverage</CardDescription>
-              <div className="text-3xl font-bold text-[#8cc63f]">
-                ₱899<span className="text-sm text-gray-500">/month</span>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-3">
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-[#8cc63f]" />
-                  <span>Annual checkups</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-[#8cc63f]" />
-                  <span>Vaccinations</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-[#8cc63f]" />
-                  <span>Emergency care up to ₱30,000</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-[#8cc63f]" />
-                  <span>24/7 vet hotline</span>
-                </li>
-              </ul>
-              <Button className="w-full mt-6 bg-[#8cc63f] hover:bg-[#7eb238]">Choose Plan</Button>
-            </CardContent>
-          </Card>
-
-          <Card className="border-2 border-[#8cc63f] shadow-lg scale-105">
-            <CardHeader>
-              <Badge className="w-fit bg-[#8cc63f] text-white mb-2">Most Popular</Badge>
-              <div className="h-12 w-12 bg-[#8cc63f]/10 rounded-lg flex items-center justify-center mb-4">
-                <Shield className="h-6 w-6 text-[#8cc63f]" />
-              </div>
-              <CardTitle className="text-[#342d47]">Complete Care</CardTitle>
-              <CardDescription>Comprehensive coverage for all life stages</CardDescription>
-              <div className="text-3xl font-bold text-[#8cc63f]">
-                ₱1,499<span className="text-sm text-gray-500">/month</span>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-3">
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-[#8cc63f]" />
-                  <span>Everything in Essential</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-[#8cc63f]" />
-                  <span>Dental care</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-[#8cc63f]" />
-                  <span>Emergency care up to ₱150,000</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-[#8cc63f]" />
-                  <span>Specialist consultations</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-[#8cc63f]" />
-                  <span>Memorial services included</span>
-                </li>
-              </ul>
-              <Button className="w-full mt-6 bg-[#8cc63f] hover:bg-[#7eb238]">Choose Plan</Button>
-            </CardContent>
-          </Card>
-
-          <Card className="border-2 hover:border-[#8cc63f] transition-colors">
-            <CardHeader>
-              <div className="h-12 w-12 bg-[#8cc63f]/10 rounded-lg flex items-center justify-center mb-4">
-                <Heart className="h-6 w-6 text-[#8cc63f]" />
-              </div>
-              <CardTitle className="text-[#342d47]">Legacy Care</CardTitle>
-              <CardDescription>Premium coverage with lifetime benefits</CardDescription>
-              <div className="text-3xl font-bold text-[#8cc63f]">
-                ₱2,299<span className="text-sm text-gray-500">/month</span>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-3">
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-[#8cc63f]" />
-                  <span>Everything in Complete</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-[#8cc63f]" />
-                  <span>Unlimited emergency care</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-[#8cc63f]" />
-                  <span>Premium memorial services</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-[#8cc63f]" />
-                  <span>Grief counseling support</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-[#8cc63f]" />
-                  <span>Tree planting ceremony</span>
-                </li>
-              </ul>
-              <Button className="w-full mt-6 bg-[#8cc63f] hover:bg-[#7eb238]">Choose Plan</Button>
-            </CardContent>
-          </Card>
+          {applications.map((app) => (
+            <Card key={app.id} className="border-2 hover:border-[#8cc63f] transition-colors">
+              <CardHeader>
+                <div className="h-12 w-12 bg-[#8cc63f]/10 rounded-lg flex items-center justify-center mb-4">
+                  {/* Icon based on planType */}
+                  {app.planType === "Essential Care" && <Stethoscope className="h-6 w-6 text-[#8cc63f]" />}
+                  {app.planType === "Complete Care" && <Shield className="h-6 w-6 text-[#8cc63f]" />}
+                  {app.planType === "Legacy Care" && <Heart className="h-6 w-6 text-[#8cc63f]" />}
+                </div>
+                <CardTitle className="text-[#342d47]">{app.planType}</CardTitle>
+                <CardDescription>Plan details</CardDescription>
+                <div className="text-3xl font-bold text-[#8cc63f]">
+                  ₱{app.coverageAmount.toLocaleString()}<span className="text-sm text-gray-500">/month</span>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-3">
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-[#8cc63f]" />
+                    <span>Reimbursement: {app.reimbursement}%</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-[#8cc63f]" />
+                    <span>Deductible: ₱{app.deductible.toLocaleString()}</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-[#8cc63f]" />
+                    <span>Coverage Length: {app.coverageLength ?? "N/A"} months</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-[#8cc63f]" />
+                    <span>Payment Frequency: {app.paymentFrequency ?? "N/A"}</span>
+                  </li>
+                </ul>
+                <Button className="w-full mt-6 bg-[#8cc63f] hover:bg-[#7eb238]">Choose Plan</Button>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </div>
     </section>
