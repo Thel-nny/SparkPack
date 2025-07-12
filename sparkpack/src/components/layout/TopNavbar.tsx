@@ -1,3 +1,4 @@
+// src/components/layout/TopNavbar.tsx (REVISED)
 "use client";
 
 import React, { useState } from "react";
@@ -7,12 +8,12 @@ import { ChevronDown, User, Menu, X } from "lucide-react";
 
 interface NavItem {
   label: string;
-  href?: string;
+  href?: string; // Optional href for top-level items that don't directly navigate (e.g., just open a dropdown)
   hasDropdown: boolean;
   items?: (
     | { label: string; href: string; type?: "link" }
     | { label: string; type: "heading" }
-  )[];
+  )[]; // Simplified to a single array for all dropdowns
 }
 
 interface TopNavbarProps {
@@ -23,53 +24,49 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ className = "" }) => {
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // Define navItems directly within the component or import from a data file
+  // For this example, I'm defining them here for clarity of changes.
   const navItems: NavItem[] = [
     {
       label: "Insurance",
       hasDropdown: true,
       items: [
-        { label: "Medical Care Insurance", type: "heading" },
         { label: "Our Packages", href: "#insurance-packages" },
-        { label: "Coverage Details", href: "#insurance-packages" },
-        { label: "Add-On Services", href: "#insurance-packages" },
-        { label: "Compare Plans", href: "#insurance-packages" },
-        { label: "Legacy Insurance", type: "heading" },
-        { label: "Our Packages", href: "#insurance-packages" },
-        { label: "Coverage Details", href: "#insurance-packages" },
-        { label: "Compare Plans", href: "#insurance-packages" },
-        { label: "Claims Process", href: "#insurance-packages" },
+        { label: "Coverage Details", href: "/insurance/packages" },
+        { label: "Add-On Services", href: "/insurance/packages" },
+        { label: "Our Plans", href: "/insurance/packages" },
       ],
     },
     {
       label: "Memorial Services",
       hasDropdown: true,
       items: [
-        { label: "Cremation Services", href: "#cremation-services" },
-        { label: "Tree Planting Ceremony", href: "#cremation-services" },
-        { label: "Memorial Options", href: "#cremation-services" },
-        { label: "Tree Care & Maintenance", href: "#cremation-services" },
-        { label: "Memorial Gallery", href: "#cremation-services" },
-        { label: "Grief Support", href: "#cremation-services" },
+        { label: "Cremation Services", href: "/memorial-services#cremation-services" }, // Use full paths with section IDs
+        { label: "Tree Planting Ceremony", href: "/memorial-services#tree-planting" },
+        { label: "Memorial Options", href: "/memorial-services#memorial-options" },
+        { label: "Tree Care & Maintenance", href: "/memorial-services#tree-care" },
+        { label: "Memorial Gallery", href: "/memorial-services#gallery" },
+        { label: "Grief Support", href: "/memorial-services#grief-support" },
       ],
     },
     {
       label: "Local Partners",
       hasDropdown: true,
       items: [
-        { label: "Partner Veterinarians", href: "#partner-vets" },
-        { label: "Pet-Friendly Businesses", href: "#partner-businesses" },
-        { label: "Community Impact", href: "#partner-vets" },
-        { label: "Local Events", href: "#partner-vets" },
-        { label: "Adoption Partners", href: "#partner-vets" },
+        { label: "Partner Veterinarians", href: "/local-partners#partner-vets" },
+        { label: "Pet-Friendly Businesses", href: "/local-partners#partner-businesses" },
+        { label: "Community Impact", href: "/local-partners#community-impact" },
+        { label: "Local Events", href: "/local-partners#local-events" },
+        { label: "Adoption Partners", href: "/local-partners#adoption-partners" },
       ],
     },
     {
       label: "About",
       hasDropdown: true,
       items: [
-        { label: "Our Story", href: "#our-story" },
-        { label: "Why Sparkpack", href: "#why-sparkpack" },
-        { label: "Team", href: "#our-story" },
+        { label: "Our Story", href: "/about#our-story" },
+        { label: "Why Sparkpack", href: "/about#why-sparkpack" },
+        { label: "Team", href: "/about#team" },
       ],
     },
   ];
@@ -82,17 +79,24 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ className = "" }) => {
     setActiveDropdown(null);
   };
 
-  // Signout handler: clear localStorage and redirect to login page
   const handleSignOut = () => {
     localStorage.clear();
     setActiveDropdown(null);
-    window.location.href = "/auth/login";
+    // Use Next.js router for navigation if available and preferred
+    window.location.href = "/auth/login"; // Direct reload for sign out for simplicity
   };
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
-    setActiveDropdown(null);
+    setActiveDropdown(null); // Close any open dropdown when mobile menu toggles
   };
+
+  // Helper to determine if the path is active for styling, if needed
+  // const isLinkActive = (href: string) => {
+  //   if (!href) return false;
+  //   const currentPath = window.location.pathname + window.location.hash;
+  //   return currentPath === href;
+  // };
 
   return (
     <nav
@@ -133,7 +137,7 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ className = "" }) => {
                   )}
                 </button>
 
-                {/* Dropdown Menu */}
+                {/* Dropdown Menu (Desktop) */}
                 {item.hasDropdown && activeDropdown === index && (
                   <>
                     <div
@@ -141,9 +145,15 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ className = "" }) => {
                       onClick={handleClickOutside}
                       aria-hidden="true"
                     />
-                    <div className="absolute top-full left-0 mt-1 w-56 bg-white rounded-md shadow-lg border border-gray-200 z-20">
-                      <div className="py-1">
-                        {item.items?.map((subItem, subIndex) =>
+                    <div
+                      className="absolute top-full left-0 mt-1 bg-white rounded-md shadow-lg border border-gray-200 z-20 w-56" // Removed conditional width
+                    >
+                      <div className="py-1"> {/* Removed grid classes, default to single column */}
+                        {/* Render dropdown items */}
+                        {(item.items as (
+                          | { label: string; href: string; type?: "link" }
+                          | { label: string; type: "heading" }
+                        )[]).map((subItem, subIndex) =>
                           subItem.type === "heading" ? (
                             <div
                               key={subIndex}
@@ -156,7 +166,7 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ className = "" }) => {
                               key={subIndex}
                               href={subItem.href}
                               className="block px-4 py-2 text-sm text-[#342d47] hover:bg-[#f5f8f3] hover:text-[#7eb238] transition-colors duration-150"
-                              onClick={() => setActiveDropdown(null)}
+                              onClick={() => setActiveDropdown(null)} // Close dropdown on link click
                             >
                               {subItem.label}
                             </Link>
@@ -197,7 +207,7 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ className = "" }) => {
 
             <div className="relative">
               <button
-                onClick={() => handleDropdownToggle(navItems.length)}
+                onClick={() => handleDropdownToggle(navItems.length)} // Use a unique index for this dropdown
                 className="flex items-center text-[#342d47] hover:text-[#7eb238] px-3 py-2 text-sm font-medium transition-colors duration-200"
                 aria-expanded={activeDropdown === navItems.length}
                 aria-haspopup="true"
@@ -220,7 +230,7 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ className = "" }) => {
                   />
                   <div
                     className="absolute top-full right-0 mt-1 w-56 bg-white rounded-md shadow-lg border border-gray-200 z-20"
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e) => e.stopPropagation()} // Prevent closing dropdown when clicking inside it
                   >
                     <div className="py-1">
                       <Link
@@ -272,46 +282,43 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ className = "" }) => {
           <div className="px-2 pt-2 pb-3 space-y-1">
             {navItems.map((item, index) => (
               <div key={index} className="relative">
-                <button
-                  onClick={() =>
-                    setActiveDropdown(activeDropdown === index ? null : index)
-                  }
-                  className="w-full flex items-center justify-between text-[#342d47] hover:text-[#7eb238] px-4 py-2 text-sm font-medium transition-colors duration-200"
-                  aria-expanded={activeDropdown === index}
-                  aria-haspopup={item.hasDropdown}
-                >
-                  {item.label}
-                  {item.hasDropdown && (
-                    <ChevronDown
-                      className={`ml-1 h-4 w-4 transition-transform duration-200 ${
-                        activeDropdown === index ? "rotate-180" : ""
-                      }`}
-                    />
-                  )}
-                </button>
-                <Link
-                  href="/auth/login"
-                  className="block px-4 py-2 text-sm text-[#342d47] hover:bg-[#f5f8f3] hover:text-[#7eb238] transition-colors duration-150"
-                  onClick={() => setActiveDropdown(null)}
-                >
-                  Policyholder Login
-                </Link>
-                <Link
-                  href="/claims/file"
-                  className="block px-4 py-2 text-sm text-[#342d47] hover:bg-[#f5f8f3] hover:text-[#7eb238] transition-colors duration-150"
-                  onClick={() => setActiveDropdown(null)}
-                >
-                  File a Claim
-                </Link>
+                {/* Top-level mobile menu item (button or link) */}
+                {!item.hasDropdown ? (
+                    <Link
+                        href={item.href || '#'} // Fallback href for non-dropdown items
+                        className="w-full flex items-center justify-between text-[#342d47] hover:text-[#7eb238] px-4 py-2 text-sm font-medium transition-colors duration-200"
+                        onClick={() => { setMobileMenuOpen(false); setActiveDropdown(null); }}
+                    >
+                        {item.label}
+                    </Link>
+                ) : (
+                    <button
+                        onClick={() => handleDropdownToggle(index)}
+                        className="w-full flex items-center justify-between text-[#342d47] hover:text-[#7eb238] px-4 py-2 text-sm font-medium transition-colors duration-200"
+                        aria-expanded={activeDropdown === index}
+                        aria-haspopup={item.hasDropdown}
+                    >
+                        {item.label}
+                        <ChevronDown
+                            className={`ml-1 h-4 w-4 transition-transform duration-200 ${
+                                activeDropdown === index ? "rotate-180" : ""
+                            }`}
+                        />
+                    </button>
+                )}
 
-                {/* Dropdown Menu */}
+
+                {/* Dropdown Menu for Mobile */}
                 {item.hasDropdown && activeDropdown === index && (
-                  <div className="pl-4">
-                    {item.items?.map((subItem, subIndex) =>
+                  <div className="pl-4 border-l border-gray-200 ml-4"> {/* Indent and add border for hierarchy */}
+                    {(item.items as (
+                      | { label: string; href: string; type?: "link" }
+                      | { label: string; type: "heading" }
+                    )[]).map((subItem, subIndex) =>
                       subItem.type === "heading" ? (
                         <div
                           key={subIndex}
-                          className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider mt-2"
+                          className="px-2 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider mt-2"
                         >
                           {subItem.label}
                         </div>
@@ -319,10 +326,10 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ className = "" }) => {
                         <Link
                           key={subIndex}
                           href={subItem.href}
-                          className="block px-4 py-2 text-sm text-[#342d47] hover:bg-[#f5f8f3] hover:text-[#7eb238] transition-colors duration-150"
+                          className="block px-2 py-1.5 text-sm text-[#342d47] hover:bg-[#f5f8f3] hover:text-[#7eb238] transition-colors duration-150"
                           onClick={() => {
                             setActiveDropdown(null);
-                            setMobileMenuOpen(false);
+                            setMobileMenuOpen(false); // Close mobile menu when a sub-link is clicked
                           }}
                         >
                           {subItem.label}
@@ -333,6 +340,69 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ className = "" }) => {
                 )}
               </div>
             ))}
+
+            {/* Mobile-specific Login/Account/Quote links consolidated at the bottom */}
+            <div className="border-t border-gray-200 mt-2 pt-2">
+                <Link
+                  href="/get-quote"
+                  className="block w-full text-center bg-[#8cc63f] hover:bg-[#7eb238] text-white px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 mt-2"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setActiveDropdown(null);
+                  }}
+                >
+                  Get Quote
+                </Link>
+                <Link
+                  href="/auth/login"
+                  className="block px-4 py-2 text-sm text-[#342d47] hover:bg-[#f5f8f3] hover:text-[#7eb238] transition-colors duration-150"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setActiveDropdown(null);
+                  }}
+                >
+                  Policyholder Login
+                </Link>
+                <Link
+                  href="/claims/file"
+                  className="block px-4 py-2 text-sm text-[#342d47] hover:bg-[#f5f8f3] hover:text-[#7eb238] transition-colors duration-150"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setActiveDropdown(null);
+                  }}
+                >
+                  File a Claim
+                </Link>
+                <Link
+                  href="/account/management"
+                  className="block px-4 py-2 text-sm text-[#342d47] hover:bg-[#f5f8f3] hover:text-[#7eb238] transition-colors duration-150"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setActiveDropdown(null);
+                  }}
+                >
+                  Account Management
+                </Link>
+                <Link
+                  href="/support/contact"
+                  className="block px-4 py-2 text-sm text-[#342d47] hover:bg-[#f5f8f3] hover:text-[#7eb238] transition-colors duration-150"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setActiveDropdown(null);
+                  }}
+                >
+                  Contact Support
+                </Link>
+                <button
+                  onClick={() => {
+                    handleSignOut();
+                    setMobileMenuOpen(false); // Close mobile menu after sign out
+                  }}
+                  className="w-full text-left block px-4 py-2 text-sm text-[#342d47] hover:bg-[#f5f8f3] hover:text-[#7eb238] transition-colors duration-150"
+                >
+                  Sign Out
+                </button>
+              </div>
           </div>
         </div>
       )}

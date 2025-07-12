@@ -4,44 +4,43 @@ import { Badge } from "@/components/ui/badge"
 import { CheckCircle, Shield, Heart, Stethoscope } from "lucide-react" // Assuming these icons are used for visual representation
 
 export default function InsuranceSection() {
-  // Product details mirroring the definitions in ProductDetailsStep.tsx for consistency
   const productOptions = [
     {
       name: 'Medical Care Insurance',
-      description: 'Basic Plan',
-      premiumRange: '₱950 - ₱1,700',
-      coverageRange: '₱20,000 - ₱30,000',
+      description: 'Essential Illness & Accident Coverage',
+      premiumRange: '₱6,000 - ₱9,600', // Still assuming these ranges for basic
+      coverageRange: '₱15,000 - ₱35,000',
       details: [
         '1-year renewable policy',
-        'Premium starts from ₱950/year (monthly options available)',
-        'Coverage up to ₱30,000 for accidents & illnesses',
+        'Premiums from ₱6,000/year (monthly options available)',
+        'Up to ₱35,000 for accidents & illnesses',
         'Veterinary consultations & diagnostics',
       ],
       icon: <Stethoscope className="h-6 w-6 text-[#8cc63f]" />,
     },
     {
-      name: 'Medicare and Legacy Insurance', // This is the comprehensive one
-      description: 'Comprehensive Plan',
-      premiumRange: '₱1,800 - ₱4,500+',
-      coverageRange: '₱7,500 - ₱80,000',
+      name: 'Medicare & Legacy Insurance', // This is the comprehensive one
+      description: 'Ultimate Protection & Peace of Mind', // Revised description to reflect comprehensiveness
+      premiumRange: '₱14,400 - ₱21,600', // Reflecting the new annual premium range
+      coverageRange: '₱60,000 - ₱100,000', // Reflecting the new annual coverage limits
       details: [
         '1-year renewable policy',
-        'Premium starts from ₱1,800/year (monthly options available)',
-        'Coverage up to ₱80,000 for medical & legacy benefits',
-        'Extensive medical, accidental death, and burial support',
-        'Specialist consultations & grief counseling support',
+        'Premiums from ₱14,400/year (monthly options available)', // Updated to annual base from "Complete Care" tier
+        'Up to ₱100,000 for advanced medical & legacy needs', // Highlights the higher coverage
+        'MRI/CT scans & Major Surgeries Covered', // Key high-value benefits
+        'Extensive illness care, accidental death & burial support', // Summarized other core benefits
       ],
       icon: <Shield className="h-6 w-6 text-[#8cc63f]" />,
     },
     {
       name: 'Legacy Insurance', // This is the end-of-life/lost pet one
-      description: 'Protection & Peace of Mind',
-      premiumRange: '₱700 - ₱1,100',
-      coverageRange: '₱5,000 - ₱20,000',
+      description: 'End-of-Life & Loss Protection', // More descriptive
+      premiumRange: '₱3,120 - ₱4,800',
+      coverageRange: '₱9,000 - ₱18,000',
       details: [
         '1-year renewable policy',
-        'Premium starts from ₱700/year (monthly options available)',
-        'Coverage up to ₱20,000 for covered incidents',
+        'Premiums from ₱3,120/year (monthly options available)',
+        'Up to ₱20,000 for covered incidents',
         'Accidental death or essential euthanasia coverage',
         'Burial/Cremation assistance',
       ],
@@ -86,11 +85,11 @@ export default function InsuranceSection() {
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle className="h-4 w-4 text-[#8cc63f]" />
-                  <span>Emergency care up to ₱50,000</span>
+                  <span>Emergency care up to ₱35,000</span> {/* Updated coverage limit to be more precise for this tier */}
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle className="h-4 w-4 text-[#8cc63f]" />
-                  <span>24/7 vet hotline</span>
+                  <span>24/7 vet hotline access</span> {/* Made it clearer */}
                 </li>
               </ul>
               <Button className="w-full mt-6 bg-[#8cc63f] hover:bg-[#7eb238]">Choose Plan</Button>
