@@ -1,9 +1,12 @@
-import React, { useRef } from 'react';
+'use client';
+
+import React, { useRef, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Input } from '@/components/ui/input'; // Corrected import syntax from '=>' to 'from'
 import { Filter, ChevronDown, XCircle } from 'lucide-react';
 
-interface FiltersProps {
+// Define the props for the consolidated ApplicationFilters component
+interface ApplicationFiltersProps {
   statusFilter: string;
   setStatusFilter: (value: string) => void;
   productFilter: string;
@@ -20,10 +23,17 @@ interface FiltersProps {
   setActiveFilterDropdown: (value: string | null) => void;
   clearFilters: () => void;
   areFiltersActive: boolean;
+  
+  // New prop to specify the status options for this particular filter instance
+  statusOptions: string[];
+  // Optional prop for the default 'All Statuses' label, if it varies
+  allStatusesLabel?: string;
 }
 
-const AdvisorInProgressApplicationsFilters: React.FC<FiltersProps> = ({
+const ApplicationFilters: React.FC<ApplicationFiltersProps> = ({
+  statusFilter, // Kept for display/highlighting purposes, though not directly used in dropdown logic here
   setStatusFilter,
+  productFilter,
   setProductFilter,
   minCoverage,
   setMinCoverage,
@@ -33,29 +43,51 @@ const AdvisorInProgressApplicationsFilters: React.FC<FiltersProps> = ({
   setStartDate,
   endDate,
   setEndDate,
-  activeFilterDropdown,
+  activeFilterDropdown, // Destructure activeFilterDropdown to use its current value
   setActiveFilterDropdown,
   clearFilters,
   areFiltersActive,
+  statusOptions, // Destructure the new prop
+  allStatusesLabel = 'All Statuses', // Default label for 'All Statuses' option
 }) => {
+  // Refs for each dropdown to detect clicks outside
   const statusDropdownRef = useRef<HTMLDivElement>(null);
   const productDropdownRef = useRef<HTMLDivElement>(null);
   const coverageDropdownRef = useRef<HTMLDivElement>(null);
   const dateDropdownRef = useRef<HTMLDivElement>(null);
 
-  const toggleDropdown = (dropdownName: string) => {
+  /**
+   * Toggles the visibility of a specific filter dropdown.
+   * If the clicked dropdown is already active, it closes it. Otherwise, it opens it.
+   * @param dropdownName The name of the dropdown to toggle ('status', 'product', 'coverage', 'date').
+   */
+  const toggleDropdown = useCallback((dropdownName: string) => {
+    // Directly use the current activeFilterDropdown prop to determine the next state
     setActiveFilterDropdown(activeFilterDropdown === dropdownName ? null : dropdownName);
-  };
+  }, [activeFilterDropdown, setActiveFilterDropdown]); // Add activeFilterDropdown to dependencies
 
-  React.useEffect(() => {
+  /**
+   * Handles the selection of a filter option within a dropdown.
+   * Sets the filter value and closes the dropdown.
+   * @param setter The state setter function for the filter (e.g., setStatusFilter).
+   * @param value The value to set the filter to.
+   */
+  const handleOptionSelect = useCallback((setter: (value: string) => void, value: string) => {
+    setter(value);
+    setActiveFilterDropdown(null);
+  }, [setActiveFilterDropdown]);
+
+  // Effect hook to handle clicks outside of any open dropdown to close it.
+  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      // Check if the click occurred outside all dropdowns
       if (
         statusDropdownRef.current && !statusDropdownRef.current.contains(event.target as Node) &&
         productDropdownRef.current && !productDropdownRef.current.contains(event.target as Node) &&
         coverageDropdownRef.current && !coverageDropdownRef.current.contains(event.target as Node) &&
         dateDropdownRef.current && !dateDropdownRef.current.contains(event.target as Node)
       ) {
-        setActiveFilterDropdown(null);
+        setActiveFilterDropdown(null); // Close all dropdowns
       }
     };
 
@@ -63,9 +95,11 @@ const AdvisorInProgressApplicationsFilters: React.FC<FiltersProps> = ({
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [setActiveFilterDropdown]);
+  }, [setActiveFilterDropdown]); // Dependency array includes setActiveFilterDropdown
 
   return (
+    // The main container for all filter controls.
+    // Adjusted to use a div with flex properties, consistent with AdvisorActiveApplications/FilterControls.tsx
     <div className="flex flex-col sm:flex-row items-center justify-start space-y-4 sm:space-y-0 sm:space-x-4 mb-2">
       <Filter className="h-5 w-5 text-gray-600" /> {/* Filter Icon */}
 
@@ -83,21 +117,19 @@ const AdvisorInProgressApplicationsFilters: React.FC<FiltersProps> = ({
           <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-20 py-1">
             <div
               className="block px-4 py-2 text-sm text-gray-700 hover:bg-[#f5f8f3] hover:text-[#7eb238] cursor-pointer"
-              onClick={() => { setStatusFilter(''); setActiveFilterDropdown(null); }}
+              onClick={() => handleOptionSelect(setStatusFilter, '')} // Pass empty string for 'All'
             >
-              All Statuses
+              {allStatusesLabel}
             </div>
-            {['Advisor Declaration Pending', 'Signature Process Pending', 'Signature In Process'].map(
-              (statusOption) => (
-                <div
-                  key={statusOption}
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-[#f5f8f3] hover:text-[#7eb238] cursor-pointer"
-                  onClick={() => { setStatusFilter(statusOption); setActiveFilterDropdown(null); }}
-                >
-                  {statusOption}
-                </div>
-              )
-            )}
+            {statusOptions.map((option) => (
+              <div
+                key={option}
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-[#f5f8f3] hover:text-[#7eb238] cursor-pointer"
+                onClick={() => handleOptionSelect(setStatusFilter, option)}
+              >
+                {option}
+              </div>
+            ))}
           </div>
         )}
       </div>
@@ -116,7 +148,7 @@ const AdvisorInProgressApplicationsFilters: React.FC<FiltersProps> = ({
           <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-20 py-1">
             <div
               className="block px-4 py-2 text-sm text-gray-700 hover:bg-[#f5f8f3] hover:text-[#7eb238] cursor-pointer"
-              onClick={() => { setProductFilter(''); setActiveFilterDropdown(null); }}
+              onClick={() => handleOptionSelect(setProductFilter, '')}
             >
               All Products
             </div>
@@ -124,7 +156,7 @@ const AdvisorInProgressApplicationsFilters: React.FC<FiltersProps> = ({
               <div
                 key={productOption}
                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-[#f5f8f3] hover:text-[#7eb238] cursor-pointer"
-                onClick={() => { setProductFilter(productOption); setActiveFilterDropdown(null); }}
+                onClick={() => handleOptionSelect(setProductFilter, productOption)}
               >
                 {productOption}
               </div>
@@ -150,14 +182,14 @@ const AdvisorInProgressApplicationsFilters: React.FC<FiltersProps> = ({
                 type="number"
                 placeholder="Min Amount"
                 value={minCoverage}
-                onChange={(e) => setMinCoverage(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMinCoverage(e.target.value)} // Explicitly typed 'e'
                 className="w-full text-sm"
               />
               <Input
                 type="number"
                 placeholder="Max Amount"
                 value={maxCoverage}
-                onChange={(e) => setMaxCoverage(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMaxCoverage(e.target.value)} // Explicitly typed 'e'
                 className="w-full text-sm"
               />
             </div>
@@ -181,13 +213,13 @@ const AdvisorInProgressApplicationsFilters: React.FC<FiltersProps> = ({
               <Input
                 type="date"
                 value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setStartDate(e.target.value)} // Explicitly typed 'e'
                 className="w-full text-sm"
               />
               <Input
                 type="date"
                 value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEndDate(e.target.value)} // Explicitly typed 'e'
                 className="w-full text-sm"
               />
             </div>
@@ -210,4 +242,4 @@ const AdvisorInProgressApplicationsFilters: React.FC<FiltersProps> = ({
   );
 };
 
-export default AdvisorInProgressApplicationsFilters;
+export default ApplicationFilters;

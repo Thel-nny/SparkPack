@@ -2,43 +2,37 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { AdvisorFilterSkeleton } from './loading';
-import FilterDropdowns from './AdvisorSubmittedApplications/components/FilterDropdowns';
-import ApplicationsTable from './AdvisorSubmittedApplications/components/ApplicationsTable';
-import PaginationControls from './AdvisorSubmittedApplications/components/PaginationControls';
+
+import ApplicationFilters from '@/components/advisor/common/ApplicationFilters';
+import ApplicationsTable from '@/components/advisor/common/ApplicationsTable';
+import PaginationControls from '@/components/advisor/common/PaginationControls';
+
 import ApplicationSummaryModal from './applications/ApplicationSummaryModal';
+import { ApplicationFormData } from '@/types/formData';
+import { useSession } from "next-auth/react";
 
 interface Application {
   id: string;
-  status: string;
+  status: 'SUBMITTED' | 'DECLINED' | string;
   ensured: string;
-  customer: {
-    firstName: string;
-    lastName: string
-  }
+  owners: string[];
   product: string;
   coverageAmount: number;
   dateStarted: string;
   policyNumber: string;
+  customer?: {
+    firstName: string;
+    lastName: string;
+  };
+  advisorName?: string;
 }
-
-interface SimplifiedApplication {
-  id: string;
-  status: 'SUBMITTED' | 'APPROVED' | 'REJECTED' | 'SIGNATURE_PROCESS_PENDING' | 'SIGNATURE_IN_PROCESS';
-  ensured: string;
-  owners: string[];
-  product: 'Medical Care Insurance' | 'Legacy Insurance';
-  coverageAmount: number;
-  dateStarted: string;
-  policyNumber: string;
-}
-
-import { ApplicationFormData } from '@/types/formData';
 
 const AdvisorSubmittedApplications: React.FC = () => {
-  const [applications, setApplications] = useState<SimplifiedApplication[]>([]);
+  const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [statusFilter, setStatusFilter] = useState<string>('SUBMITTED'); // Default to SUBMITTED
+
+  const [statusFilter, setStatusFilter] = useState<string>('');
   const [productFilter, setProductFilter] = useState<string>('');
   const [minCoverage, setMinCoverage] = useState<string>('');
   const [maxCoverage, setMaxCoverage] = useState<string>('');
@@ -51,18 +45,19 @@ const AdvisorSubmittedApplications: React.FC = () => {
 
   const [activeFilterDropdown, setActiveFilterDropdown] = useState<string | null>(null);
 
-  // New state for modal and selected application
   const [selectedApplicationData, setSelectedApplicationData] = useState<ApplicationFormData | null>(null);
   const [isSummaryModalOpen, setIsSummaryModalOpen] = useState(false);
 
-  // Handlers for modal navigation
-  const handleModalPrev = () => {
-    // Implement previous logic if needed
-  };
+  const { data: session } = useSession();
+  const userRole = session?.user?.role || null;
 
-  const handleModalNext = () => {
-    // Implement next/submit logic if needed
-  };
+  const handleModalPrev = useCallback(() => {
+    console.log("Modal Previous button clicked (no action defined)");
+  }, []);
+
+  const handleModalNext = useCallback(() => {
+    console.log("Modal Next button clicked (no action defined)");
+  }, []);
 
   const fetchApplications = useCallback(async (page: number) => {
     setLoading(true);
@@ -71,128 +66,160 @@ const AdvisorSubmittedApplications: React.FC = () => {
       const params = new URLSearchParams();
       params.append('page', page.toString());
       params.append('limit', itemsPerPage.toString());
+      if (statusFilter && statusFilter !== 'ALL') params.append('status', statusFilter);
+      if (productFilter) params.append('product', productFilter);
+      if (minCoverage) params.append('minCoverage', minCoverage);
+      if (maxCoverage) params.append('maxCoverage', maxCoverage);
+      if (startDate) params.append('startDate', startDate);
+      if (endDate) params.append('endDate', endDate);
 
       const response = await fetch(`/api/applications?${params.toString()}`);
+
       if (!response.ok) {
-        throw new Error(`Error fetching applications: ${response.statusText}`);
+        const errorData = await response.json();
+        console.error('API Error:', errorData);
+        throw new Error(`Error fetching applications: ${response.statusText} - ${errorData.message || 'Unknown error'}`);
       }
+
       const data = await response.json();
+
       if (data.success) {
-        const apps: SimplifiedApplication[] = data.data.applications.map((app: any) => ({
+        const apps: Application[] = data.data.applications.map((app: any) => ({
           id: app.id,
-          status: app.status,
-          ensured: app.customer ? `${app.customer.firstName} ${app.customer.lastName}` : 'N/A',
-          owners: app.pet ? [app.pet.petName] : [],
-          product: app.planType === 'Medical Care Insurance' || app.planType === 'Legacy Insurance' ? app.planType : 'Medical Care Insurance',
-          coverageAmount: app.coverageAmount,
-          dateStarted: app.startDate ? new Date(app.startDate).toISOString().split('T')[0] : '',
+          status: app.status || 'UNKNOWN',
+          ensured: app.customer ? `${app.customer.firstName || ''} ${app.customer.lastName || ''}`.trim() : 'N/A',
+          owners: app.pet && app.pet.petName ? [app.pet.petName] : [],
+          product: ['Medical Care Insurance', 'Legacy Insurance'].includes(app.planType) ? app.planType : app.planType || 'N/A',
+          coverageAmount: app.coverageAmount || 0,
+          dateStarted: app.startDate ? new Date(app.startDate).toISOString().split('T')[0] : 'N/A',
           policyNumber: app.policyNumber || 'N/A',
+          customer: app.customer,
+          advisorName: app.advisorName || undefined,
         }));
         setApplications(apps);
-        setTotalPages(data.data.pagination.pages);
+        setTotalPages(data.data.pagination.pages || 1);
       } else {
-        setError(data.error || 'Failed to fetch applications');
+        setError(data.error || 'Failed to fetch applications due to an unknown reason.');
       }
-    } catch {
-      setError('Failed to fetch applications');
+    } catch (err: any) {
+      console.error('Fetch applications failed:', err);
+      setError(err.message || 'Failed to fetch applications. Please try again.');
     } finally {
       setLoading(false);
     }
-  }, [itemsPerPage]);
+  }, [itemsPerPage, statusFilter, productFilter, minCoverage, maxCoverage, startDate, endDate]);
 
   useEffect(() => {
     fetchApplications(currentPage);
   }, [currentPage, fetchApplications]);
 
-  const filteredApplications = useMemo(() => {
-    let filtered = applications;
-
-    if (statusFilter) {
-      filtered = filtered.filter(app => app.status === statusFilter);
-    }
-    if (productFilter) {
-      filtered = filtered.filter(app => app.product === productFilter);
-    }
-    if (minCoverage) {
-      filtered = filtered.filter(app => app.coverageAmount >= parseFloat(minCoverage));
-    }
-    if (maxCoverage) {
-      filtered = filtered.filter(app => app.coverageAmount <= parseFloat(maxCoverage));
-    }
-    if (startDate) {
-      filtered = filtered.filter(app => new Date(app.dateStarted) >= new Date(startDate));
-    }
-    if (endDate) {
-      filtered = filtered.filter(app => new Date(app.dateStarted) <= new Date(endDate));
-    }
-    return filtered;
-  }, [applications, statusFilter, productFilter, minCoverage, maxCoverage, startDate, endDate]);
-
   useEffect(() => {
     setCurrentPage(1);
   }, [statusFilter, productFilter, minCoverage, maxCoverage, startDate, endDate]);
 
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentApplications = filteredApplications.slice(indexOfFirstItem, indexOfLastItem);
-
-  const formatCurrency = (amount: number): string => {
+  const formatCurrency = useCallback((amount: number): string => {
     return new Intl.NumberFormat('en-PH', {
       style: 'currency',
       currency: 'PHP',
       minimumFractionDigits: 2,
     }).format(amount);
-  };
+  }, []);
 
-  const clearFilters = () => {
-    setStatusFilter('SUBMITTED'); // Reset to SUBMITTED on clear
+  const clearFilters = useCallback(() => {
+    setStatusFilter('');
     setProductFilter('');
     setMinCoverage('');
     setMaxCoverage('');
     setStartDate('');
     setEndDate('');
     setActiveFilterDropdown(null);
-  };
+    setCurrentPage(1);
+  }, []);
 
-  // New function to fetch full application data by id
-  const fetchFullApplicationData = async (id: string): Promise<ApplicationFormData | null> => {
+  const areFiltersActive = useMemo(() => {
+    return (
+      statusFilter !== '' ||
+      productFilter !== '' ||
+      minCoverage !== '' ||
+      maxCoverage !== '' ||
+      startDate !== '' ||
+      endDate !== ''
+    );
+  }, [statusFilter, productFilter, minCoverage, maxCoverage, startDate, endDate]);
+
+  const fetchFullApplicationData = useCallback(async (id: string): Promise<ApplicationFormData | null> => {
     try {
       const response = await fetch(`/api/applications/${id}`);
       if (!response.ok) {
-        throw new Error(`Error fetching application data: ${response.statusText}`);
+        const errorData = await response.json();
+        console.error(`Error fetching full application data for ID ${id}:`, errorData);
+        throw new Error(`Error fetching application data: ${response.statusText} - ${errorData.message || 'Unknown error'}`);
       }
       const data = await response.json();
       if (data.success) {
         return data.data as ApplicationFormData;
       } else {
-        setError(data.error || 'Failed to fetch application data');
+        setError(data.error || 'Failed to fetch application data.');
         return null;
       }
-    } catch (error) {
-      setError('Failed to fetch application data');
+    } catch (err: any) {
+      console.error('Fetch full application data failed:', err);
+      setError(err.message || 'Failed to fetch application data. Please try again.');
       return null;
     }
-  };
+  }, []);
 
-  // Updated onSelectApplication handler to fetch full data
-  const handleSelectApplication = async (app: SimplifiedApplication) => {
+  const handleSelectApplication = useCallback(async (app: Application) => {
+    setLoading(true);
     const fullData = await fetchFullApplicationData(app.id);
     if (fullData) {
       setSelectedApplicationData(fullData);
       setIsSummaryModalOpen(true);
     }
-  };
+    setLoading(false);
+  }, [fetchFullApplicationData]);
+
+  const handleStatusChange = useCallback(async (appId: string, newStatus: string) => {
+    try {
+      const response = await fetch(`/api/applications/${appId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to update status");
+      }
+      console.log("Status updated successfully");
+      fetchApplications(currentPage);
+    } catch (err: any) {
+      console.error("Error updating status:", err);
+      setError(err.message || "Error updating status");
+    }
+  }, [fetchApplications, currentPage]);
+
+  const submittedStatusOptions = useMemo(() => {
+    if (userRole === 'ADVISOR') {
+      return ['Submitted', 'Declined'];
+    }
+    return ['Submitted', 'Declined'];
+  }, [userRole]);
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
       <div className="grid grid-cols-1 gap-6">
         <div className="flex flex-col sm:flex-row items-center justify-start space-y-4 sm:space-y-0 sm:space-x-4 mb-2">
-          {loading ? (
+          {loading && applications.length === 0 ? (
             <AdvisorFilterSkeleton />
           ) : error ? (
-            <div className="text-red-600">Error: {error}</div>
+            <div className="text-red-600 font-medium p-4 border border-red-300 bg-red-50 rounded-md">
+              <p>Error: {error}</p>
+              <p className="text-sm mt-1">Please try refreshing the page or contact support if the issue persists.</p>
+            </div>
           ) : (
-            <FilterDropdowns
+            <ApplicationFilters
               statusFilter={statusFilter}
               setStatusFilter={setStatusFilter}
               productFilter={productFilter}
@@ -208,41 +235,38 @@ const AdvisorSubmittedApplications: React.FC = () => {
               activeFilterDropdown={activeFilterDropdown}
               setActiveFilterDropdown={setActiveFilterDropdown}
               clearFilters={clearFilters}
-              areFiltersActive={
-                statusFilter !== '' ||
-                productFilter !== '' ||
-                minCoverage !== '' ||
-                maxCoverage !== '' ||
-                startDate !== '' ||
-                endDate !== ''
-              }
+              areFiltersActive={areFiltersActive}
+              statusOptions={submittedStatusOptions}
+              allStatusesLabel="All Submitted Statuses"
             />
           )}
         </div>
 
         <ApplicationsTable
-          currentApplications={currentApplications}
+          applications={applications}
           formatCurrency={formatCurrency}
           loading={loading}
           error={error}
-          onSelectApplication={handleSelectApplication}
+          showStatusDropdown={true}
+          handleStatusChange={handleStatusChange}
+          userRole={userRole}
+          onRowClick={handleSelectApplication}
         />
 
         <PaginationControls
           currentPage={currentPage}
           totalPages={totalPages}
-          paginate={(page) => {
-            if (page < 1 || page > totalPages) return;
-            setCurrentPage(page);
-          }}
+          paginate={setCurrentPage}
         />
       </div>
 
-      {/* --- RENDER THE APPLICATION SUMMARY MODAL HERE --- */}
       {selectedApplicationData && (
         <ApplicationSummaryModal
           isOpen={isSummaryModalOpen}
-          onClose={() => setIsSummaryModalOpen(false)}
+          onClose={() => {
+            setIsSummaryModalOpen(false);
+            setSelectedApplicationData(null);
+          }}
           formData={selectedApplicationData}
           onPrev={handleModalPrev}
           onNext={handleModalNext}

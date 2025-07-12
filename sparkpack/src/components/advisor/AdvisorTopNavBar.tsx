@@ -37,6 +37,11 @@ const AdvisorTopNavbar: React.FC<AdvisorTopNavbarProps> = ({ className = '' }) =
       href: '/advisor/applications', // Points to the new tabbed applications page
       hasDropdown: false, // No dropdown directly from this item, tabs are internal
     },
+    {
+      label: 'Manage Claims', // Consolidated link
+      href: '/advisor/claims', // Points to the new tabbed applications page
+      hasDropdown: false, // No dropdown directly from this item, tabs are internal
+    },
     // Removed 'Submitted Applications', 'Applications in Progress', 'Active Applications'
     // as they are now tabs within '/advisor/applications'
   ];

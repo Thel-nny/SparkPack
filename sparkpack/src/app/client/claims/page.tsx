@@ -1,13 +1,13 @@
 'use client';
 
 import ClientTopNavBar from '@/components/client/ClientTopNavBar';
-import ClientClaimsTable from '@/components/client/ClientClaimsTable';
+import ClientManageClaimsComponent from '@/components/client/ClientManageClaims';
 
-export default function ClientClaimsPage() {
+export default function ClientManageClaims() {
   return (
     <>
       <ClientTopNavBar />
-      <ClientClaimsTable />
+      <ClientManageClaimsComponent />
     </>
   );
 }
