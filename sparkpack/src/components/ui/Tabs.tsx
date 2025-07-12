@@ -1,59 +1,63 @@
 "use client";
 
-import React, { useState, ReactNode } from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface TabItem {
   id: string;
   label: string;
-  content: ReactNode;
+  content: React.ReactNode;
 }
 
 interface TabsProps {
   tabs: TabItem[];
   defaultTabId?: string;
+  onTabChange?: (newTabId: string) => void;
 }
 
-const Tabs: React.FC<TabsProps> = ({ tabs, defaultTabId }) => {
-  const [activeTabId, setActiveTabId] = useState(defaultTabId || tabs[0]?.id);
+const Tabs: React.FC<TabsProps> = ({ tabs, defaultTabId, onTabChange }) => {
+  const [activeTab, setActiveTab] = useState(defaultTabId || (tabs.length > 0 ? tabs[0].id : ''));
 
-  if (!tabs || tabs.length === 0) {
-    return null; // Or render a message indicating no tabs
-  }
+  useEffect(() => {
+    if (defaultTabId && defaultTabId !== activeTab) {
+      setActiveTab(defaultTabId);
+    }
+  }, [defaultTabId, activeTab]);
+
+  const handleTabClick = (tabId: string) => {
+    setActiveTab(tabId);
+    if (onTabChange) {
+      onTabChange(tabId);
+    }
+  };
 
   return (
     <div className="w-full">
-      {/* Tab List */}
-      <div className="flex border-b border-gray-200 mb-8">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTabId(tab.id)}
-            className={`
-              py-3 px-6 text-lg font-semibold transition-colors duration-200
-              ${activeTabId === tab.id
-                ? 'text-[#8cc63f] border-b-2 border-[#8cc63f]'
-                : 'text-gray-600 hover:text-[#342d47] hover:border-gray-300'
-              }
-            `}
-            role="tab"
-            aria-selected={activeTabId === tab.id}
-            id={`tab-${tab.id}`}
-            aria-controls={`panel-${tab.id}`}
-          >
-            {tab.label}
-          </button>
-        ))}
+      <div className="border-b border-gray-200">
+        <nav className="-mb-px flex space-x-8 justify-center" aria-label="Tabs"> {/* <--- ADD justify-center HERE */}
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => handleTabClick(tab.id)}
+              className={`
+                whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm
+                ${
+                  activeTab === tab.id
+                    ? 'border-[#8cc63f] text-[#8cc63f]'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }
+              `}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </nav>
       </div>
 
-      {/* Tab Content */}
-      <div className="tab-content">
+      <div className="mt-6">
         {tabs.map((tab) => (
           <div
             key={tab.id}
-            className={`${activeTabId === tab.id ? 'block' : 'hidden'}`}
-            role="tabpanel"
-            id={`panel-${tab.id}`}
-            aria-labelledby={`tab-${tab.id}`}
+            className={activeTab === tab.id ? 'block' : 'hidden'}
           >
             {tab.content}
           </div>
