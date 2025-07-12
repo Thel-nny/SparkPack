@@ -79,12 +79,6 @@ export default function InsurancePackagesPage() {
         <div id={`${packageData.id}-addons`} className="mt-12">
           <AddOnsSection addOns={packageData.addOns} />
         </div>
-
-        <div className="text-center mt-12">
-          <button className="bg-[#8cc63f] hover:bg-[#7eb238] text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors duration-200 shadow-lg">
-            Get Your Pet's Quote Now!
-          </button>
-        </div>
       </div>
     ),
   }));
