@@ -60,6 +60,11 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ className = "" }) => {
         { label: "Team", href: "#team" },
       ],
     },
+    {
+      label: "Contact Support",
+      href: "https://mail.google.com/mail/?view=cm&fs=1&to=sparkpackteam@gmail.com",
+      hasDropdown: false,
+    },
   ];
 
   const handleDropdownToggle = (index: number) => {
@@ -214,15 +219,7 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ className = "" }) => {
                           Account Management
                         </Link>
                       )}
-                      <Link
-                        href="https://mail.google.com/mail/?view=cm&fs=1&to=sparkpackteam@gmail.com"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="block px-4 py-2 text-base text-[#342d47] hover:bg-[#f5f8f3] hover:text-[#7eb238]"
-                        onClick={() => setActiveDropdown(null)}
-                      >
-                        Contact Support
-                      </Link>
+                      {/* Removed Contact Support link */}
                       {isLoggedIn && (
                         <button
                           onClick={handleSignOut}
@@ -320,15 +317,7 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ className = "" }) => {
                   Account Management
                 </Link>
               )}
-              <Link
-                href="https://mail.google.com/mail/?view=cm&fs=1&to=sparkpackteam@gmail.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block px-4 py-2 text-base text-[#342d47]"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Contact Support
-              </Link>
+                      {/* Removed Contact Support link */}
               {isLoggedIn && (
                 <button
                   onClick={handleSignOut}

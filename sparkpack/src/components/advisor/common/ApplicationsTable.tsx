@@ -201,11 +201,66 @@ const ApplicationsTable: React.FC<ApplicationsTableProps> = ({
             {/* Advisor Column (conditionally rendered) */}
             {showAdvisorAssignment && (
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                <>
+                {advisorEditable && app.status === 'APPROVED' ? (
+                  activeRowId === app.id ? (
+                    <div className="flex items-center space-x-2">
+                      <Input
+                        type="text"
+                        value={advisorNames?.[app.id] || ''}
+                        onChange={(e) =>
+                          setAdvisorNames &&
+                          setAdvisorNames((prev) => ({
+                            ...prev,
+                            [app.id]: e.target.value,
+                          }))
+                        }
+                        onClick={(e) => e.stopPropagation()} // Prevent row toggle when clicking input
+                        autoFocus
+                        placeholder="Assign advisor"
+                        className="w-full"
+                      />
+                      <button
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          if (updateAdvisor && advisorNames && advisorNames[app.id]) {
+                            await updateAdvisor(app.id, advisorNames[app.id]);
+                          }
+                          setActiveRowId && setActiveRowId(null);
+                        }}
+                        className="text-green-600 hover:text-green-800"
+                        aria-label="Submit advisor name"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={2}
+                          stroke="currentColor"
+                          className="w-5 h-5"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  ) : advisorNames && advisorNames[app.id] ? (
+                    <span
+                      title={advisorNames[app.id]}
+                      className="inline-block max-w-[10ch] truncate"
+                    >
+                      {advisorNames[app.id]}
+                    </span>
+                  ) : (
+                    <span>Click to assign</span>
+                  )
+                ) : (
                   <span title={app.customer?.clientDetails?.advisor || ''} className="inline-block max-w-[10ch] truncate">
                     {app.customer?.clientDetails?.advisor || 'N/A'}
                   </span>
-                </>
+                )}
               </td>
             )}
           </tr>
