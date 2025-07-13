@@ -4,22 +4,16 @@ import React, { useState, useEffect, useCallback, forwardRef, useImperativeHandl
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-
-// Updated import paths to use applicationFormData.ts
-import { PaymentDetails, ProductDetails } from '@/types/applicationFormData'; 
-
+import { PaymentDetails, ProductDetails } from '@/types/applicationFormData';
 import PremiumSummary from './payment-details-subcomponents/PremiumSummary';
-
-// Ensure calculatePremium is imported from ProductDetailsStep, as it's defined there
-import { calculatePremium } from './ProductDetailsStep';
-
+import { calculatePremium } from './ProductDetailsStep'; // Ensure this import is correct
 
 interface PaymentDetailsStepProps {
-  formData: PaymentDetails; // This component handles PaymentDetails specific data
-  productDetails: ProductDetails; // We need the *full* ProductDetails to calculate premium
+  formData: PaymentDetails;
+  productDetails: ProductDetails; // This now correctly includes petAge, petBreed, hasPreExistingConditions
   onUpdate: (data: Partial<PaymentDetails>) => void;
-  onPrev: () => void; // Moves back to ProductDetailsStep
-  onNext: () => void; // Moves to next step (e.g., Confirmation)
+  onPrev: () => void;
+  onNext: () => void;
 }
 
 const PaymentDetailsStep = forwardRef<any, PaymentDetailsStepProps>(
@@ -27,33 +21,45 @@ const PaymentDetailsStep = forwardRef<any, PaymentDetailsStepProps>(
     const [premiumCalculation, setPremiumCalculation] = useState({
       baseAnnual: 0, annualTotal: 0, monthlyTotal: 0, oneTimeTotal: 0, donationAmount: 0
     });
-    const [errors, setErrors] = useState<Record<string, string>>({}); // State for inline errors
+    const [errors, setErrors] = useState<Record<string, string>>({});
 
-    // Recalculate premium whenever productDetails change
     const memoizedCalculatePremium = useCallback(() => {
-      // Ensure all product details are available for calculation
-      if (productDetails.productName && productDetails.coverageAmount && productDetails.deductible &&
-          productDetails.reimbursementRate && productDetails.paymentFrequency) {
+      // Ensure all necessary product details are available and correctly typed for calculation.
+      if (
+        productDetails.productName &&
+        productDetails.coverageAmount &&
+        productDetails.deductible &&
+        productDetails.reimbursementRate &&
+        productDetails.paymentFrequency &&
+        productDetails.selectedAddOns && // Check if selectedAddOns exists
+        productDetails.donationPercentage !== undefined && // Check if donationPercentage exists
+        productDetails.petAge !== undefined && // Check if petAge exists
+        productDetails.petBreed && // Check if petBreed exists
+        productDetails.hasPreExistingConditions !== undefined // Check if hasPreExistingConditions exists
+      ) {
         const calculated = calculatePremium(
           productDetails.productName,
-          productDetails.coverageAmount,
-          productDetails.deductible,
-          productDetails.reimbursementRate,
+          productDetails.coverageAmount, // Pass as string
+          productDetails.deductible,     // Pass as string
+          productDetails.reimbursementRate, // Pass as string
           productDetails.paymentFrequency,
           productDetails.selectedAddOns,
-          productDetails.donationPercentage
+          productDetails.donationPercentage,
+          productDetails.petAge, // Pass as number
+          productDetails.petBreed,
+          productDetails.hasPreExistingConditions // Pass the boolean
         );
         setPremiumCalculation(calculated);
       } else {
+        // Set to default or handle error state if crucial productDetails are missing
         setPremiumCalculation({ baseAnnual: 0, annualTotal: 0, monthlyTotal: 0, oneTimeTotal: 0, donationAmount: 0 });
       }
-    }, [productDetails]); // Dependency on productDetails
+    }, [productDetails]); // Dependency array includes productDetails to re-calculate when it changes
 
     useEffect(() => {
       memoizedCalculatePremium();
     }, [memoizedCalculatePremium]);
 
-    // Validation function for individual fields
     const validateField = (name: keyof PaymentDetails, value: string): string => {
       let error = '';
       switch (name) {
@@ -71,8 +77,17 @@ const PaymentDetailsStep = forwardRef<any, PaymentDetailsStepProps>(
           }
           break;
         case 'expiryDate':
+          // Validates MM/YY format and ensures it's a future date
           if (formData.paymentMethod === 'Credit/Debit Card' && (!value || !/^(0[1-9]|1[0-2])\/\d{2}$/.test(value))) {
             error = 'Please enter a valid expiry date (MM/YY).';
+          } else if (formData.paymentMethod === 'Credit/Debit Card') {
+            const [month, year] = value.split('/').map(Number);
+            const currentYear = new Date().getFullYear() % 100; // Get last two digits of current year
+            const currentMonth = new Date().getMonth() + 1; // Month is 0-indexed
+
+            if (year < currentYear || (year === currentYear && month < currentMonth)) {
+              error = 'Expiry date cannot be in the past.';
+            }
           }
           break;
         case 'cvv':
@@ -86,8 +101,8 @@ const PaymentDetailsStep = forwardRef<any, PaymentDetailsStepProps>(
           }
           break;
         case 'accountNumber':
-          if (formData.paymentMethod === 'Bank Transfer' && !value) {
-            error = 'Account number is required.';
+          if (formData.paymentMethod === 'Bank Transfer' && (!value || !/^\d+$/.test(value))) { // Basic numeric validation for account number
+            error = 'Account number is required and should contain only digits.';
           }
           break;
         case 'accountName':
@@ -111,19 +126,17 @@ const PaymentDetailsStep = forwardRef<any, PaymentDetailsStepProps>(
       return error;
     };
 
-    // Comprehensive validation for the entire step
     const validateStep = (): boolean => {
       const newErrors: Record<string, string> = {};
       let isValid = true;
 
-      // Validate paymentMethod first
       const methodError = validateField('paymentMethod', formData.paymentMethod);
       if (methodError) {
         newErrors.paymentMethod = methodError;
         isValid = false;
       }
 
-      // Validate fields based on selected payment method
+      // Validate fields specific to the selected payment method
       if (formData.paymentMethod === 'Credit/Debit Card') {
         const fields: Array<keyof PaymentDetails> = ['cardNumber', 'cardName', 'expiryDate', 'cvv'];
         fields.forEach(field => {
@@ -152,12 +165,12 @@ const PaymentDetailsStep = forwardRef<any, PaymentDetailsStepProps>(
           }
         });
       }
+      // No specific fields to validate for "Cash/Cheque"
 
       setErrors(newErrors);
       return isValid;
     };
 
-    // Expose the validate function to the parent component via ref
     useImperativeHandle(ref, () => ({
       validate: validateStep,
     }));
@@ -168,12 +181,23 @@ const PaymentDetailsStep = forwardRef<any, PaymentDetailsStepProps>(
         [name as keyof PaymentDetails]: value,
       });
 
-      // Validate field on change and update errors state
-      const error = validateField(name as keyof PaymentDetails, value);
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        [name]: error,
-      }));
+      // Clear related errors when payment method changes
+      if (name === 'paymentMethod') {
+        setErrors({}); // Clear all errors when changing method
+        // You might want to reset payment-method specific fields here too
+        onUpdate({
+          cardNumber: '', cardName: '', expiryDate: '', cvv: '',
+          bankName: '', accountNumber: '', accountName: '',
+          gcashNumber: '', gcashName: ''
+        });
+      } else {
+        // Validate individual field on change
+        const error = validateField(name as keyof PaymentDetails, value);
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          [name]: error,
+        }));
+      }
     };
 
     const handleNextClick = () => {
@@ -183,19 +207,18 @@ const PaymentDetailsStep = forwardRef<any, PaymentDetailsStepProps>(
     };
 
     return (
-      <div className="flex flex-col h-full justify-between">
+      <div className="flex flex-col h-full justify-between p-4 sm:p-6 lg:p-8 rounded-lg shadow-lg bg-white">
         <div>
-          <h2 className="text-2xl font-bold mb-6 text-[#8cc63f]">Payment Details</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-[#8cc63f] border-b-2 pb-2 border-[#8cc63f]">Payment Details</h2>
 
-          <p className="text-gray-700 mb-6">
+          <p className="text-gray-700 mb-6 text-base">
             Review your estimated premium and choose your preferred payment method.
           </p>
 
-          {/* Premium Summary is now here */}
-          <div className="mb-8">
+          <div className="mb-8 p-4 bg-gray-50 rounded-md border border-gray-200">
             <PremiumSummary
               premiumCalculation={premiumCalculation}
-              selectedPaymentFrequency={productDetails.paymentFrequency} // Use payment frequency from productDetails
+              selectedPaymentFrequency={productDetails.paymentFrequency}
             />
           </div>
 
@@ -204,7 +227,7 @@ const PaymentDetailsStep = forwardRef<any, PaymentDetailsStepProps>(
             {errors.paymentMethod && <p className="mt-1 text-sm text-red-500">{errors.paymentMethod}</p>}
 
             <div className="space-y-4">
-              {/* Credit/Debit Card */}
+              {/* Credit/Debit Card Option */}
               <div className="flex items-center">
                 <input
                   type="radio"
@@ -213,38 +236,38 @@ const PaymentDetailsStep = forwardRef<any, PaymentDetailsStepProps>(
                   value="Credit/Debit Card"
                   checked={formData.paymentMethod === 'Credit/Debit Card'}
                   onChange={handleChange}
-                  className="h-4 w-4 text-[#8cc63f] border-gray-300 focus:ring-[#8cc63f]"
+                  className="h-4 w-4 text-[#8cc63f] border-gray-300 focus:ring-[#8cc63f] rounded-full cursor-pointer"
                 />
-                <Label htmlFor="paymentMethodCard" className="ml-2 block text-sm font-medium text-gray-700">
+                <Label htmlFor="paymentMethodCard" className="ml-2 block text-base font-medium text-gray-700 cursor-pointer">
                   Credit/Debit Card
                 </Label>
               </div>
               {formData.paymentMethod === 'Credit/Debit Card' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ml-6 p-4 border border-gray-200 rounded-md bg-gray-50">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ml-6 p-4 border border-gray-200 rounded-md bg-gray-50 transition-all duration-300 ease-in-out">
                   <div>
                     <Label htmlFor="cardNumber" className="block text-sm font-medium text-gray-700 mb-1">Card Number</Label>
-                    <Input type="text" id="cardNumber" name="cardNumber" value={formData.cardNumber || ''} onChange={handleChange} placeholder="XXXX XXXX XXXX XXXX" className={`${errors.cardNumber ? 'border-red-500' : ''}`} />
+                    <Input type="text" id="cardNumber" name="cardNumber" value={formData.cardNumber || ''} onChange={handleChange} placeholder="XXXX XXXX XXXX XXXX" className={`rounded-md ${errors.cardNumber ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-[#8cc63f]'}`} />
                     {errors.cardNumber && <p className="mt-1 text-sm text-red-500">{errors.cardNumber}</p>}
                   </div>
                   <div>
                     <Label htmlFor="cardName" className="block text-sm font-medium text-gray-700 mb-1">Name on Card</Label>
-                    <Input type="text" id="cardName" name="cardName" value={formData.cardName || ''} onChange={handleChange} placeholder="Full Name" className={`${errors.cardName ? 'border-red-500' : ''}`} />
+                    <Input type="text" id="cardName" name="cardName" value={formData.cardName || ''} onChange={handleChange} placeholder="Full Name" className={`rounded-md ${errors.cardName ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-[#8cc63f]'}`} />
                     {errors.cardName && <p className="mt-1 text-sm text-red-500">{errors.cardName}</p>}
                   </div>
                   <div>
                     <Label htmlFor="expiryDate" className="block text-sm font-medium text-gray-700 mb-1">Expiry Date</Label>
-                    <Input type="text" id="expiryDate" name="expiryDate" value={formData.expiryDate || ''} onChange={handleChange} placeholder="MM/YY" className={`${errors.expiryDate ? 'border-red-500' : ''}`} />
+                    <Input type="text" id="expiryDate" name="expiryDate" value={formData.expiryDate || ''} onChange={handleChange} placeholder="MM/YY" className={`rounded-md ${errors.expiryDate ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-[#8cc63f]'}`} />
                     {errors.expiryDate && <p className="mt-1 text-sm text-red-500">{errors.expiryDate}</p>}
                   </div>
                   <div>
                     <Label htmlFor="cvv" className="block text-sm font-medium text-gray-700 mb-1">CVV</Label>
-                    <Input type="text" id="cvv" name="cvv" value={formData.cvv || ''} onChange={handleChange} placeholder="XXX" className={`${errors.cvv ? 'border-red-500' : ''}`} />
+                    <Input type="text" id="cvv" name="cvv" value={formData.cvv || ''} onChange={handleChange} placeholder="XXX" className={`rounded-md ${errors.cvv ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-[#8cc63f]'}`} />
                     {errors.cvv && <p className="mt-1 text-sm text-red-500">{errors.cvv}</p>}
                   </div>
                 </div>
               )}
 
-              {/* Bank Transfer */}
+              {/* Bank Transfer Option */}
               <div className="flex items-center">
                 <input
                   type="radio"
@@ -253,33 +276,33 @@ const PaymentDetailsStep = forwardRef<any, PaymentDetailsStepProps>(
                   value="Bank Transfer"
                   checked={formData.paymentMethod === 'Bank Transfer'}
                   onChange={handleChange}
-                  className="h-4 w-4 text-[#8cc63f] border-gray-300 focus:ring-[#8cc63f]"
+                  className="h-4 w-4 text-[#8cc63f] border-gray-300 focus:ring-[#8cc63f] rounded-full cursor-pointer"
                 />
-                <Label htmlFor="paymentMethodBankTransfer" className="ml-2 block text-sm font-medium text-gray-700">
+                <Label htmlFor="paymentMethodBankTransfer" className="ml-2 block text-base font-medium text-gray-700 cursor-pointer">
                   Bank Transfer (Instructions will be provided)
                 </Label>
               </div>
               {formData.paymentMethod === 'Bank Transfer' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ml-6 p-4 border border-gray-200 rounded-md bg-gray-50">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ml-6 p-4 border border-gray-200 rounded-md bg-gray-50 transition-all duration-300 ease-in-out">
                   <div>
                     <Label htmlFor="bankName" className="block text-sm font-medium text-gray-700 mb-1">Bank Name</Label>
-                    <Input type="text" id="bankName" name="bankName" value={formData.bankName || ''} onChange={handleChange} placeholder="e.g., BDO, BPI" className={`${errors.bankName ? 'border-red-500' : ''}`} />
+                    <Input type="text" id="bankName" name="bankName" value={formData.bankName || ''} onChange={handleChange} placeholder="e.g., BDO, BPI" className={`rounded-md ${errors.bankName ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-[#8cc63f]'}`} />
                     {errors.bankName && <p className="mt-1 text-sm text-red-500">{errors.bankName}</p>}
                   </div>
                   <div>
                     <Label htmlFor="accountNumber" className="block text-sm font-medium text-gray-700 mb-1">Account Number</Label>
-                    <Input type="text" id="accountNumber" name="accountNumber" value={formData.accountNumber || ''} onChange={handleChange} placeholder="e.g., 001234567890" className={`${errors.accountNumber ? 'border-red-500' : ''}`} />
+                    <Input type="text" id="accountNumber" name="accountNumber" value={formData.accountNumber || ''} onChange={handleChange} placeholder="e.g., 001234567890" className={`rounded-md ${errors.accountNumber ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-[#8cc63f]'}`} />
                     {errors.accountNumber && <p className="mt-1 text-sm text-red-500">{errors.accountNumber}</p>}
                   </div>
-                  <div className="col-span-full"> {/* Make this span full width */}
+                  <div className="col-span-full">
                     <Label htmlFor="accountName" className="block text-sm font-medium text-gray-700 mb-1">Account Name</Label>
-                    <Input type="text" id="accountName" name="accountName" value={formData.accountName || ''} onChange={handleChange} placeholder="Full Name of Account Holder" className={`${errors.accountName ? 'border-red-500' : ''}`} />
+                    <Input type="text" id="accountName" name="accountName" value={formData.accountName || ''} onChange={handleChange} placeholder="Full Name of Account Holder" className={`rounded-md ${errors.accountName ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-[#8cc63f]'}`} />
                     {errors.accountName && <p className="mt-1 text-sm text-red-500">{errors.accountName}</p>}
                   </div>
                 </div>
               )}
 
-              {/* GCash */}
+              {/* GCash Option */}
               <div className="flex items-center">
                 <input
                   type="radio"
@@ -288,28 +311,28 @@ const PaymentDetailsStep = forwardRef<any, PaymentDetailsStepProps>(
                   value="GCash"
                   checked={formData.paymentMethod === 'GCash'}
                   onChange={handleChange}
-                  className="h-4 w-4 text-[#8cc63f] border-gray-300 focus:ring-[#8cc63f]"
+                  className="h-4 w-4 text-[#8cc63f] border-gray-300 focus:ring-[#8cc63f] rounded-full cursor-pointer"
                 />
-                <Label htmlFor="paymentMethodGcash" className="ml-2 block text-sm font-medium text-gray-700">
+                <Label htmlFor="paymentMethodGcash" className="ml-2 block text-base font-medium text-gray-700 cursor-pointer">
                   GCash
                 </Label>
               </div>
               {formData.paymentMethod === 'GCash' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ml-6 p-4 border border-gray-200 rounded-md bg-gray-50">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ml-6 p-4 border border-gray-200 rounded-md bg-gray-50 transition-all duration-300 ease-in-out">
                   <div>
                     <Label htmlFor="gcashNumber" className="block text-sm font-medium text-gray-700 mb-1">GCash Number</Label>
-                    <Input type="text" id="gcashNumber" name="gcashNumber" value={formData.gcashNumber || ''} onChange={handleChange} placeholder="e.g., 0917XXXXXXX" className={`${errors.gcashNumber ? 'border-red-500' : ''}`} />
+                    <Input type="text" id="gcashNumber" name="gcashNumber" value={formData.gcashNumber || ''} onChange={handleChange} placeholder="e.g., 0917XXXXXXX" className={`rounded-md ${errors.gcashNumber ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-[#8cc63f]'}`} />
                     {errors.gcashNumber && <p className="mt-1 text-sm text-red-500">{errors.gcashNumber}</p>}
                   </div>
                   <div>
                     <Label htmlFor="gcashName" className="block text-sm font-medium text-gray-700 mb-1">GCash Account Name</Label>
-                    <Input type="text" id="gcashName" name="gcashName" value={formData.gcashName || ''} onChange={handleChange} placeholder="Full Name of GCash Account Holder" className={`${errors.gcashName ? 'border-red-500' : ''}`} />
+                    <Input type="text" id="gcashName" name="gcashName" value={formData.gcashName || ''} onChange={handleChange} placeholder="Full Name of GCash Account Holder" className={`rounded-md ${errors.gcashName ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-[#8cc63f]'}`} />
                     {errors.gcashName && <p className="mt-1 text-sm text-red-500">{errors.gcashName}</p>}
                   </div>
                 </div>
               )}
 
-              {/* Cash/Cheque - no additional fields for now */}
+              {/* Cash/Cheque Option */}
               <div className="flex items-center">
                 <input
                   type="radio"
@@ -318,29 +341,28 @@ const PaymentDetailsStep = forwardRef<any, PaymentDetailsStepProps>(
                   value="Cash/Cheque"
                   checked={formData.paymentMethod === 'Cash/Cheque'}
                   onChange={handleChange}
-                  className="h-4 w-4 text-[#8cc63f] border-gray-300 focus:ring-[#8cc63f]"
+                  className="h-4 w-4 text-[#8cc63f] border-gray-300 focus:ring-[#8cc63f] rounded-full cursor-pointer"
                 />
-                <Label htmlFor="paymentMethodCashCheque" className="ml-2 block text-sm font-medium text-gray-700">
+                <Label htmlFor="paymentMethodCashCheque" className="ml-2 block text-base font-medium text-gray-700 cursor-pointer">
                   Cash / Cheque (For in-person payment)
                 </Label>
               </div>
-
             </div>
           </div>
-        </div> {/* This closing div tag was missing */}
+        </div>
 
-        <div className="flex justify-between mt-8">
+        <div className="flex justify-between mt-8 pt-4 border-t border-gray-200">
           <Button
-            onClick={onPrev} // Go back to Product Details step
-            className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded"
+            onClick={onPrev}
+            className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-md shadow-sm transition-colors duration-200 ease-in-out"
           >
             Previous: Product Details
           </Button>
 
           <Button
-            type="button" // Changed to button to prevent default form submission
-            onClick={handleNextClick} // Call handleNextClick for validation and progression
-            className="bg-[#8cc63f] hover:bg-[#7eb238] text-white font-bold py-2 px-4 rounded"
+            type="button"
+            onClick={handleNextClick}
+            className="bg-[#8cc63f] hover:bg-[#7eb238] text-white font-bold py-2 px-4 rounded-md shadow-sm transition-colors duration-200 ease-in-out"
           >
             Next: Review & Confirm
           </Button>
