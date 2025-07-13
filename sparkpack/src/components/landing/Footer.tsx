@@ -24,22 +24,22 @@ export default function Footer() {
             <h4 className="font-semibold mb-4">Insurance</h4>
             <ul className="space-y-2 text-gray-300">
               <li>
-                <Link href="#insurance-packages" className="hover:text-[#8cc63f]">
+                <Link href="/insurance/packages" className="hover:text-[#8cc63f]">
                   Medical Care Plans
                 </Link>
               </li>
               <li>
-                <Link href="#legacy-packages" className="hover:text-[#8cc63f]">
+                <Link href="/insurance/packages" className="hover:text-[#8cc63f]">
                   Legacy Insurance
                 </Link>
               </li>
               <li>
-                <Link href="#claims-process" className="hover:text-[#8cc63f]">
+                <Link href="/insurance/packages" className="hover:text-[#8cc63f]">
                   Claims Process
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-[#8cc63f]">
+                <Link href="/insurance/packages" className="hover:text-[#8cc63f]">
                   Coverage Details
                 </Link>
               </li>
