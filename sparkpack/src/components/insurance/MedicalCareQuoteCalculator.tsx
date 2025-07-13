@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { medicalCareQuoteConfig, commonBreeds } from '@/data/quoteConfig'; // Import config
 
 interface MedicalCareQuoteCalculatorProps {
@@ -24,12 +24,7 @@ const MedicalCareQuoteCalculator: React.FC<MedicalCareQuoteCalculatorProps> = ({
       'basic-care-premium': '₱35,000'
   }[selectedTierId];
 
-
-  useEffect(() => {
-    calculatePremium();
-  }, [selectedTierId, petType, petAge, petBreed]); // Recalculate if these change
-
-  const calculatePremium = () => {
+  const calculatePremium = useCallback(() => {
     let premium = medicalCareQuoteConfig.basePremiums[selectedTierId];
 
     // Apply pet type multiplier
@@ -44,7 +39,12 @@ const MedicalCareQuoteCalculator: React.FC<MedicalCareQuoteCalculatorProps> = ({
     premium *= medicalCareQuoteConfig.breedMultipliers[petBreed] || 1;
 
     setEstimatedMonthlyPremium(Math.max(0, Math.round(premium)));
-  };
+  }, [selectedTierId, petType, petAge, petBreed]);
+
+    useEffect(() => {
+    calculatePremium();
+  },[calculatePremium]); // Recalculate if these change
+
 
   const getAnnualPremium = () => {
     return estimatedMonthlyPremium * 12;

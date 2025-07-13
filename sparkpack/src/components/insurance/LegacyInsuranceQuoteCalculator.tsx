@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { legacyInsuranceQuoteConfig, commonBreeds } from '@/data/quoteConfig';
 
 interface LegacyInsuranceQuoteCalculatorProps {
@@ -17,13 +17,9 @@ const LegacyInsuranceQuoteCalculator: React.FC<LegacyInsuranceQuoteCalculatorPro
 
   // Derive current tier details for display
   const currentAccidentalDeathBenefit = legacyInsuranceQuoteConfig.accidentalDeathBenefit[selectedTierId];
-  const currentBurialCremationAssistance = legacyInsuranceQuoteConfig.burialCremationAssistance[selectedTierId];
+  const currentBurialCremationAssistance = legacyInsuranceQuoteConfig.burialCremationAssistance[selectedTierId]; // Recalculate if these change
 
-  useEffect(() => {
-    calculatePremium();
-  }, [selectedTierId, petType, petAge, petBreed]); // Recalculate if these change
-
-  const calculatePremium = () => {
+  const calculatePremium = useCallback(() => {
     let premium = legacyInsuranceQuoteConfig.basePremiums[selectedTierId];
 
     // Apply pet type multiplier
@@ -37,7 +33,11 @@ const LegacyInsuranceQuoteCalculator: React.FC<LegacyInsuranceQuoteCalculatorPro
     premium *= legacyInsuranceQuoteConfig.breedMultipliers[petBreed] || 1;
 
     setEstimatedMonthlyPremium(Math.max(0, Math.round(premium)));
-  };
+  },[selectedTierId, petType, petAge, petBreed]);
+
+  useEffect(() => {
+    calculatePremium();
+  }, [calculatePremium]);
 
   const getAnnualPremium = () => {
     return estimatedMonthlyPremium * 12;

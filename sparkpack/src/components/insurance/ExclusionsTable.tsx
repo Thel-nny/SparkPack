@@ -30,7 +30,7 @@ const ExclusionsTable: React.FC<ExclusionsTableProps> = ({ exclusions }) => {
                 Category
               </th>
               <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-red-800 uppercase tracking-wider">
-                What's Not Covered (Examples)
+                What&apos;s Not Covered (Examples)
               </th>
               <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-red-800 uppercase tracking-wider">
                 Why

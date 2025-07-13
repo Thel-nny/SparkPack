@@ -2,7 +2,7 @@
 
 import React, { useCallback } from 'react';
 import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input'; // Assuming Input might be used for some inline editing later
+ // Assuming Input might be used for some inline editing later
 
 // Define interfaces that closely mirror your Prisma schema for clarity
 // These are duplicated here for self-containment, but ideally
@@ -156,7 +156,7 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 {/* Example actions - these would typically trigger the modal */}
                 <button
-                  onClick={(e) => { e.stopPropagation(); onRowClick && onRowClick(claim); }}
+                  onClick={(e) => { e.stopPropagation(); onRowClick?.(claim); }}
                   className="text-[#8cc63f] hover:text-[#7eb238] mr-3"
                   title="Review Claim"
                 >
