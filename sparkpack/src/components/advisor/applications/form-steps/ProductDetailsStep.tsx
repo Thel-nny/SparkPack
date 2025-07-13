@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label'; // Assuming Label component exists
 
 // Import sub-components
 import ProductCard from './product-details-subcomponents/ProductCard';
@@ -11,20 +10,16 @@ import PackageConfiguration from './product-details-subcomponents/PackageConfigu
 import OptionalBenefitsAndDonation from './product-details-subcomponents/OptionalBenefitsAndDonation';
 
 // Updated import paths to use applicationFormData.ts
-import { ProductDetails, AddOnDefinition, SelectedAddOn, ProductOption } from '@/types/applicationFormData'; 
+import { ProductDetails, AddOnDefinition, SelectedAddOn, ProductOption } from '@/types/applicationFormData';
 
 interface ProductDetailsStepProps {
   formData: ProductDetails;
   onUpdate: (data: Partial<ProductDetails>) => void;
   onPrev: () => void;
   onNext: () => void;
-  // NEW PROPS: Pet-specific risk factors passed from parent (NewApplicationForm)
-  petAge: number; // Assuming age in years
-  petBreed: string; // Assuming breed string
-  hasPreExistingConditions: boolean; // Assuming boolean
 }
 
-const productIcons: { [key: string]: React.ReactNode } = { 
+const productIcons: { [key: string]: React.ReactNode } = {
   medicalCareIcon: (
     <svg className="w-12 h-12 text-[#8cc63f] mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -43,31 +38,27 @@ const productIcons: { [key: string]: React.ReactNode } = {
   ),
 };
 
-// ==========================================================
-// Product and Add-on Definitions (Adjusted Pricing)
-// ==========================================================
-
 const productOptions: ProductOption[] = [
   {
     name: 'Medical Care Insurance',
     description: 'Basic Plan',
-    premiumRange: '₱950 - ₱1,700',
-    coverageRange: '₱20,000 - ₱30,000',
+    premiumRange: '₱6,000 - ₱9,600',
+    coverageRange: '₱15,000 - ₱35,000',
     details: [
       'Lasts for 1 year (renewable annually)',
-      'Premium payment starts from ₱950 - ₱1,700 per year (monthly options available)',
-      'Coverage up to ₱20,000 - ₱30,000',
+      'Premium payment starts from ₱500 - ₱800 per month (₱6,000 - ₱9,600 per year)',
+      'Coverage up to ₱15,000 - ₱35,000',
     ],
     iconKey: 'medicalCareIcon',
-    coverageOptions: ['₱20,000', '₱25,000', '₱30,000'],
-    deductibleOptions: ['₱1,000', '₱2,000'],
-    reimbursementOptions: ['70%', '80%'],
+    coverageOptions: ['₱15,000', '₱25,000', '₱35,000'],
+    deductibleOptions: ['₱750', '₱1,000', '₱1,500'],
+    reimbursementOptions: ['70%', '75%', '80%'],
     paymentFreqOptions: ['Annually', 'Monthly'],
     fullDetails: {
       'Key Benefits': [
         'Coverage Term: 1 year, renewable annually.',
-        'Annual Premium: Starting from ₱950 - ₱1,700 per year (monthly options available).',
-        'Total Annual Coverage Limit: Up to ₱20,000 - ₱30,000 for covered accidental injuries and illnesses.',
+        'Annual Premium: Starting from ₱6,000 - ₱9,600 per year (monthly options available from ₱500 - ₱800).',
+        'Total Annual Coverage Limit: Up to ₱15,000 - ₱35,000 for covered accidental injuries and illnesses.',
       ],
       "What's Covered": [
         'Veterinary consultations and check-ups related to covered incidents.',
@@ -87,26 +78,26 @@ const productOptions: ProductOption[] = [
   {
     name: 'Legacy Insurance',
     description: 'Protection & Peace of Mind',
-    premiumRange: '₱700 - ₱1,100',
-    coverageRange: '₱5,000 - ₱20,000',
+    premiumRange: '₱3,120 - ₱4,800',
+    coverageRange: '₱9,000 - ₱18,000',
     details: [
       'Lasts for 1 year (renewable annually)',
-      'Premium payment starts from ₱700 - ₱1,100 per year (monthly options available)',
-      'Coverage up to ₱5,000 - ₱20,000'
+      'Premium payment starts from ₱260 - ₱400 per month (₱3,120 - ₱4,800 per year)',
+      'Coverage up to ₱9,000 - ₱18,000'
     ],
     iconKey: 'legacyInsuranceIcon',
-    coverageOptions: ['₱5,000', '₱10,000', '₱20,000'],
+    coverageOptions: ['₱9,000', '₱12,000', '₱18,000'],
     deductibleOptions: ['₱0', '₱500'],
     reimbursementOptions: ['100%'],
     paymentFreqOptions: ['Annually', 'Monthly'],
     fullDetails: {
       'Key Benefits': [
         'Coverage Term: 1 year, renewable annually.',
-        'Annual Premium: Starting from ₱700 - ₱1,100 per year (monthly options available).',
-        'Total Annual Coverage Limit: Up to ₱5,000 - ₱20,000 for covered incidents.',
+        'Annual Premium: Starting from ₱3,120 - ₱4,800 per year (monthly options available from ₱260 - ₱400).',
+        'Total Annual Coverage Limit: Up to ₱9,000 - ₱18,000 for covered incidents.',
       ],
       "What's Covered": [
-        'Accidental Death or Essential Euthanasia: Up to ₱12,000 in the event of accidental death or a veterinarian-prescribed essential euthanasia due to covered accidental injuries or severe illnesses (as defined by the policy).',
+        'Accidental Death or Essential Euthanasia: Up to ₱18,000 in the event of accidental death or a veterinarian-prescribed essential euthanasia due to covered accidental injuries or severe illnesses (as defined by the policy).',
         'Burial/Cremation Assistance: Up to ₱9,000 to help cover the costs of your pet\'s dignified farewell.',
       ],
       'Important Notes': [
@@ -120,39 +111,33 @@ const productOptions: ProductOption[] = [
   {
     name: 'Medicare and Legacy Insurance',
     description: 'Comprehensive Plan',
-    // REVISED premiumRange
-    premiumRange: '₱1,800 - ₱4,500+',
-    // REVISED coverageRange
-    coverageRange: '₱7,500 - ₱80,000',
+    premiumRange: '₱14,400 - ₱21,600',
+    coverageRange: '₱60,000 - ₱100,000',
     details: [
       'Lasts for 1 year (renewable annually)',
-      'Premium payment starts from ₱1,800 - ₱4,500+ per year (monthly options available, with potential discounts for combined coverage)',
-      // REVISED coverage detail
-      'Coverage up to ₱7,500 - ₱80,000'
+      'Premium payment starts from ₱1,800 - ₱4,500+ per month (₱14,400 - ₱21,600 per year, with potential discounts for combined coverage)',
+      'Coverage up to ₱60,000 - ₱100,000'
     ],
     iconKey: 'medicareLegacyIcon',
-    // REVISED coverageOptions
-    coverageOptions: ['₱7,500', '₱25,000', '₱50,000', '₱80,000'],
-    // REVISED deductibleOptions
-    deductibleOptions: ['₱3,000', '₱5,000'],
+    coverageOptions: ['₱60,000', '₱80,000', '₱100,000'],
+    deductibleOptions: ['₱1,000', '₱1,500'],
     reimbursementOptions: ['80%', '90%'],
     paymentFreqOptions: ['Annually', 'Monthly'],
     fullDetails: {
       'Key Benefits': [
         'Coverage Term: 1 year, renewable annually.',
-        'Annual Premium: Starting from ₱1,800 - ₱4,500+ per year (or inquire about our convenient monthly payment options and potential discounts for combined coverage).',
-        // REVISED Total Annual Coverage Limit
-        'Total Annual Coverage Limit: Up to ₱7,500 - ₱80,000 for all covered benefits combined.',
+        'Annual Premium: Starting from ₱14,400 - ₱21,600 per year (or inquire about our convenient monthly payment options from ₱1,800 - ₱4,500+ and potential discounts for combined coverage).',
+        'Total Annual Coverage Limit: Up to ₱60,000 - ₱100,000 for all covered benefits combined.',
       ],
       "What's Covered": [
-        'Extensive Accidental Injury & Illness Coverage: Up to ₱30,000 for vet consultations, diagnostics (X-rays, MRI, blood work), prescribed medications, surgeries, hospitalization, and emergency care. Covers both minor and major medical events.',
-        'Accidental Death or Essential Euthanasia: Up to ₱15,000 for accidental death or veterinarian-prescribed essential euthanasia due to covered accidental injuries or severe illnesses.',
+        'Extensive Accidental Injury & Illness Coverage: Up to ₱35,000 for vet consultations, diagnostics (X-rays, MRI, blood work), prescribed medications, surgeries, hospitalization, and emergency care. Covers both minor and major medical events.',
+        'Accidental Death or Essential Euthanasia: Up to ₱18,000 for accidental death or veterinarian-prescribed essential euthanasia due to covered accidental injuries or severe illnesses.',
         'Burial/Cremation Assistance: Up to ₱10,000 to help cover end-of-life arrangements.',
       ],
       'Important Notes': [
         'Waiting Periods: Accidents: <span class="font-bold">3 days</span>. Illnesses: <span class="font-bold">14 days</span>. Cruciate Ligament Conditions: A longer waiting period of <span class="font-bold">6 months</span> may apply for specific orthopedic conditions like cruciate ligament injuries, or may require a vet waiver.',
         'Exclusions: Pre-existing conditions, Routine/Preventive Care (unless specific wellness add-ons are chosen), Behavioral issues, breeding/pregnancy, or cosmetic procedures. Conditions arising from negligence, intentional harm, or illegal activities.',
-        'Deductibles/Co-payments: A deductible (e.g., a fixed amount per claim) or a co-payment percentage (e.g., you pay 20% of the vet bill, we cover 80%) may apply. Current deductible options are ₱3,000 or ₱5,000. Specified in your full policy document.',
+        'Deductibles/Co-payments: A deductible (e.g., a fixed amount per claim) or a co-payment percentage (e.g., you pay 20% of the vet bill, we cover 80%) may apply. Current deductible options are ₱1,000 or ₱1,500. Specified in your full policy document.',
         'Sub-limits: While there\'s a generous overall coverage limit, some specific treatments or conditions may have their own sub-limits (e.g., maximum amount for a single surgery).',
         'Claim Reimbursement: Claims are typically processed on a reimbursement basis, meaning you pay the vet first, then submit your claim for reimbursement up to your coverage limit.',
         'Eligibility: Your pet must be <span class="font-bold">3 months to 8 years old</span> and in good health at the time of enrollment.',
@@ -232,12 +217,11 @@ export const calculatePremium = (
   paymentFrequency: string,
   selectedAddOns: SelectedAddOn[],
   donationPercentage: number,
-  // NEW PARAMETERS for risk assessment
-  petAge: number, // Assuming age in years
-  petBreed: string, // Assuming breed string
-  hasPreExistingConditions: boolean // Assuming boolean
+  petAge: number, // Changed to number
+  petBreed: string,
+  hasPreExistingConditions: boolean
 ): { baseAnnual: number; annualTotal: number; monthlyTotal: number; oneTimeTotal: number; donationAmount: number } => {
-  let basePremium = 0; // Renamed from basePrice for clarity
+  let basePremium = 0;
   const cleanCoverage = parseFloat(coverageAmount?.replace(/[₱,]/g, '') || '0');
   const cleanDeductible = parseFloat(deductible?.replace(/[₱,]/g, '') || '0');
   const cleanReimbursement = parseFloat(reimbursementRate?.replace(/%/g, '') || '0') / 100;
@@ -245,75 +229,68 @@ export const calculatePremium = (
   // 1. Determine Base Premium based on Product and Coverage
   switch (productName) {
     case 'Medical Care Insurance':
-      if (cleanCoverage === 20000) basePremium = 1000; // Adjusted for illustrative purposes
-      if (cleanCoverage === 25000) basePremium = 1300;
-      if (cleanCoverage === 30000) basePremium = 1600;
+      if (cleanCoverage === 15000) basePremium = 6000;
+      else if (cleanCoverage === 25000) basePremium = 7800;
+      else if (cleanCoverage === 35000) basePremium = 9600;
       break;
     case 'Legacy Insurance':
-      if (cleanCoverage === 5000) basePremium = 750;
-      if (cleanCoverage === 10000) basePremium = 900;
-      if (cleanCoverage === 20000) basePremium = 1150;
+      if (cleanCoverage === 9000) basePremium = 3120;
+      else if (cleanCoverage === 12000) basePremium = 3800;
+      else if (cleanCoverage === 18000) basePremium = 4800;
       break;
     case 'Medicare and Legacy Insurance':
-      if (cleanCoverage === 7500) basePremium = 2000;
-      if (cleanCoverage === 25000) basePremium = 2800;
-      if (cleanCoverage === 50000) basePremium = 3800;
-      if (cleanCoverage === 80000) basePremium = 4800;
+      if (cleanCoverage === 60000) basePremium = 14400;
+      else if (cleanCoverage === 80000) basePremium = 18000;
+      else if (cleanCoverage === 100000) basePremium = 21600;
       break;
     default:
       return { baseAnnual: 0, annualTotal: 0, monthlyTotal: 0, oneTimeTotal: 0, donationAmount: 0 };
   }
 
   // 2. Apply Policy Design Factors (Deductible, Reimbursement)
-  // These are now *multipliers* on the base premium
   let deductibleMultiplier = 1;
   if (productName === 'Medical Care Insurance') {
-    if (cleanDeductible === 1000) deductibleMultiplier = 1.0; // No discount for lower deductible
-    if (cleanDeductible === 2000) deductibleMultiplier = 0.95; // 5% discount for higher deductible
+    if (cleanDeductible === 750) deductibleMultiplier = 1.05;
+    else if (cleanDeductible === 1000) deductibleMultiplier = 1.0;
+    else if (cleanDeductible === 1500) deductibleMultiplier = 0.95;
   } else if (productName === 'Legacy Insurance') {
-    if (cleanDeductible === 0) deductibleMultiplier = 1.0;
-    if (cleanDeductible === 500) deductibleMultiplier = 0.98;
+    if (cleanDeductible === 0) deductibleMultiplier = 1.02;
+    else if (cleanDeductible === 500) deductibleMultiplier = 1.0;
   } else if (productName === 'Medicare and Legacy Insurance') {
-    if (cleanDeductible === 3000) deductibleMultiplier = 1.0;
-    if (cleanDeductible === 5000) deductibleMultiplier = 0.92; // 8% discount for higher deductible
+    if (cleanDeductible === 1000) deductibleMultiplier = 1.05;
+    else if (cleanDeductible === 1500) deductibleMultiplier = 1.0;
   }
 
   let reimbursementMultiplier = 1;
   if (productName === 'Medical Care Insurance') {
-    if (cleanReimbursement === 0.70) reimbursementMultiplier = 0.98; // 2% discount for lower reimbursement
-    if (cleanReimbursement === 0.80) reimbursementMultiplier = 1.0;
+    if (cleanReimbursement === 0.70) reimbursementMultiplier = 0.98;
+    else if (cleanReimbursement === 0.75) reimbursementMultiplier = 1.0;
+    else if (cleanReimbursement === 0.80) reimbursementMultiplier = 1.02;
   } else if (productName === 'Medicare and Legacy Insurance') {
-    if (cleanReimbursement === 0.80) reimbursementMultiplier = 0.95; // 5% discount for lower reimbursement
-    if (cleanReimbursement === 0.90) reimbursementMultiplier = 1.0;
+    if (cleanReimbursement === 0.80) reimbursementMultiplier = 0.98;
+    else if (cleanReimbursement === 0.90) reimbursementMultiplier = 1.02;
   }
-  // Legacy Insurance has 100% reimbursement, so no multiplier needed there based on current options
 
   basePremium *= deductibleMultiplier * reimbursementMultiplier;
 
-  // 3. Apply Pet-Specific Risk Factors (Illustrative placeholders)
+  // 3. Apply Pet-Specific Risk Factors
   let ageRiskFactor = 1.0;
-  if (petAge > 8) ageRiskFactor = 1.2; // 20% surcharge for older pets
-  else if (petAge < 1) ageRiskFactor = 1.05; // 5% surcharge for very young pets (initial health checks)
-  else if (petAge >= 1 && petAge <= 8) ageRiskFactor = 1.0; // Base for prime age
+  if (petAge > 8) ageRiskFactor = 1.25;
+  else if (petAge < 1) ageRiskFactor = 1.10;
+  else if (petAge >= 1 && petAge <= 8) ageRiskFactor = 1.0;
 
   let breedRiskFactor = 1.0;
-  // This would ideally come from a lookup table mapping breeds to risk levels
-  // For demonstration, let's assume some high-risk breeds
-  const highRiskBreeds = ['Bulldog', 'Pug', 'German Shepherd', 'Labrador Retriever']; // Example breeds prone to certain issues
+  const highRiskBreeds = ['Bulldog', 'Pug', 'German Shepherd', 'Labrador Retriever', 'Dachshund', 'Great Dane'];
   if (highRiskBreeds.includes(petBreed)) {
-    breedRiskFactor = 1.15; // 15% surcharge for high-risk breeds
+    breedRiskFactor = 1.18;
   }
 
   let preExistingConditionSurcharge = 0;
   if (hasPreExistingConditions) {
-    // This is often an exclusion, or a significant surcharge if covered at all
-    // For this calculator, let's assume a fixed surcharge or a very high multiplier
-    preExistingConditionSurcharge = 500; // Example fixed annual surcharge
-    // Or, a multiplier: basePremium *= 1.5; // 50% increase
+    preExistingConditionSurcharge = basePremium * 0.30;
   }
 
-  // Apply pet-specific factors to the base premium
-  basePremium = basePremium * ageRiskFactor * breedRiskFactor + preExistingConditionSurcharge;
+  basePremium = (basePremium * ageRiskFactor * breedRiskFactor) + preExistingConditionSurcharge;
 
   // 4. Calculate Add-on Costs
   let annualAddOnCost = 0;
@@ -329,8 +306,9 @@ export const calculatePremium = (
     }
   });
 
-  // 5. Calculate Donation Amount
   const totalAnnualPremiumBeforeDonation = basePremium + annualAddOnCost;
+
+  // 5. Calculate Donation Amount
   let calculatedDonationAmount = (totalAnnualPremiumBeforeDonation * (donationPercentage / 100));
   let finalAnnualTotalPremium = totalAnnualPremiumBeforeDonation + calculatedDonationAmount;
 
@@ -341,31 +319,26 @@ export const calculatePremium = (
       finalMonthlyTotalPremium *= monthlySurchargeFactor;
   }
 
-  // Rounding
+  // Rounding for currency
   finalAnnualTotalPremium = Math.round(finalAnnualTotalPremium);
-  finalMonthlyTotalPremium = Math.round(finalMonthlyTotalPremium * 100) / 100; // Keep 2 decimal places for monthly
-  calculatedDonationAmount = Math.round(calculatedDonationAmount * 100) / 100;
+  finalMonthlyTotalPremium = parseFloat(finalMonthlyTotalPremium.toFixed(2));
+  calculatedDonationAmount = parseFloat(calculatedDonationAmount.toFixed(2));
 
   return {
-    baseAnnual: Math.round(basePremium), // This now reflects the base premium with policy design and pet risk factors
+    baseAnnual: parseFloat(basePremium.toFixed(2)),
     annualTotal: finalAnnualTotalPremium,
     monthlyTotal: finalMonthlyTotalPremium,
-    oneTimeTotal: oneTimeAddOnCost,
+    oneTimeTotal: parseFloat(oneTimeAddOnCost.toFixed(2)),
     donationAmount: calculatedDonationAmount
   };
 };
 
-// ==========================================================
-// ProductDetailsStep Component
-// ==========================================================
-
 const ProductDetailsStep = forwardRef<any, ProductDetailsStepProps>(
   ({ formData, onUpdate, onPrev, onNext }, ref) => {
     const [currentSubStep, setCurrentSubStep] = useState(1);
-    const [errors, setErrors] = useState<Record<string, string>>({}); // State for inline errors
+    const [errors, setErrors] = useState<Record<string, string>>({});
     const totalSubSteps = 3;
 
-    // Validation function for individual fields (for PackageConfiguration)
     const validateField = (name: keyof ProductDetails, value: string | number): string => {
       let error = '';
       const currentProduct = productOptions.find(p => p.name === formData.productName);
@@ -405,25 +378,23 @@ const ProductDetailsStep = forwardRef<any, ProductDetailsStepProps>(
         case 'startDate':
           if (!value) error = 'Start Date is required.';
           break;
-        // donationPercentage and selectedAddOns are optional and handled by handleAddOnToggle/handleChange
         default:
           break;
       }
       return error;
     };
 
-    // Comprehensive validation for the current sub-step
     const validateSubStep = (): boolean => {
       const newErrors: Record<string, string> = {};
       let isValid = true;
 
-      if (currentSubStep === 1) { // Product Selection
+      if (currentSubStep === 1) {
         const error = validateField('productName', formData.productName);
         if (error) {
           newErrors.productName = error;
           isValid = false;
         }
-      } else if (currentSubStep === 2) { // Package Configuration
+      } else if (currentSubStep === 2) {
         const fieldsToValidate: Array<keyof ProductDetails> = [
           'coverageAmount', 'deductible', 'reimbursementRate', 'paymentFrequency', 'startDate'
         ];
@@ -434,16 +405,12 @@ const ProductDetailsStep = forwardRef<any, ProductDetailsStepProps>(
             isValid = false;
           }
         });
-      } else if (currentSubStep === 3) { // Optional Benefits & Donation
-        // No required fields for this step, it's all optional.
-        isValid = true;
       }
 
       setErrors(newErrors);
       return isValid;
     };
 
-    // Expose the validate function to the parent component via ref
     useImperativeHandle(ref, () => ({
       validate: validateSubStep,
     }));
@@ -460,7 +427,6 @@ const ProductDetailsStep = forwardRef<any, ProductDetailsStepProps>(
         [name as keyof ProductDetails]: newValue,
       });
 
-      // Validate field on change and update errors state
       const error = validateField(name as keyof ProductDetails, newValue);
       setErrors((prevErrors) => ({
         ...prevErrors,
@@ -471,7 +437,6 @@ const ProductDetailsStep = forwardRef<any, ProductDetailsStepProps>(
     const handleProductSelect = (productName: string) => {
       const selectedProduct = productOptions.find(p => p.name === productName);
 
-      // Map productName to planType enum value
       let planType = '';
       switch (productName) {
         case 'Medical Care Insurance':
@@ -484,32 +449,36 @@ const ProductDetailsStep = forwardRef<any, ProductDetailsStepProps>(
           planType = 'MEDICARE_AND_LEGACY_INSURANCE';
           break;
         default:
-          planType = 'SINGLE_PRODUCT'; // Fallback or error state
+          planType = 'SINGLE_PRODUCT';
       }
 
-      // Update parent formData directly
       onUpdate({
         productName: productName,
         planType: planType,
         coverageAmount: selectedProduct?.coverageOptions?.[0] || '',
         deductible: selectedProduct?.deductibleOptions?.[0] || '',
         reimbursementRate: selectedProduct?.reimbursementOptions?.[0] || '',
-        paymentFrequency: 'Annually', // Default to Annually
+        paymentFrequency: 'Annually',
         startDate: new Date().toISOString().split('T')[0],
         coverageLength: '1 Year',
-        selectedAddOns: [], // Reset add-ons on product change
-        donationPercentage: 0, // Reset donation on product change
+        selectedAddOns: [],
+        donationPercentage: 0,
+        // Pet-specific details for calculation, assuming they are already in formData or passed through
+        // If these are not coming from formData directly, you'll need to pass them down as props
+        // from NewApplicationForm, similar to how they were in the original ProductDetailsStepProps.
+        // For simplicity and assuming they exist in formData due to earlier steps:
+        petAge: formData.petAge, // Assuming petAge is correctly a number in formData
+        petBreed: formData.petBreed,
+        hasPreExistingConditions: formData.hasPreExistingConditions,
       });
 
-      // Clear product-related errors when a new product is selected
       setErrors({});
     };
 
     const handleAddOnToggle = (addOn: AddOnDefinition) => {
-      // Get the current selectedAddOns from formData
       const currentSelectedAddOns = formData.selectedAddOns || [];
       const isSelected = currentSelectedAddOns.some((item: SelectedAddOn) => item.id === addOn.id);
-      
+
       let newSelectedAddOns: SelectedAddOn[];
       if (isSelected) {
         newSelectedAddOns = currentSelectedAddOns.filter((item: SelectedAddOn) => item.id !== addOn.id);
@@ -522,7 +491,6 @@ const ProductDetailsStep = forwardRef<any, ProductDetailsStepProps>(
         }];
       }
 
-      // Update parent formData with the new array of selectedAddOns
       onUpdate({ selectedAddOns: newSelectedAddOns });
     };
 
@@ -531,23 +499,18 @@ const ProductDetailsStep = forwardRef<any, ProductDetailsStepProps>(
         return;
       }
 
-      // No need to call onUpdate(formData) here, as handleChange and handleProductSelect already do this.
-
       if (currentSubStep < totalSubSteps) {
         setCurrentSubStep((prevSubStep) => prevSubStep + 1);
       } else {
-        onNext(); // Move to next main step (PaymentDetailsStep)
+        onNext();
       }
     };
 
     const handleInternalPrev = () => {
-      // No validation needed when going back
-      // No need to call onUpdate(formData) here, as handleChange and handleProductSelect already do this.
-
       if (currentSubStep > 1) {
         setCurrentSubStep((prevSubStep) => prevSubStep - 1);
       } else {
-        onPrev(); // Move to previous main step (Pet Details)
+        onPrev();
       }
     };
 
@@ -584,23 +547,23 @@ const ProductDetailsStep = forwardRef<any, ProductDetailsStepProps>(
         case 2: // Package Configuration
           return (
             <PackageConfiguration
-              formData={formData} // Pass formData directly
+              formData={formData}
               selectedProductData={selectedProductData}
               handleChange={handleChange}
-              errors={errors} // Pass errors down
+              errors={errors}
             />
           );
         case 3: // Optional Benefits & Donation
           return (
             <OptionalBenefitsAndDonation
-              formData={formData} // Pass formData directly
+              formData={formData}
               filteredAddOns={filteredAddOns}
               oneTimeAddOns={oneTimeAddOns}
               annualAddOns={annualAddOns}
               donationPercentages={donationPercentages}
               handleAddOnToggle={handleAddOnToggle}
               handleChange={handleChange}
-              errors={errors} // Pass errors down (though likely less critical here)
+              errors={errors}
             />
           );
         default:
