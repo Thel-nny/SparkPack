@@ -39,7 +39,7 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ className = "" }) => {
     },
     {
       label: "Memorial Services",
-      hasDropdown: true,
+      hasDropdown: false,
       items: [
         { label: "Cremation Services", href: "/memorial-services#cremation-services" }, // Use full paths with section IDs
         { label: "Tree Planting Ceremony", href: "/memorial-services#tree-planting" },
@@ -51,7 +51,7 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ className = "" }) => {
     },
     {
       label: "Local Partners",
-      hasDropdown: true,
+      hasDropdown: false,
       items: [
         { label: "Partner Veterinarians", href: "/local-partners#partner-vets" },
         { label: "Pet-Friendly Businesses", href: "/local-partners#partner-businesses" },
@@ -198,12 +198,6 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ className = "" }) => {
 
           {/* Right Side - Get Quote and Login/Account */}
           <div className="hidden md:flex items-center space-x-4">
-            <Link
-              href="/get-quote"
-              className="flex items-center bg-[#8cc63f] hover:bg-[#7eb238] text-white px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200"
-            >
-              Get Quote
-            </Link>
 
             <div className="relative">
               <button
@@ -261,12 +255,7 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ className = "" }) => {
                       >
                         Contact Support
                       </Link>
-                      <button
-                        onClick={handleSignOut}
-                        className="w-full text-left block px-4 py-2 text-sm text-[#342d47] hover:bg-[#f5f8f3] hover:text-[#7eb238] transition-colors duration-150"
-                      >
-                        Sign Out
-                      </button>
+                      
                     </div>
                   </div>
                 </>
@@ -343,16 +332,7 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ className = "" }) => {
 
             {/* Mobile-specific Login/Account/Quote links consolidated at the bottom */}
             <div className="border-t border-gray-200 mt-2 pt-2">
-                <Link
-                  href="/get-quote"
-                  className="block w-full text-center bg-[#8cc63f] hover:bg-[#7eb238] text-white px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 mt-2"
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    setActiveDropdown(null);
-                  }}
-                >
-                  Get Quote
-                </Link>
+                
                 <Link
                   href="/auth/login"
                   className="block px-4 py-2 text-sm text-[#342d47] hover:bg-[#f5f8f3] hover:text-[#7eb238] transition-colors duration-150"
@@ -393,15 +373,7 @@ const TopNavbar: React.FC<TopNavbarProps> = ({ className = "" }) => {
                 >
                   Contact Support
                 </Link>
-                <button
-                  onClick={() => {
-                    handleSignOut();
-                    setMobileMenuOpen(false); // Close mobile menu after sign out
-                  }}
-                  className="w-full text-left block px-4 py-2 text-sm text-[#342d47] hover:bg-[#f5f8f3] hover:text-[#7eb238] transition-colors duration-150"
-                >
-                  Sign Out
-                </button>
+                
               </div>
           </div>
         </div>

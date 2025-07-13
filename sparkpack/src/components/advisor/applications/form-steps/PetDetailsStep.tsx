@@ -274,7 +274,7 @@ const PetDetailsStep = forwardRef<any, PetDetailsStepProps>(
                 </div>
                 <div>
                   <Label htmlFor="dobOrAdoptionDate" className="block text-sm font-medium text-gray-700 mb-1">
-                    Date of birth or adoption date (Optional)
+                    Date of birth or adoption date
                   </Label>
                   <Input id="dobOrAdoptionDate" name="dobOrAdoptionDate" type="date" value={formData.dobOrAdoptionDate || ''} onChange={handleChange} className="shadow-sm" />
                 </div>

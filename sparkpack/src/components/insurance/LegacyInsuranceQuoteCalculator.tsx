@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback  } from 'react';
+import Link from 'next/link';
 import { legacyInsuranceQuoteConfig, commonBreeds } from '@/data/quoteConfig';
 
 interface LegacyInsuranceQuoteCalculatorProps {
@@ -170,9 +171,9 @@ const calculatePremium = useCallback(() => {
       </div>
 
       <div className="text-center mt-6">
-        <button className="bg-[#8cc63f] hover:bg-[#7eb238] text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors duration-200 shadow-lg">
+        <Link href="/auth/register" className="bg-[#8cc63f] hover:bg-[#7eb238] text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors duration-200 shadow-lg">
           Proceed to Full Application
-        </button>
+        </Link>
       </div>
     </div>
   );
