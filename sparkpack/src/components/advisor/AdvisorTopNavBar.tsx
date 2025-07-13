@@ -203,7 +203,7 @@ const AdvisorTopNavbar: React.FC<AdvisorTopNavbarProps> = ({ className = '' }) =
                   <div className="absolute top-full right-0 mt-1 w-56 bg-white rounded-md shadow-lg border border-gray-200 z-20">
                     <div className="py-1">
                       <Link
-                        href="/account/management"
+                        href="/advisor/account/management"
                         className="block px-4 py-2 text-sm text-[#342d47] hover:bg-[#f5f8f3] hover:text-[#7eb238] transition-colors duration-150"
                         onClick={() => setActiveDropdown(null)}
                       >
