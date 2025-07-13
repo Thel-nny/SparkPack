@@ -1,15 +1,13 @@
-// sparkpack/src/types/applicationFormData.ts
-
 export interface ClientDetails {
   title: string;
   firstName: string;
   middleName?: string;
   lastName: string;
   dob: string;
-  pob?: string; // Made optional as per your previous ClientDetailsStep
+  pob?: string;
   gender: string;
   allowPhoneCollection: boolean;
-  phoneNumber: string; // Changed from optional to required string
+  phoneNumber: string;
   email: string;
   streetAddress: string;
   country: string;
@@ -56,28 +54,6 @@ export interface SelectedAddOn {
   type: 'one-time' | 'annual';
 }
 
-export interface ProductDetails {
-  productName: string;
-  planType: string;
-  coverageAmount: string;
-  deductible: string;
-  reimbursementRate: string;
-  paymentFrequency: string;
-  startDate: string;
-  coverageLength: string;
-  selectedAddOns: SelectedAddOn[];
-  donationPercentage: number;
-}
-
-export interface AddOnDefinition {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  type: 'one-time' | 'annual';
-  availableFor: string[];
-}
-
 export interface ProductOption {
   name: string;
   description: string;
@@ -90,6 +66,33 @@ export interface ProductOption {
   reimbursementOptions: string[];
   paymentFreqOptions: string[];
   fullDetails: { [key: string]: string[] };
+}
+
+export interface AddOnDefinition {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  type: 'one-time' | 'annual';
+  availableFor: string[];
+}
+
+
+export interface ProductDetails {
+  productName: string;
+  planType: string;
+  coverageAmount: string;
+  deductible: string; // Changed to string
+  reimbursementRate: string;
+  paymentFrequency: string;
+  startDate: string;
+  coverageLength: string;
+  selectedAddOns: SelectedAddOn[];
+  donationPercentage: number;
+  // Added these fields to ProductDetails to make them accessible for premium calculation
+  petAge: number;
+  petBreed: string;
+  hasPreExistingConditions: boolean;
 }
 
 export interface PaymentDetails {
@@ -106,8 +109,8 @@ export interface PaymentDetails {
 }
 
 export interface ApplicationFormData {
-  client: ClientDetails;
-  pet: PetDetails;
-  product: ProductDetails;
-  payment: PaymentDetails;
+  clientDetails: ClientDetails;
+  petDetails: PetDetails;
+  productDetails: ProductDetails;
+  paymentDetails: PaymentDetails;
 }
