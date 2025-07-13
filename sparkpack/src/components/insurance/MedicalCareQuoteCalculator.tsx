@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import { medicalCareQuoteConfig, commonBreeds } from '@/data/quoteConfig'; // Import config
 
 interface MedicalCareQuoteCalculatorProps {
@@ -23,6 +24,7 @@ const MedicalCareQuoteCalculator: React.FC<MedicalCareQuoteCalculatorProps> = ({
       'basic-care-plus': '₱25,000',
       'basic-care-premium': '₱35,000'
   }[selectedTierId];
+ // Recalculate if these change
 
   const calculatePremium = useCallback(() => {
     let premium = medicalCareQuoteConfig.basePremiums[selectedTierId];
@@ -43,8 +45,7 @@ const MedicalCareQuoteCalculator: React.FC<MedicalCareQuoteCalculatorProps> = ({
 
     useEffect(() => {
     calculatePremium();
-  },[calculatePremium]); // Recalculate if these change
-
+  }, [calculatePremium]);
 
   const getAnnualPremium = () => {
     return estimatedMonthlyPremium * 12;
@@ -177,9 +178,9 @@ const MedicalCareQuoteCalculator: React.FC<MedicalCareQuoteCalculatorProps> = ({
       </div>
 
       <div className="text-center mt-6">
-        <button className="bg-[#8cc63f] hover:bg-[#7eb238] text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors duration-200 shadow-lg">
+        <Link href="/auth/register" className="bg-[#8cc63f] hover:bg-[#7eb238] text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors duration-200 shadow-lg">
           Proceed to Full Application
-        </button>
+        </Link>
       </div>
     </div>
   );

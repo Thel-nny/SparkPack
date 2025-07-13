@@ -7,6 +7,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Eye, EyeOff } from "lucide-react";
 import { CheckedState } from "@radix-ui/react-checkbox";
 
+import PrivacyPolicyModal from '@/components/ui/PrivacyPolicyModal';
+import TermsAndConditionsModal from '@/components/ui/TermsAndConditionsModal'; // Ensure this path is correct
+
 const Spinner = ({ size = "small" }) => {
   const spinnerSize = size === "small" ? "h-4 w-4" : "h-6 w-6";
   return (
@@ -37,6 +40,10 @@ export default function Register() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState({ firstName: "", lastName: "", phoneNumber: "", email: "", password: "", confirmPassword: "", role: "", submit: "" });
   const [isLoading, setIsLoading] = useState(false);
+
+  const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
+  const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
+
 
   const isValidEmail = (email: string) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -77,7 +84,7 @@ export default function Register() {
     } else if (!isValidPhoneNumber(phoneNumber)) {
       newErrors.phoneNumber = "Please enter a valid phone number (digits only, optional '+' at start).";
       isValid = false;
-    } else if (!isLengthValid(phoneNumber, 7, MAX_LENGTH.phoneNumber)) { 
+    } else if (!isLengthValid(phoneNumber, 7, MAX_LENGTH.phoneNumber)) {
       newErrors.phoneNumber = `Phone number must be between 7 and ${MAX_LENGTH.phoneNumber} digits.`;
       isValid = false;
     }
@@ -117,7 +124,6 @@ export default function Register() {
     setErrors(prev => ({ ...prev, submit: "" }));
 
     try {
-
       let role = "";
       if (isAdvisor) role = "ADMIN";
       else if (isPolicyholder) role = "CUSTOMER";
@@ -126,28 +132,31 @@ export default function Register() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          username: firstName,
+          username: firstName, // Ensure your backend expects 'username' or adjust to 'firstName'
           email,
           password,
           role, // Send role to backend
+          // You might also want to send lastName and phoneNumber to the backend
+          lastName,
+          phoneNumber
         }),
       });
-      
+
       const data = await res.json();
-          if (!res.ok) {
-            setErrors(prev => ({ ...prev, submit: data.error || "Registration failed." }));
-            setIsLoading(false);
-            return;
-          }
-      
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      if (!res.ok) {
+        setErrors(prev => ({ ...prev, submit: data.error || "Registration failed." }));
+        setIsLoading(false);
+        return;
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate network delay
       console.log("Registration simulated successfully!");
-      window.location.href = "/auth/login?registered=true";
+      window.location.href = "/auth/login?registered=true"; // Redirect upon successful registration
 
       console.log("Attempting to register with:", { firstName, lastName, phoneNumber, email, password, isPolicyholder, isAdvisor });
-    } catch {
-      console.error("Simulated registration error:");
-      const submitMsg = "A simulated error occurred during registration.";
+    } catch (error) {
+      console.error("Registration error:", error); // Use actual error
+      const submitMsg = "An unexpected error occurred during registration.";
       setErrors(prev => ({ ...prev, submit: submitMsg }));
     } finally {
       setIsLoading(false);
@@ -158,22 +167,22 @@ export default function Register() {
     <div className="min-h-screen flex items-center justify-center bg-[#f5f7f8] p-2 md:p-4">
       <div className="z-10 w-full max-w-md p-4 md:px-6 lg:px-8 rounded-lg bg-white bg-opacity-95 border-2 border-gray-400 shadow-md">
         <div className="flex flex-col items-center mb-1 md:mb-2">
-          <img src="/Furrest_Logo-04.svg" width={100} height={100} alt="Placeholder logo" className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full" />
+          <img src="/Furrest_Logo-04.svg" width={100} height={100} alt="Furrest logo" className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full" />
           <p className="text-base md:text-lg font-semibold text-[#7eb238]">
             SparkPack
           </p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-2">
           {/* First Name and Last Name */}
-          <div className="flex gap-x-2"> 
-            <div className="flex-1"> 
+          <div className="flex gap-x-2">
+            <div className="flex-1">
               <label htmlFor="firstName" className="block text-sm font-medium text-gray-800">First Name</label>
               <Input
                 id="firstName"
                 type="text"
                 value={firstName}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFirstName(e.target.value)}
-                placeholder="First name" 
+                placeholder="First name"
                 maxLength={MAX_LENGTH.firstName}
                 className="w-full bg-white border-gray-400 text-gray-800 placeholder-gray-600 h-9 text-sm"
               />
@@ -186,7 +195,7 @@ export default function Register() {
                 type="text"
                 value={lastName}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLastName(e.target.value)}
-                placeholder="Last name" 
+                placeholder="Last name"
                 maxLength={MAX_LENGTH.lastName}
                 className="w-full bg-white border-gray-400 text-gray-800 placeholder-gray-600 h-9 text-sm"
               />
@@ -199,7 +208,7 @@ export default function Register() {
             <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-800">Phone Number</label>
             <Input
               id="phoneNumber"
-              type="tel" 
+              type="tel"
               value={phoneNumber}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPhoneNumber(e.target.value)}
               placeholder="e.g., +639171234567"
@@ -209,7 +218,7 @@ export default function Register() {
             {errors.phoneNumber && <p className="text-red-500 text-xs mt-1">{errors.phoneNumber}</p>}
           </div>
 
-          {/*  Email, Password, Confirm Password fields */}
+          {/* Email, Password, Confirm Password fields */}
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-800">Email</label>
             <Input
@@ -235,7 +244,7 @@ export default function Register() {
                 maxLength={MAX_LENGTH.password}
                 className="w-full bg-white border-gray-400 text-gray-800 placeholder-gray-600 pr-10 h-9 text-sm"
               />
-              <button type="button" onClick={() => setShowPassword(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300">
+              <button type="button" onClick={() => setShowPassword(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300" aria-label={showPassword ? "Hide password" : "Show password"}>
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
@@ -253,7 +262,7 @@ export default function Register() {
                 maxLength={MAX_LENGTH.password}
                 className="w-full bg-white border-gray-400 text-gray-800 placeholder-gray-600 pr-10 h-9 text-sm"
               />
-              <button type="button" onClick={() => setShowConfirmPassword(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300">
+              <button type="button" onClick={() => setShowConfirmPassword(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300" aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}>
                 {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
@@ -267,6 +276,7 @@ export default function Register() {
                 onCheckedChange={(checked: CheckedState) => {
                   if (typeof checked === 'boolean') {
                     setIsPolicyholder(checked);
+                    if (checked) setIsAdvisor(false); // Uncheck advisor if policyholder is checked
                   }
                 }}
                 className="mr-2"
@@ -280,6 +290,7 @@ export default function Register() {
                 onCheckedChange={(checked: CheckedState) => {
                   if (typeof checked === 'boolean') {
                     setIsAdvisor(checked);
+                    if (checked) setIsPolicyholder(false); // Uncheck policyholder if advisor is checked
                   }
                 }}
                 className="mr-2"
@@ -302,9 +313,34 @@ export default function Register() {
           <p className="text-sm text-gray-500">Already have an account? <a href={`/auth/login`} className="text-[#8cc63f] hover:underline">Log in here</a></p>
         </div>
         <div className="mt-4 text-center text-xs text-gray-500">
-          <a href="mailto:partnerships.iloilo@sparkpack.org" className="hover:underline">Help</a> · <a href="/privacy-policy" className="ml-2 hover:underline">Privacy Policy</a> · <a href="/terms-and-conditions" className="ml-2 hover:underline">Terms and Conditions</a>
+          <a href="mailto:partnerships.iloilo@sparkpack.org" className="hover:underline">Help</a> ·
+          <button
+            type="button"
+            onClick={() => setIsPrivacyModalOpen(true)}
+            className="ml-2 hover:underline focus:outline-none"
+          >
+            Privacy Policy
+          </button>{" "}
+          ·{" "}
+          <button
+            type="button"
+            onClick={() => setIsTermsModalOpen(true)} // Open Terms modal
+            className="ml-2 hover:underline focus:outline-none"
+          >
+            Terms and Conditions
+          </button>
         </div>
       </div>
+
+      <PrivacyPolicyModal
+        isOpen={isPrivacyModalOpen}
+        onClose={() => setIsPrivacyModalOpen(false)}
+      />
+
+      <TermsAndConditionsModal
+        isOpen={isTermsModalOpen}
+        onClose={() => setIsTermsModalOpen(false)}
+      />
     </div>
   );
 }

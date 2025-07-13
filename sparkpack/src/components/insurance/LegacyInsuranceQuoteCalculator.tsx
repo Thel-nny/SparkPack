@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback  } from 'react';
+import Link from 'next/link';
 import { legacyInsuranceQuoteConfig, commonBreeds } from '@/data/quoteConfig';
 
 interface LegacyInsuranceQuoteCalculatorProps {
@@ -17,9 +18,9 @@ const LegacyInsuranceQuoteCalculator: React.FC<LegacyInsuranceQuoteCalculatorPro
 
   // Derive current tier details for display
   const currentAccidentalDeathBenefit = legacyInsuranceQuoteConfig.accidentalDeathBenefit[selectedTierId];
-  const currentBurialCremationAssistance = legacyInsuranceQuoteConfig.burialCremationAssistance[selectedTierId]; // Recalculate if these change
+  const currentBurialCremationAssistance = legacyInsuranceQuoteConfig.burialCremationAssistance[selectedTierId];
 
-  const calculatePremium = useCallback(() => {
+const calculatePremium = useCallback(() => {
     let premium = legacyInsuranceQuoteConfig.basePremiums[selectedTierId];
 
     // Apply pet type multiplier
@@ -33,11 +34,12 @@ const LegacyInsuranceQuoteCalculator: React.FC<LegacyInsuranceQuoteCalculatorPro
     premium *= legacyInsuranceQuoteConfig.breedMultipliers[petBreed] || 1;
 
     setEstimatedMonthlyPremium(Math.max(0, Math.round(premium)));
-  },[selectedTierId, petType, petAge, petBreed]);
+  }, [selectedTierId, petType, petAge, petBreed]);
 
-  useEffect(() => {
+    useEffect(() => {
     calculatePremium();
-  }, [calculatePremium]);
+  }, [calculatePremium]); // Recalculate if these change
+
 
   const getAnnualPremium = () => {
     return estimatedMonthlyPremium * 12;
@@ -169,9 +171,9 @@ const LegacyInsuranceQuoteCalculator: React.FC<LegacyInsuranceQuoteCalculatorPro
       </div>
 
       <div className="text-center mt-6">
-        <button className="bg-[#8cc63f] hover:bg-[#7eb238] text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors duration-200 shadow-lg">
+        <Link href="/auth/register" className="bg-[#8cc63f] hover:bg-[#7eb238] text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors duration-200 shadow-lg">
           Proceed to Full Application
-        </button>
+        </Link>
       </div>
     </div>
   );

@@ -30,6 +30,7 @@ interface UseApplicationsResult {
   error: string | null;
   setPage: (page: number) => void;
   currentPage: number;
+  refetch: () => void;
 }
 
 export default function useApplications(params: UseApplicationsParams): UseApplicationsResult {
@@ -54,16 +55,7 @@ export default function useApplications(params: UseApplicationsParams): UseAppli
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchApplications({
-        page: currentPage,
-        limit,
-        statusFilter,
-        productFilter,
-        minCoverage,
-        maxCoverage,
-        startDate,
-        endDate,
-      });
+      const data = await fetchApplications(currentPage, limit, 'active');
       if (data.success) {
         setApplications(data.data.applications);
         setTotalPages(data.data.pagination.pages);
@@ -78,12 +70,6 @@ export default function useApplications(params: UseApplicationsParams): UseAppli
   }, [
     currentPage,
     limit,
-    statusFilter,
-    productFilter,
-    minCoverage,
-    maxCoverage,
-    startDate,
-    endDate,
   ]);
 
   useEffect(() => {
@@ -101,6 +87,11 @@ export default function useApplications(params: UseApplicationsParams): UseAppli
     }
   };
 
+  // Add refetch function to allow manual data refresh
+  const refetch = () => {
+    fetchData();
+  };
+
   return {
     applications,
     totalPages,
@@ -108,5 +99,6 @@ export default function useApplications(params: UseApplicationsParams): UseAppli
     error,
     setPage,
     currentPage,
+    refetch,
   };
 }

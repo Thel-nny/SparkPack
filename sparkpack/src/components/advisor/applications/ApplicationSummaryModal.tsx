@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { ApplicationFormData } from '@/types/formData';
+import { ApplicationFormData } from '@/types/applicationFormData';
 import SummaryDetailsStep from './form-steps/SummaryDetailsStep'; // Adjust path if necessary
 import { Button } from '@/components/ui/button'; // Assuming you have a Button component
 

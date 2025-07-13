@@ -11,6 +11,9 @@ import validator from "validator";
 import { signIn } from "next-auth/react";
 import { getSession } from "next-auth/react";
 
+import PrivacyPolicyModal from '@/components/ui/PrivacyPolicyModal';
+import TermsAndConditionsModal from '@/components/ui/TermsAndConditionsModal';
+
 const MAX_LENGTH = {
   email: 255,
   password: 128,
@@ -24,6 +27,9 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({ email: "", password: "", submit: "" });
   const [isLoading, setIsLoading] = useState(false);
+
+  const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
+  const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
 
   const validateForm = () => {
     let isValid = true;
@@ -158,6 +164,7 @@ export default function Login() {
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300"
+                aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? (
                   <EyeOff className="h-4 w-4" />
@@ -213,15 +220,33 @@ export default function Login() {
             Help
           </a>{" "}
           ·{" "}
-          <a href="/privacy-policy" className="ml-2 hover:underline">
+          <button
+            type="button"
+            onClick={() => setIsPrivacyModalOpen(true)}
+            className="ml-2 hover:underline focus:outline-none"
+          >
             Privacy Policy
-          </a>{" "}
+          </button>{" "}
           ·{" "}
-          <a href="/terms-and-conditions" className="ml-2 hover:underline">
+          <button
+            type="button"
+            onClick={() => setIsTermsModalOpen(true)}
+            className="ml-2 hover:underline focus:outline-none"
+          >
             Terms and Conditions
-          </a>
+          </button>
         </div>
       </div>
+
+      <PrivacyPolicyModal
+        isOpen={isPrivacyModalOpen}
+        onClose={() => setIsPrivacyModalOpen(false)}
+      />
+
+      <TermsAndConditionsModal
+        isOpen={isTermsModalOpen}
+        onClose={() => setIsTermsModalOpen(false)}
+      />
     </div>
   );
 }

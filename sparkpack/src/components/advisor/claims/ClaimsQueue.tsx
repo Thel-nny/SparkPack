@@ -100,7 +100,7 @@ const ClaimsQueue: React.FC = () => {
       if (startDate) params.append('startDate', startDate);
       if (endDate) params.append('endDate', endDate);
 
-      const response = await fetch(`/api/claims?${params.toString()}`);
+      const response = await fetch(`/api/claims/queue?${params.toString()}`);
 
       if (!response.ok) {
         const errorData = await response.json();

@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, use } from 'react';
+import Link from 'next/link';
 import { medicareLegacyQuoteConfig, commonBreeds } from '@/data/quoteConfig';
 
 interface MedicalCareLegacyQuoteCalculatorProps {
@@ -22,6 +23,9 @@ const MedicalCareLegacyQuoteCalculator: React.FC<MedicalCareLegacyQuoteCalculato
   const currentAccidentalDeathBenefit = medicareLegacyQuoteConfig.accidentalDeathBenefit[selectedTierId];
   const currentBurialCremationAssistance = medicareLegacyQuoteConfig.burialCremationAssistance[selectedTierId];
 
+
+
+
   const calculatePremium = useCallback(() => {
     let premium = medicareLegacyQuoteConfig.basePremiums[selectedTierId];
 
@@ -37,10 +41,10 @@ const MedicalCareLegacyQuoteCalculator: React.FC<MedicalCareLegacyQuoteCalculato
 
     setEstimatedMonthlyPremium(Math.max(0, Math.round(premium)));
   }, [selectedTierId, petType, petAge, petBreed]);
+
     useEffect(() => {
     calculatePremium();
-  },[calculatePremium] ); // Recalculate if these change
-
+  }, [calculatePremium]); // Recalculate if these change
 
   const getAnnualPremium = () => {
     return estimatedMonthlyPremium * 12;
@@ -178,9 +182,9 @@ const MedicalCareLegacyQuoteCalculator: React.FC<MedicalCareLegacyQuoteCalculato
       </div>
 
       <div className="text-center mt-6">
-        <button className="bg-[#8cc63f] hover:bg-[#7eb238] text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors duration-200 shadow-lg">
+        <Link href="/auth/register" className="bg-[#8cc63f] hover:bg-[#7eb238] text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors duration-200 shadow-lg">
           Proceed to Full Application
-        </button>
+        </Link>
       </div>
     </div>
   );

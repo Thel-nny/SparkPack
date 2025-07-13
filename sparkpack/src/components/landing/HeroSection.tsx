@@ -17,18 +17,6 @@ export default function HeroSection() {
                 comprehensive medical insurance with unique memorial services in one simple plan.
               </p>
             </div>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button size="lg" className="bg-[#8cc63f] hover:bg-[#7eb238] text-white px-8 py-4 text-lg">
-                Get Quote Now
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                className="px-8 py-4 text-lg border-[#8cc63f] text-[#8cc63f] hover:bg-[#8cc63f] hover:text-white bg-transparent"
-              >
-                Learn More
-              </Button>
-            </div>
             <div className="flex items-center gap-6 text-sm text-gray-600">
               <div className="flex items-center gap-2">
                 <CheckCircle className="h-5 w-5 text-[#8cc63f]" />

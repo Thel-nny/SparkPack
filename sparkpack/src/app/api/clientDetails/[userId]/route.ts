@@ -2,6 +2,34 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { withAuth } from "@/lib/auth-guard";
 
+export const GET = withAuth(async (req: NextRequest, authenticatedUserId: string, userRole: string) => {
+  try {
+    const url = new URL(req.url);
+    const pathSegments = url.pathname.split("/");
+    const targetUserId = pathSegments[pathSegments.length - 1];
+
+    if (authenticatedUserId !== targetUserId && userRole !== "ADMIN") {
+      return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
+    }
+
+    const clientDetails = await prisma.clientDetails.findUnique({
+      where: { userId: targetUserId },
+    });
+
+    if (!clientDetails) {
+      return NextResponse.json({ success: false, error: "Client details not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({
+      success: true,
+      data: clientDetails,
+    });
+  } catch (error) {
+    console.error("Error fetching client details:", error);
+    return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 });
+  }
+});
+
 export const PUT = withAuth(async (req: NextRequest, authenticatedUserId: string, userRole: string) => {
   try {
     const url = new URL(req.url);
@@ -13,6 +41,13 @@ export const PUT = withAuth(async (req: NextRequest, authenticatedUserId: string
     }
 
     const body = await req.json();
+
+    // Validate advisor field
+    let advisorValue = null;
+    if (body.advisor && typeof body.advisor === "string") {
+      const trimmedAdvisor = body.advisor.trim();
+      advisorValue = trimmedAdvisor === "" || trimmedAdvisor.toUpperCase() === "N/A" ? null : trimmedAdvisor;
+    }
 
     // Update ClientDetails with advisor field
     const updatedClientDetails = await prisma.clientDetails.update({
@@ -31,16 +66,13 @@ export const PUT = withAuth(async (req: NextRequest, authenticatedUserId: string
         province: body.province,
         postalCode: body.postalCode,
         declarationAccuracy: body.declarationAccuracy,
-       advisor: body.advisor ? body.advisor.trim() : null,
+        advisor: advisorValue,
       },
     });
 
-    // If advisor is assigned (not null, not empty, not "N/A"), update related applications' status to APPROVED
-    // Otherwise, set status to APPROVED (or appropriate in-progress status)
-    const advisorAssigned = body.advisor && body.advisor.trim() !== "" && body.advisor.trim().toUpperCase() !== "N/A";
-
-    if (advisorAssigned) {
-      // Update all applications for this user with in-progress statuses to ACTIVE (active)
+    // If advisor is assigned (not null), update related applications' status to ACTIVE
+    // Otherwise, set applications back to APPROVED
+    if (advisorValue) {
       await prisma.application.updateMany({
         where: {
           customerId: targetUserId,
@@ -53,7 +85,6 @@ export const PUT = withAuth(async (req: NextRequest, authenticatedUserId: string
         },
       });
     } else {
-      // Set applications back to in-progress statuses if advisor removed
       await prisma.application.updateMany({
         where: {
           customerId: targetUserId,
@@ -72,6 +103,9 @@ export const PUT = withAuth(async (req: NextRequest, authenticatedUserId: string
     });
   } catch (error) {
     console.error("Error updating client details:", error);
+    if (error instanceof Error) {
+      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    }
     return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 });
   }
 });
