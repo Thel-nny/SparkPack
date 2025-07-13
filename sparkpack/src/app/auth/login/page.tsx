@@ -11,6 +11,8 @@ import validator from "validator";
 import { signIn } from "next-auth/react";
 import { getSession } from "next-auth/react";
 
+import PrivacyPolicyModal from '@/components/ui/PrivacyPolicyModal'; // Adjust the path if you placed it elsewhere, e.g., '@/components/modals/PrivacyPolicyModal'
+
 const MAX_LENGTH = {
   email: 255,
   password: 128,
@@ -24,6 +26,8 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({ email: "", password: "", submit: "" });
   const [isLoading, setIsLoading] = useState(false);
+
+  const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
 
   const validateForm = () => {
     let isValid = true;
@@ -213,15 +217,26 @@ export default function Login() {
             Help
           </a>{" "}
           ·{" "}
-          <a href="/privacy-policy" className="ml-2 hover:underline">
+          {/* --- Modified Privacy Policy Link to open modal --- */}
+          <button
+            type="button" // Use type="button" to prevent form submission
+            onClick={() => setIsPrivacyModalOpen(true)}
+            className="ml-2 hover:underline focus:outline-none" // Tailwind for button styling
+          >
             Privacy Policy
-          </a>{" "}
+          </button>{" "}
           ·{" "}
           <a href="/terms-and-conditions" className="ml-2 hover:underline">
             Terms and Conditions
           </a>
         </div>
       </div>
+
+      {/* --- Render the Privacy Policy Modal --- */}
+      <PrivacyPolicyModal
+        isOpen={isPrivacyModalOpen}
+        onClose={() => setIsPrivacyModalOpen(false)}
+      />
     </div>
   );
 }
