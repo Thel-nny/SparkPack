@@ -48,16 +48,53 @@ const AdvisorActiveApplications: React.FC = () => {
     error,
     setPage,
     currentPage,
+    refetch,
   } = useApplications({
     page: 1,
     limit: itemsPerPage,
-    statusFilter,
+    statusFilter: statusFilter || 'ACTIVE,INACTIVE', // Default to only show ACTIVE and INACTIVE
     productFilter,
     minCoverage,
     maxCoverage,
     startDate,
     endDate,
   });
+
+  // Handler to update advisor in backend for active applications
+  const updateAdvisor = async (applicationId: string, advisorName: string) => {
+    try {
+      // Find the application to getn customerId
+      const application = applications.find(app => app.id === applicationId);
+      if (!application) return;
+
+      // Assuming application has customerId property
+      const customerId = (application as any).customerId || undefined;
+      if (!customerId) {
+        console.error('Customer ID not found for application:', applicationId);
+        return;
+      }
+
+      // Call API to update clientDetails with new advisor
+      const response = await fetch(`/api/clientDetails/${customerId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ advisor: advisorName }),
+      });
+      const result = await response.json();
+      if (result.success) {
+        // Update advisorNames state
+        setAdvisorNames(prev => ({ ...prev, [applicationId]: advisorName }));
+        console.log("Advisor updated successfully for active application.");
+        
+        // Refresh applications list to reflect changes
+        refetch();
+      } else {
+        console.error('Failed to update advisor:', result.error);
+      }
+    } catch (error) {
+      console.error('Error updating advisor:', error);
+    }
+  };
 
   useEffect(() => {
     setPage(1);
@@ -140,6 +177,7 @@ const AdvisorActiveApplications: React.FC = () => {
               showAdvisorAssignment={true}
               loading={loading}
               error={error}
+              updateAdvisor={updateAdvisor}
             />
           )}
         </Card>

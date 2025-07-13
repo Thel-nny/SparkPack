@@ -9,6 +9,26 @@ export async function GET(req: NextRequest) {
       const pathSegments = url.pathname.split('/');
       const targetUserId = pathSegments[pathSegments.length - 1];
 
+      // If no targetUserId in path, and user is admin, return list of all users
+      if (!targetUserId && userRole === 'ADMIN') {
+        const users = await prisma.user.findMany({
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+            phoneNum: true,
+            role: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        });
+        return NextResponse.json({
+          success: true,
+          data: users,
+        });
+      }
+
       // Users can only access their own data unless they're admin
       if (userRole !== 'ADMIN' && userId !== targetUserId) {
         return NextResponse.json(

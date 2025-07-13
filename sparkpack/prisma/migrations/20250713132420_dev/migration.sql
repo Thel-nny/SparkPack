@@ -1,14 +1,5 @@
 -- CreateEnum
-CREATE TYPE "ApplicationStatus" AS ENUM ('ADVISOR_DECLERATION_PENDING', 'SIGNATURE_PROCESS_PENDING', 'SIGNATURE_IN_PROCESS', 'SUBMITTED', 'APPROVED', 'REJECTED');
-
--- CreateEnum
-CREATE TYPE "applicationsstatus" AS ENUM ('SUBMITTED', 'IN_PROGRESS', 'ACTIVE');
-
--- CreateEnum
-CREATE TYPE "submittedstatus" AS ENUM ('SUBMITTED', 'APPROVED', 'DECLINED');
-
--- CreateEnum
-CREATE TYPE "ApplicationProgressStatus" AS ENUM ('IN_PROGRESS', 'COMPLETED', 'ON_HOLD', 'CANCELLED');
+CREATE TYPE "ApplicationStatusSimplified" AS ENUM ('SUBMITTED', 'APPROVED', 'DECLINED', 'ACTIVE', 'INACTIVE');
 
 -- CreateEnum
 CREATE TYPE "PlanType" AS ENUM ('MEDICAL_CARE_INSURANCE', 'LEGACY_INSURANCE', 'MEDICARE_AND_LEGACY_INSURANCE', 'SINGLE_PRODUCT');
@@ -113,8 +104,8 @@ CREATE TABLE "Application" (
     "reimbursement" DOUBLE PRECISION NOT NULL,
     "deductible" DOUBLE PRECISION NOT NULL,
     "coverageAmount" DOUBLE PRECISION,
-    "status" "ApplicationStatus" NOT NULL DEFAULT 'ADVISOR_DECLERATION_PENDING',
-    "progressStatus" "ApplicationProgressStatus" NOT NULL DEFAULT 'IN_PROGRESS',
+    "status" "ApplicationStatusSimplified" NOT NULL DEFAULT 'SUBMITTED',
+    "progressStatus" "ApplicationStatusSimplified" NOT NULL DEFAULT 'ACTIVE',
     "startDate" TIMESTAMP(3) NOT NULL,
     "endDate" TIMESTAMP(3),
     "coverageLength" INTEGER,

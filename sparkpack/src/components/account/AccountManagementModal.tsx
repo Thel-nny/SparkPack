@@ -10,6 +10,7 @@ interface AccountManagementModalProps {
 }
 
 interface FormData {
+  title: any;
   firstName: string;
   middleName: string;
   lastName: string;
@@ -32,6 +33,7 @@ export default function AccountManagementModal({
   onClose,
 }: AccountManagementModalProps) {
   const [formData, setFormData] = useState<FormData>({
+    title: "",
     firstName: "",
     middleName: "",
     lastName: "",
@@ -158,6 +160,7 @@ export default function AccountManagementModal({
             province: formData.province,
             postalCode: formData.postalCode,
             declarationAccuracy: formData.declarationAccuracy,
+            title: formData.title,
           }),
         });
 

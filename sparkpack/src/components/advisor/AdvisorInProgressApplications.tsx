@@ -10,13 +10,14 @@ import PaginationControls from '@/components/advisor/common/PaginationControls';
 
 interface Application {
   id: string;
-  status: 'SIGNATURE_PROCESS_PENDING' | 'SIGNATURE_IN_PROCESS' | string;
+  status: 'APPROVED' | 'SIGNATURE_PROCESS_PENDING' | 'SIGNATURE_IN_PROCESS' | string;
   ensured: string;
   owners: string[];
   product: string;
   coverageAmount: number;
   dateStarted: string;
   policyNumber: string;
+  customerId?: string;
   customer?: {
     firstName: string;
     lastName: string;
@@ -26,49 +27,12 @@ interface Application {
 
 const ITEMS_PER_PAGE = 7;
 
-
 const AdvisorInProgressApplications: React.FC = () => {
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [advisorNames, setAdvisorNames] = useState<Record<string, string>>({});
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
-
-  // Handler to update advisor in backend
-  const updateAdvisor = async (applicationId: string, advisorName: string) => {
-    try {
-      // Find the application to get customerId
-      const application = applications.find(app => app.id === applicationId);
-      if (!application) return;
-
-      // Fix: customer is an object with firstName and lastName, no id property
-      // We need to find customerId from the application object itself
-      // Assuming application has customerId property, else fallback to undefined
-      const customerId = (application as any).customerId || undefined;
-      if (!customerId) {
-        console.error('Customer ID not found for application:', applicationId);
-        return;
-      }
-
-      // Call API to update clientDetails with new advisor
-      const response = await fetch(`/api/clientDetails/${customerId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ advisor: advisorName }),
-      });
-      const result = await response.json();
-      if (result.success) {
-        // Optionally refresh applications list or update state
-        // For simplicity, update advisorNames state
-        setAdvisorNames(prev => ({ ...prev, [applicationId]: advisorName }));
-      } else {
-        console.error('Failed to update advisor:', result.error);
-      }
-    } catch (error) {
-      console.error('Error updating advisor:', error);
-    }
-  };
-
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [productFilter, setProductFilter] = useState<string>('');
   const [minCoverage, setMinCoverage] = useState<string>('');
@@ -82,8 +46,6 @@ const AdvisorInProgressApplications: React.FC = () => {
 
   const [activeFilterDropdown, setActiveFilterDropdown] = useState<string | null>(null);
 
-  const inProgressStatuses = useMemo(() => ['SIGNATURE_PROCESS_PENDING', 'SIGNATURE_IN_PROCESS'], []);
-
   const fetchApplications = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -92,11 +54,13 @@ const AdvisorInProgressApplications: React.FC = () => {
       params.append('page', currentPage.toString());
       params.append('limit', itemsPerPage.toString());
 
-      let statusParam = statusFilter;
-      if (!statusFilter || !inProgressStatuses.includes(statusFilter as any)) {
-        statusParam = inProgressStatuses.join(',');
+      // Only fetch applications with APPROVED or in-progress statuses
+      if (statusFilter && statusFilter !== 'ALL') {
+        params.append('status', statusFilter);
+      } else {
+        // Default to show APPROVED and signature process statuses
+        params.append('status', 'APPROVED,SIGNATURE_PROCESS_PENDING,SIGNATURE_IN_PROCESS');
       }
-      if (statusParam) params.append('status', statusParam);
 
       if (productFilter) params.append('product', productFilter);
       if (minCoverage) params.append('minCoverage', minCoverage);
@@ -104,7 +68,7 @@ const AdvisorInProgressApplications: React.FC = () => {
       if (startDate) params.append('startDate', startDate);
       if (endDate) params.append('endDate', endDate);
 
-      const response = await fetch(`/api/applications?${params.toString()}`);
+      const response = await fetch(`/api/applications/in-progress?${params.toString()}`);
       if (!response.ok) {
         const errorData = await response.json();
         console.error('API Error:', errorData);
@@ -121,6 +85,7 @@ const AdvisorInProgressApplications: React.FC = () => {
           coverageAmount: app.coverageAmount || 0,
           dateStarted: app.startDate ? new Date(app.startDate).toISOString().split('T')[0] : 'N/A',
           policyNumber: app.policyNumber || 'N/A',
+          customerId: app.customerId,
           customer: app.customer,
           advisorName: app.advisorName || undefined,
         }));
@@ -137,7 +102,7 @@ const AdvisorInProgressApplications: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [currentPage, itemsPerPage, statusFilter, productFilter, minCoverage, maxCoverage, startDate, endDate, inProgressStatuses]);
+  }, [currentPage, itemsPerPage, statusFilter, productFilter, minCoverage, maxCoverage, startDate, endDate]);
 
   useEffect(() => {
     fetchApplications();
@@ -146,6 +111,57 @@ const AdvisorInProgressApplications: React.FC = () => {
   useEffect(() => {
     setCurrentPage(1);
   }, [statusFilter, productFilter, minCoverage, maxCoverage, startDate, endDate]);
+
+   const updateAdvisor = useCallback(async (applicationId: string, advisorName: string) => {
+  try {
+    const application = applications.find(app => app.id === applicationId);
+    if (!application) return;
+
+    const customerId = application.customerId || undefined;
+    if (!customerId) {
+      console.error('Customer ID not found for application:', applicationId);
+      return;
+    }
+
+    const response = await fetch(`/api/clientDetails/${customerId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ advisor: advisorName }),
+    });
+
+    const result = await response.json();
+    if (result.success) {
+      setAdvisorNames(prev => ({ ...prev, [applicationId]: advisorName }));
+
+      const statusResponse = await fetch(`/api/applications/${applicationId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'ACTIVE' }),
+      });
+
+      if (statusResponse.ok) {
+        setApplications(prevApps => prevApps.filter(app => app.id !== applicationId));
+        console.log("Application moved to ACTIVE status successfully.");
+      } else {
+        console.error('Failed to update application status to ACTIVE');
+      }
+
+      fetchApplications();
+    } else {
+      console.error('Failed to update advisor:', result.error);
+    }
+  } catch (error) {
+    console.error('Error updating advisor:', error);
+  }
+}, [applications, fetchApplications]);
+
+  // Expose updateAdvisor function globally for ApplicationsTable to call
+  useEffect(() => {
+    (window as any).updateAdvisor = updateAdvisor;
+    return () => {
+      delete (window as any).updateAdvisor;
+    };
+  }, [updateAdvisor]);
 
   const formatCurrency = useCallback((amount: number): string => {
     return new Intl.NumberFormat('en-PH', {
@@ -180,8 +196,7 @@ const AdvisorInProgressApplications: React.FC = () => {
   const paginate = useCallback((pageNumber: number) => setCurrentPage(pageNumber), []);
 
   const inProgressStatusOptions = [
-    'Signature in Process Pending',
-    'Signature in Process',
+    'Approved',
   ];
 
   return (
@@ -233,6 +248,7 @@ const AdvisorInProgressApplications: React.FC = () => {
               showAdvisorAssignment={true}
               loading={loading}
               error={error}
+              updateAdvisor={updateAdvisor}
             />
           )}
         </Card>

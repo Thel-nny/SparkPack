@@ -1,6 +1,6 @@
-export async function fetchApplications(page = 1, limit = 10) {
+export async function fetchApplications(page = 1, limit = 10, category: 'submitted' | 'active' | 'in-progress' = 'submitted') {
   try {
-    const response = await fetch(`/api/applications?page=${page}&limit=${limit}`);
+    const response = await fetch(`/api/applications/${category}/?page=${page}&limit=${limit}`);
     if (!response.ok) {
       throw new Error('Failed to fetch applications');
     }

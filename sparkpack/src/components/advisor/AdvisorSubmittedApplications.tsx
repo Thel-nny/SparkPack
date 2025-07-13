@@ -8,12 +8,12 @@ import ApplicationsTable from '@/components/advisor/common/ApplicationsTable';
 import PaginationControls from '@/components/advisor/common/PaginationControls';
 
 import ApplicationSummaryModal from './applications/ApplicationSummaryModal';
-import { ApplicationFormData } from '@/types/formData';
+import { ApplicationFormData } from '@/types/applicationFormData';
 import { useSession } from "next-auth/react";
 
 interface Application {
   id: string;
-  status: 'SUBMITTED' | 'DECLINED' | string;
+  status: 'SUBMITTED' | 'DECLINED' | 'APPROVED' | string;
   ensured: string;
   owners: string[];
   product: string;
@@ -66,14 +66,22 @@ const AdvisorSubmittedApplications: React.FC = () => {
       const params = new URLSearchParams();
       params.append('page', page.toString());
       params.append('limit', itemsPerPage.toString());
-      if (statusFilter && statusFilter !== 'ALL') params.append('status', statusFilter);
+      
+      // Only fetch applications with SUBMITTED or DECLINED status
+      if (statusFilter && statusFilter !== 'ALL') {
+        params.append('status', statusFilter);
+      } else {
+        // Default to only show SUBMITTED and DECLINED applications
+        params.append('status', 'SUBMITTED,DECLINED');
+      }
+      
       if (productFilter) params.append('product', productFilter);
       if (minCoverage) params.append('minCoverage', minCoverage);
       if (maxCoverage) params.append('maxCoverage', maxCoverage);
       if (startDate) params.append('startDate', startDate);
       if (endDate) params.append('endDate', endDate);
 
-      const response = await fetch(`/api/applications?${params.toString()}`);
+      const response = await fetch(`/api/applications/submitted?${params.toString()}`);
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -192,8 +200,18 @@ const AdvisorSubmittedApplications: React.FC = () => {
         const errorData = await response.json();
         throw new Error(errorData.error || "Failed to update status");
       }
+      
       console.log("Status updated successfully");
-      fetchApplications(currentPage);
+      
+      // If status changed to APPROVED, remove from current list immediately
+      if (newStatus === 'APPROVED') {
+        setApplications(prevApps => prevApps.filter(app => app.id !== appId));
+        // Also refresh the list to ensure consistency
+        fetchApplications(currentPage);
+      } else {
+        // For other status changes, just refresh the list
+        fetchApplications(currentPage);
+      }
     } catch (err: any) {
       console.error("Error updating status:", err);
       setError(err.message || "Error updating status");
@@ -204,7 +222,7 @@ const AdvisorSubmittedApplications: React.FC = () => {
     if (userRole === 'ADVISOR') {
       return ['Submitted', 'Declined'];
     }
-    return ['Submitted', 'Declined'];
+    return ['Submitted', 'Declined', 'Approved'];
   }, [userRole]);
 
   return (
