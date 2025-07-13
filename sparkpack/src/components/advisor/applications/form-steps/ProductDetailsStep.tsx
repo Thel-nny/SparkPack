@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label'; // Assuming Label component exists
 
 // Import sub-components
 import ProductCard from './product-details-subcomponents/ProductCard';
@@ -51,23 +50,23 @@ const productOptions: ProductOption[] = [
   {
     name: 'Medical Care Insurance',
     description: 'Basic Plan',
-    premiumRange: '₱950 - ₱1,700',
-    coverageRange: '₱20,000 - ₱30,000',
+    premiumRange: '₱6,000 - ₱9,600', // Updated annual premium range
+    coverageRange: '₱15,000 - ₱35,000', // Updated coverage range
     details: [
       'Lasts for 1 year (renewable annually)',
-      'Premium payment starts from ₱950 - ₱1,700 per year (monthly options available)',
-      'Coverage up to ₱20,000 - ₱30,000',
+      'Premium payment starts from ₱500 - ₱800 per month (₱6,000 - ₱9,600 per year)', // Updated monthly and annual premium details
+      'Coverage up to ₱15,000 - ₱35,000', // Updated coverage detail
     ],
     iconKey: 'medicalCareIcon',
-    coverageOptions: ['₱20,000', '₱25,000', '₱30,000'],
-    deductibleOptions: ['₱1,000', '₱2,000'],
-    reimbursementOptions: ['70%', '80%'],
+    coverageOptions: ['₱15,000', '₱25,000', '₱35,000'], // Updated coverage options
+    deductibleOptions: ['₱750', '₱1,000', '₱1,500'], // Updated deductible options (reversed order to match lowest first)
+    reimbursementOptions: ['70%', '75%', '80%'], // Updated reimbursement options
     paymentFreqOptions: ['Annually', 'Monthly'],
     fullDetails: {
       'Key Benefits': [
         'Coverage Term: 1 year, renewable annually.',
-        'Annual Premium: Starting from ₱950 - ₱1,700 per year (monthly options available).',
-        'Total Annual Coverage Limit: Up to ₱20,000 - ₱30,000 for covered accidental injuries and illnesses.',
+        'Annual Premium: Starting from ₱6,000 - ₱9,600 per year (monthly options available from ₱500 - ₱800).', // Updated premium details
+        'Total Annual Coverage Limit: Up to ₱15,000 - ₱35,000 for covered accidental injuries and illnesses.', // Updated coverage limit
       ],
       "What's Covered": [
         'Veterinary consultations and check-ups related to covered incidents.',
@@ -87,27 +86,27 @@ const productOptions: ProductOption[] = [
   {
     name: 'Legacy Insurance',
     description: 'Protection & Peace of Mind',
-    premiumRange: '₱700 - ₱1,100',
-    coverageRange: '₱5,000 - ₱20,000',
+    premiumRange: '₱3,120 - ₱4,800', // Updated annual premium range
+    coverageRange: '₱9,000 - ₱18,000', // Updated coverage range
     details: [
       'Lasts for 1 year (renewable annually)',
-      'Premium payment starts from ₱700 - ₱1,100 per year (monthly options available)',
-      'Coverage up to ₱5,000 - ₱20,000'
+      'Premium payment starts from ₱260 - ₱400 per month (₱3,120 - ₱4,800 per year)', // Updated monthly and annual premium details
+      'Coverage up to ₱9,000 - ₱18,000' // Updated coverage detail
     ],
     iconKey: 'legacyInsuranceIcon',
-    coverageOptions: ['₱5,000', '₱10,000', '₱20,000'],
+    coverageOptions: ['₱9,000', '₱12,000', '₱18,000'], // Updated coverage options (added 12,000 as a logical step)
     deductibleOptions: ['₱0', '₱500'],
     reimbursementOptions: ['100%'],
     paymentFreqOptions: ['Annually', 'Monthly'],
     fullDetails: {
       'Key Benefits': [
         'Coverage Term: 1 year, renewable annually.',
-        'Annual Premium: Starting from ₱700 - ₱1,100 per year (monthly options available).',
-        'Total Annual Coverage Limit: Up to ₱5,000 - ₱20,000 for covered incidents.',
+        'Annual Premium: Starting from ₱3,120 - ₱4,800 per year (monthly options available from ₱260 - ₱400).', // Updated premium details
+        'Total Annual Coverage Limit: Up to ₱9,000 - ₱18,000 for covered incidents.', // Updated coverage limit
       ],
       "What's Covered": [
-        'Accidental Death or Essential Euthanasia: Up to ₱12,000 in the event of accidental death or a veterinarian-prescribed essential euthanasia due to covered accidental injuries or severe illnesses (as defined by the policy).',
-        'Burial/Cremation Assistance: Up to ₱9,000 to help cover the costs of your pet\'s dignified farewell.',
+        'Accidental Death or Essential Euthanasia: Up to ₱18,000 in the event of accidental death or a veterinarian-prescribed essential euthanasia due to covered accidental injuries or severe illnesses (as defined by the policy).', // Adjusted maximum based on new range
+        'Burial/Cremation Assistance: Up to ₱9,000 to help cover the costs of your pet\'s dignified farewell.', // Consistent with provided data
       ],
       'Important Notes': [
         'Waiting Periods: Accidental Death: <span class="font-bold">3 days</span>. Essential Euthanasia (illness): <span class="font-bold">14 days</span>.',
@@ -120,39 +119,33 @@ const productOptions: ProductOption[] = [
   {
     name: 'Medicare and Legacy Insurance',
     description: 'Comprehensive Plan',
-    // REVISED premiumRange
-    premiumRange: '₱1,800 - ₱4,500+',
-    // REVISED coverageRange
-    coverageRange: '₱7,500 - ₱80,000',
+    premiumRange: '₱14,400 - ₱21,600', // Updated annual premium range
+    coverageRange: '₱60,000 - ₱100,000', // Updated comprehensive coverage range
     details: [
       'Lasts for 1 year (renewable annually)',
-      'Premium payment starts from ₱1,800 - ₱4,500+ per year (monthly options available, with potential discounts for combined coverage)',
-      // REVISED coverage detail
-      'Coverage up to ₱7,500 - ₱80,000'
+      'Premium payment starts from ₱1,800 - ₱4,500+ per month (₱14,400 - ₱21,600 per year, with potential discounts for combined coverage)', // Updated monthly and annual premium details
+      'Coverage up to ₱60,000 - ₱100,000' // Updated coverage detail
     ],
     iconKey: 'medicareLegacyIcon',
-    // REVISED coverageOptions
-    coverageOptions: ['₱7,500', '₱25,000', '₱50,000', '₱80,000'],
-    // REVISED deductibleOptions
-    deductibleOptions: ['₱3,000', '₱5,000'],
+    coverageOptions: ['₱60,000', '₱80,000', '₱100,000'], // Updated coverage options
+    deductibleOptions: ['₱1,000', '₱1,500'], // Updated deductible options (reversed order to match lowest first)
     reimbursementOptions: ['80%', '90%'],
     paymentFreqOptions: ['Annually', 'Monthly'],
     fullDetails: {
       'Key Benefits': [
         'Coverage Term: 1 year, renewable annually.',
-        'Annual Premium: Starting from ₱1,800 - ₱4,500+ per year (or inquire about our convenient monthly payment options and potential discounts for combined coverage).',
-        // REVISED Total Annual Coverage Limit
-        'Total Annual Coverage Limit: Up to ₱7,500 - ₱80,000 for all covered benefits combined.',
+        'Annual Premium: Starting from ₱14,400 - ₱21,600 per year (or inquire about our convenient monthly payment options from ₱1,800 - ₱4,500+ and potential discounts for combined coverage).', // Updated premium details
+        'Total Annual Coverage Limit: Up to ₱60,000 - ₱100,000 for all covered benefits combined.', // Updated total annual coverage limit
       ],
       "What's Covered": [
-        'Extensive Accidental Injury & Illness Coverage: Up to ₱30,000 for vet consultations, diagnostics (X-rays, MRI, blood work), prescribed medications, surgeries, hospitalization, and emergency care. Covers both minor and major medical events.',
-        'Accidental Death or Essential Euthanasia: Up to ₱15,000 for accidental death or veterinarian-prescribed essential euthanasia due to covered accidental injuries or severe illnesses.',
-        'Burial/Cremation Assistance: Up to ₱10,000 to help cover end-of-life arrangements.',
+        'Extensive Accidental Injury & Illness Coverage: Up to ₱35,000 for vet consultations, diagnostics (X-rays, MRI, blood work), prescribed medications, surgeries, hospitalization, and emergency care. Covers both minor and major medical events.', // Adjusted based on new medical care max
+        'Accidental Death or Essential Euthanasia: Up to ₱18,000 for accidental death or veterinarian-prescribed essential euthanasia due to covered accidental injuries or severe illnesses.', // Adjusted based on new legacy max
+        'Burial/Cremation Assistance: Up to ₱10,000 to help cover end-of-life arrangements.', // Consistent with original, within new legacy range
       ],
       'Important Notes': [
         'Waiting Periods: Accidents: <span class="font-bold">3 days</span>. Illnesses: <span class="font-bold">14 days</span>. Cruciate Ligament Conditions: A longer waiting period of <span class="font-bold">6 months</span> may apply for specific orthopedic conditions like cruciate ligament injuries, or may require a vet waiver.',
         'Exclusions: Pre-existing conditions, Routine/Preventive Care (unless specific wellness add-ons are chosen), Behavioral issues, breeding/pregnancy, or cosmetic procedures. Conditions arising from negligence, intentional harm, or illegal activities.',
-        'Deductibles/Co-payments: A deductible (e.g., a fixed amount per claim) or a co-payment percentage (e.g., you pay 20% of the vet bill, we cover 80%) may apply. Current deductible options are ₱3,000 or ₱5,000. Specified in your full policy document.',
+        'Deductibles/Co-payments: A deductible (e.g., a fixed amount per claim) or a co-payment percentage (e.g., you pay 20% of the vet bill, we cover 80%) may apply. Current deductible options are ₱1,000 or ₱1,500. Specified in your full policy document.', // Updated deductible options
         'Sub-limits: While there\'s a generous overall coverage limit, some specific treatments or conditions may have their own sub-limits (e.g., maximum amount for a single surgery).',
         'Claim Reimbursement: Claims are typically processed on a reimbursement basis, meaning you pay the vet first, then submit your claim for reimbursement up to your coverage limit.',
         'Eligibility: Your pet must be <span class="font-bold">3 months to 8 years old</span> and in good health at the time of enrollment.',
@@ -232,12 +225,11 @@ export const calculatePremium = (
   paymentFrequency: string,
   selectedAddOns: SelectedAddOn[],
   donationPercentage: number,
-  // NEW PARAMETERS for risk assessment
   petAge: number, // Assuming age in years
   petBreed: string, // Assuming breed string
   hasPreExistingConditions: boolean // Assuming boolean
 ): { baseAnnual: number; annualTotal: number; monthlyTotal: number; oneTimeTotal: number; donationAmount: number } => {
-  let basePremium = 0; // Renamed from basePrice for clarity
+  let basePremium = 0;
   const cleanCoverage = parseFloat(coverageAmount?.replace(/[₱,]/g, '') || '0');
   const cleanDeductible = parseFloat(deductible?.replace(/[₱,]/g, '') || '0');
   const cleanReimbursement = parseFloat(reimbursementRate?.replace(/%/g, '') || '0') / 100;
@@ -245,80 +237,74 @@ export const calculatePremium = (
   // 1. Determine Base Premium based on Product and Coverage
   switch (productName) {
     case 'Medical Care Insurance':
-      if (cleanCoverage === 20000) basePremium = 1000; // Adjusted for illustrative purposes
-      if (cleanCoverage === 25000) basePremium = 1300;
-      if (cleanCoverage === 30000) basePremium = 1600;
+      if (cleanCoverage === 15000) basePremium = 6000;
+      else if (cleanCoverage === 25000) basePremium = 7800;
+      else if (cleanCoverage === 35000) basePremium = 9600;
       break;
     case 'Legacy Insurance':
-      if (cleanCoverage === 5000) basePremium = 750;
-      if (cleanCoverage === 10000) basePremium = 900;
-      if (cleanCoverage === 20000) basePremium = 1150;
+      if (cleanCoverage === 9000) basePremium = 3120;
+      else if (cleanCoverage === 12000) basePremium = 3800; // Adjusted based on previous iteration's addition
+      else if (cleanCoverage === 18000) basePremium = 4800;
       break;
     case 'Medicare and Legacy Insurance':
-      if (cleanCoverage === 7500) basePremium = 2000;
-      if (cleanCoverage === 25000) basePremium = 2800;
-      if (cleanCoverage === 50000) basePremium = 3800;
-      if (cleanCoverage === 80000) basePremium = 4800;
+      if (cleanCoverage === 60000) basePremium = 14400;
+      else if (cleanCoverage === 80000) basePremium = 18000;
+      else if (cleanCoverage === 100000) basePremium = 21600;
       break;
     default:
       return { baseAnnual: 0, annualTotal: 0, monthlyTotal: 0, oneTimeTotal: 0, donationAmount: 0 };
   }
 
   // 2. Apply Policy Design Factors (Deductible, Reimbursement)
-  // These are now *multipliers* on the base premium
   let deductibleMultiplier = 1;
   if (productName === 'Medical Care Insurance') {
-    if (cleanDeductible === 1000) deductibleMultiplier = 1.0; // No discount for lower deductible
-    if (cleanDeductible === 2000) deductibleMultiplier = 0.95; // 5% discount for higher deductible
+    if (cleanDeductible === 750) deductibleMultiplier = 1.05;
+    else if (cleanDeductible === 1000) deductibleMultiplier = 1.0;
+    else if (cleanDeductible === 1500) deductibleMultiplier = 0.95;
   } else if (productName === 'Legacy Insurance') {
-    if (cleanDeductible === 0) deductibleMultiplier = 1.0;
-    if (cleanDeductible === 500) deductibleMultiplier = 0.98;
+    if (cleanDeductible === 0) deductibleMultiplier = 1.02;
+    else if (cleanDeductible === 500) deductibleMultiplier = 1.0;
   } else if (productName === 'Medicare and Legacy Insurance') {
-    if (cleanDeductible === 3000) deductibleMultiplier = 1.0;
-    if (cleanDeductible === 5000) deductibleMultiplier = 0.92; // 8% discount for higher deductible
+    if (cleanDeductible === 1000) deductibleMultiplier = 1.05;
+    else if (cleanDeductible === 1500) deductibleMultiplier = 1.0;
   }
 
   let reimbursementMultiplier = 1;
   if (productName === 'Medical Care Insurance') {
-    if (cleanReimbursement === 0.70) reimbursementMultiplier = 0.98; // 2% discount for lower reimbursement
-    if (cleanReimbursement === 0.80) reimbursementMultiplier = 1.0;
+    if (cleanReimbursement === 0.70) reimbursementMultiplier = 0.98;
+    else if (cleanReimbursement === 0.75) reimbursementMultiplier = 1.0;
+    else if (cleanReimbursement === 0.80) reimbursementMultiplier = 1.02;
   } else if (productName === 'Medicare and Legacy Insurance') {
-    if (cleanReimbursement === 0.80) reimbursementMultiplier = 0.95; // 5% discount for lower reimbursement
-    if (cleanReimbursement === 0.90) reimbursementMultiplier = 1.0;
+    if (cleanReimbursement === 0.80) reimbursementMultiplier = 0.98;
+    else if (cleanReimbursement === 0.90) reimbursementMultiplier = 1.02;
   }
-  // Legacy Insurance has 100% reimbursement, so no multiplier needed there based on current options
 
   basePremium *= deductibleMultiplier * reimbursementMultiplier;
 
-  // 3. Apply Pet-Specific Risk Factors (Illustrative placeholders)
+  // 3. Apply Pet-Specific Risk Factors
   let ageRiskFactor = 1.0;
-  if (petAge > 8) ageRiskFactor = 1.2; // 20% surcharge for older pets
-  else if (petAge < 1) ageRiskFactor = 1.05; // 5% surcharge for very young pets (initial health checks)
-  else if (petAge >= 1 && petAge <= 8) ageRiskFactor = 1.0; // Base for prime age
+  if (petAge > 8) ageRiskFactor = 1.25;
+  else if (petAge < 1) ageRiskFactor = 1.10;
+  else if (petAge >= 1 && petAge <= 8) ageRiskFactor = 1.0;
 
   let breedRiskFactor = 1.0;
-  // This would ideally come from a lookup table mapping breeds to risk levels
-  // For demonstration, let's assume some high-risk breeds
-  const highRiskBreeds = ['Bulldog', 'Pug', 'German Shepherd', 'Labrador Retriever']; // Example breeds prone to certain issues
+  const highRiskBreeds = ['Bulldog', 'Pug', 'German Shepherd', 'Labrador Retriever', 'Dachshund', 'Great Dane'];
   if (highRiskBreeds.includes(petBreed)) {
-    breedRiskFactor = 1.15; // 15% surcharge for high-risk breeds
+    breedRiskFactor = 1.18;
   }
 
   let preExistingConditionSurcharge = 0;
   if (hasPreExistingConditions) {
-    // This is often an exclusion, or a significant surcharge if covered at all
-    // For this calculator, let's assume a fixed surcharge or a very high multiplier
-    preExistingConditionSurcharge = 500; // Example fixed annual surcharge
-    // Or, a multiplier: basePremium *= 1.5; // 50% increase
+    preExistingConditionSurcharge = basePremium * 0.30;
   }
 
-  // Apply pet-specific factors to the base premium
-  basePremium = basePremium * ageRiskFactor * breedRiskFactor + preExistingConditionSurcharge;
+  basePremium = (basePremium * ageRiskFactor * breedRiskFactor) + preExistingConditionSurcharge;
 
   // 4. Calculate Add-on Costs
   let annualAddOnCost = 0;
   let oneTimeAddOnCost = 0;
   selectedAddOns.forEach(addOn => {
+    // Assuming addOnDefinitions is accessible in this scope (e.g., imported)
     const def = addOnDefinitions.find(d => d.id === addOn.id);
     if (def) {
       if (def.type === 'annual') {
@@ -329,8 +315,9 @@ export const calculatePremium = (
     }
   });
 
-  // 5. Calculate Donation Amount
   const totalAnnualPremiumBeforeDonation = basePremium + annualAddOnCost;
+
+  // 5. Calculate Donation Amount
   let calculatedDonationAmount = (totalAnnualPremiumBeforeDonation * (donationPercentage / 100));
   let finalAnnualTotalPremium = totalAnnualPremiumBeforeDonation + calculatedDonationAmount;
 
@@ -341,16 +328,18 @@ export const calculatePremium = (
       finalMonthlyTotalPremium *= monthlySurchargeFactor;
   }
 
-  // Rounding
+  // Rounding for currency
+  // Round annualTotal to the nearest whole number for a cleaner look.
+  // Keep monthlyTotal and donationAmount to two decimal places for precision.
   finalAnnualTotalPremium = Math.round(finalAnnualTotalPremium);
-  finalMonthlyTotalPremium = Math.round(finalMonthlyTotalPremium * 100) / 100; // Keep 2 decimal places for monthly
-  calculatedDonationAmount = Math.round(calculatedDonationAmount * 100) / 100;
+  finalMonthlyTotalPremium = parseFloat(finalMonthlyTotalPremium.toFixed(2));
+  calculatedDonationAmount = parseFloat(calculatedDonationAmount.toFixed(2));
 
   return {
-    baseAnnual: Math.round(basePremium), // This now reflects the base premium with policy design and pet risk factors
+    baseAnnual: parseFloat(basePremium.toFixed(2)), // Base premium reflecting all factors before add-ons and donation
     annualTotal: finalAnnualTotalPremium,
     monthlyTotal: finalMonthlyTotalPremium,
-    oneTimeTotal: oneTimeAddOnCost,
+    oneTimeTotal: parseFloat(oneTimeAddOnCost.toFixed(2)),
     donationAmount: calculatedDonationAmount
   };
 };
