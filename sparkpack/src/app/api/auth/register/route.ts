@@ -3,33 +3,34 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
 import { getToken } from "next-auth/jwt";
 import { ApplicationStatusSimplified } from "@prisma/client";
-import nodemailer from "nodemailer";
+// import nodemailer from "nodemailer";
 
-async function sendWelcomeEmail(toEmail: string, username: string) {
-  const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT) || 587,
-    secure: false,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
+// async function sendWelcomeEmail(toEmail: string, username: string) {
+//   const transporter = nodemailer.createTransport({
+//     host: process.env.SMTP_HOST,
+//     port: Number(process.env.SMTP_PORT) || 587,
+//     secure: false,
+//     auth: {
+//       user: process.env.SMTP_USER,
+//       pass: process.env.SMTP_PASS,
+//     },
+//   });
 
-  const mailOptions = {
-    from: `"SparkPack Support" <${process.env.SMTP_USER}>`,
-    to: toEmail,
-    subject: "Welcome to SparkPack",
-    text: `Hello ${username},\n\nThank you for registering at SparkPack! We're excited to have you on board.`,
-    html: `<p>Hello <strong>${username}</strong>,</p><p>Thank you for registering at SparkPack! We're excited to have you on board.</p>`,
-  };
+//   const mailOptions = {
+//     from: `"SparkPack Support" <${process.env.SMTP_USER}>`,
+//     to: toEmail,
+//     subject: "Welcome to SparkPack",
+//     text: `Hello ${username},\n\nThank you for registering at SparkPack! We're excited to have you on board.`,
+//     html: `<p>Hello <strong>${username}</strong>,</p><p>Thank you for registering at SparkPack! We're excited to have you on board.</p>`,
+//   };
 
-  await transporter.sendMail(mailOptions);
-}
+//   await transporter.sendMail(mailOptions);
+// }
 
 export async function POST(req: NextRequest) {
   try {
-    const { username, email, password, role, phoneNum } = await req.json();
+    const reqBody = await req.json();
+    const { username, email, password, role, phoneNum } = reqBody;
 
     if (!username || !email || !password || !role) {
       return NextResponse.json({ error: "All fields are required." }, { status: 400 });
@@ -80,14 +81,15 @@ export async function POST(req: NextRequest) {
     });
 
     // Send welcome email after user creation
-    try {
-      await sendWelcomeEmail(email, username);
-    } catch (emailError) {
-      console.error("Failed to send welcome email:", emailError);
-    }
+    // try {
+    //   await sendWelcomeEmail(email, username);
+    // } catch (emailError) {
+    //   console.error("Failed to send welcome email:", emailError);
+    // }
 
     // If role is CUSTOMER, create ClientDetails record
     if (role === "CUSTOMER") {
+      // The request body has already been read above, so reuse the parsed data
       const {
         firstName,
         lastName,
@@ -102,7 +104,7 @@ export async function POST(req: NextRequest) {
         province,
         postalCode,
         declarationAccuracy,
-      } = await req.json();
+      } = reqBody;
 
       await prisma.clientDetails.create({
         data: {

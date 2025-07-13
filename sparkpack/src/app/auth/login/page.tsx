@@ -10,6 +10,10 @@ import { useRouter } from "next/navigation";
 import validator from "validator";
 import { signIn } from "next-auth/react";
 import { getSession } from "next-auth/react";
+import Link from "next/link";
+
+import PrivacyPolicyModal from '@/components/ui/PrivacyPolicyModal';
+import TermsAndConditionsModal from '@/components/ui/TermsAndConditionsModal';
 
 const MAX_LENGTH = {
   email: 255,
@@ -24,6 +28,9 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({ email: "", password: "", submit: "" });
   const [isLoading, setIsLoading] = useState(false);
+
+  const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
+  const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
 
   const validateForm = () => {
     let isValid = true;
@@ -101,6 +108,7 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-[#f5f7f8] p-2 md:p-4">
       <div className="z-10 w-full max-w-md p-6 md:px-8 lg:px-10 rounded-lg bg-white bg-opacity-95 border-2 border-gray-400 shadow-md">
         <div className="flex flex-col items-center mb-2 md:mb-4">
+          <Link href={"/"}>
           <Image
             src="/Furrest_Logo-04.svg"
             width={120}
@@ -111,6 +119,7 @@ export default function Login() {
           <p className="text-base md:text-lg font-semibold text-[#7eb238]">
             SparkPack
           </p>
+          </Link>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -158,6 +167,7 @@ export default function Login() {
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300"
+                aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? (
                   <EyeOff className="h-4 w-4" />
@@ -172,7 +182,7 @@ export default function Login() {
           </div>
           <div className="flex justify-between items-center">
             <a
-              href="/auth/reset-password"
+              href="/client/account/management"
               className="text-sm text-[#8cc63f] hover:underline"
             >
               Forgot Password?
@@ -213,15 +223,33 @@ export default function Login() {
             Help
           </a>{" "}
           ·{" "}
-          <a href="/privacy-policy" className="ml-2 hover:underline">
+          <button
+            type="button"
+            onClick={() => setIsPrivacyModalOpen(true)}
+            className="ml-2 hover:underline focus:outline-none"
+          >
             Privacy Policy
-          </a>{" "}
+          </button>{" "}
           ·{" "}
-          <a href="/terms-and-conditions" className="ml-2 hover:underline">
+          <button
+            type="button"
+            onClick={() => setIsTermsModalOpen(true)}
+            className="ml-2 hover:underline focus:outline-none"
+          >
             Terms and Conditions
-          </a>
+          </button>
         </div>
       </div>
+
+      <PrivacyPolicyModal
+        isOpen={isPrivacyModalOpen}
+        onClose={() => setIsPrivacyModalOpen(false)}
+      />
+
+      <TermsAndConditionsModal
+        isOpen={isTermsModalOpen}
+        onClose={() => setIsTermsModalOpen(false)}
+      />
     </div>
   );
 }

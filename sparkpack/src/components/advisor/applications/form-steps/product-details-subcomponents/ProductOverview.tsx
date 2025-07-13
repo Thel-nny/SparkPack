@@ -1,6 +1,6 @@
 import React from 'react';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
-import { ProductOption } from '@/types/formData'; // Assuming ProductOption is defined here
+import { ProductOption } from '@/types/applicationFormData'; // Updated import path
 
 interface ProductOverviewProps {
   selectedProductData: ProductOption | undefined;
