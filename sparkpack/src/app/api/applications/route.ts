@@ -343,8 +343,8 @@ export async function POST(req: NextRequest) {
         data: application,
         message: "Application created successfully",
       });
-    } catch{
-      console.error("Error creating application:");
+    } catch(error){
+      console.error("Error creating application:", error);
       return NextResponse.json(
         { success: false, error: "Internal server error" },
         { status: 500 }

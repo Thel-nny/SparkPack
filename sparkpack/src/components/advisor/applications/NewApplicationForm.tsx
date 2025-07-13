@@ -1,155 +1,66 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from 'react';
-import ApplicationStepNavbar from './ApplicationStepNavbar';
-import ClientDetailsStep from './form-steps/ClientDetailsStep';
-import PetDetailsStep from './form-steps/PetDetailsStep';
-import ProductDetailsStep from './form-steps/ProductDetailsStep';
-import PaymentDetailsStep from './form-steps/PaymentDetailsStep';
-import SummaryDetailsStep from './form-steps/SummaryDetailsStep'; 
-import SubmitStep from './form-steps/SubmitStep';
-import { ApplicationFormData, ClientDetails, PetDetails, ProductDetails, PaymentDetails, SelectedAddOn } from '@/types/applicationFormData'; 
-import { createApplication, updateApplication } from '@/lib/api/applications';
+import React from 'react';
 import { useRouter } from 'next/navigation';
-import MessageModal from '@/components/ui/MessageModal'; // Import the new MessageModal
-
-// Define a type for the ref to the step components' validation functions
-type StepValidationRef = {
-  validate: () => boolean;
-};
-
-const applicationSteps = [
-  { id: 1, name: 'Client Details' },
-  { id: 2, name: 'Pet Details' },
-  { id: 3, name: 'Product Details' },
-  { id: 4, name: 'Payment Details' },
-  { id: 5, name: 'Summary' },
-  { id: 6, name: 'Sign & Submit' }, 
-];
+import { createApplication, updateApplication } from '@/lib/api/applications';
+import MessageModal from '@/components/ui/MessageModal';
+import { useApplicationFormData } from './hooks/useApplicationFormData';
+import { useModal } from './hooks/useModal';
+import ApplicationFormStepper from './ApplicationFormStepper';
+import { useSession } from "next-auth/react";
 
 const NewApplicationForm: React.FC = () => {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { formData, updateFormData } = useApplicationFormData();
+  const {
+    showModal,
+    modalMessage,
+    modalType,
+    modalTitle,
+    openModal,
+    closeModal,
+  } = useModal();
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
   const router = useRouter();
+  const { data: session } = useSession();
 
-  // State for MessageModal
-  const [showModal, setShowModal] = useState(false);
-  const [modalMessage, setModalMessage] = useState('');
-  const [modalType, setModalType] = useState<'success' | 'error' | 'info'>('info');
-  const [modalTitle, setModalTitle] = useState('');
+  React.useEffect(() => {
+    if (!session?.user?.id) return;
 
-  // Ref to hold the validation function of the current step component
-  const stepRef = useRef<StepValidationRef | null>(null);
+    const userId = session.user.id;
 
-  const [formData, setFormData] = useState<ApplicationFormData>({
-    client: {
-      // Initialize with default values to match ClientDetails interface
-      firstName: '',
-      lastName: '',
-      dob: '',
-      gender: '',
-      phoneNumber: '', // Now required as per applicationFormData.ts
-      email: '',
-      streetAddress: '',
-      country: 'Philippines',
-      city: 'Iloilo City',
-      province: 'Iloilo',
-      postalCode: '5000',
-      declarationAccuracy: false,
-      title: '',
-      allowPhoneCollection: false,
-      pob: '',
-      middleName: '',
-    },
-    pet: {
-      // Initialize with default values to match PetDetails interface
-      petName: '',
-      dobOrAdoptionDate: '',
-      weight: '',
-      gender: '',
-      species: '',
-      breed: '',
-      spayedNeutered: '',
-      vaccinationStatus: '',
-      lifestyle: '',
-      chronicIllness: '',
-      surgeryHistory: '',
-      recurringConditions: '',
-      onMedication: '',
-      estimatedAge: '',
-      otherSpecies: '',
-      otherBreed: '',
-      microchipNumber: '',
-      colorMarkings: '',
-      chronicIllnessExplanation: '',
-      surgeryHistoryExplanation: '',
-      recurringConditionsExplanation: '',
-      onMedicationExplanation: '',
-      vetName: '',
-      vetClinicName: '',
-      clinicPhoneNumber: '',
-      clinicAddress: '',
-      lastVetVisitDate: '',
-    },
-    product: {
-      // Initialize with default values to match ProductDetails interface
-      productName: '',
-      planType: '',
-      coverageAmount: '',
-      deductible: '',
-      reimbursementRate: '',
-      paymentFrequency: '',
-      startDate: new Date().toISOString().split('T')[0],
-      coverageLength: '1 Year',
-      selectedAddOns: [] as SelectedAddOn[], // Correctly initialized as SelectedAddOn[]
-      donationPercentage: 0,
-    },
-    payment: {
-      // Initialize with default values to match the explicit PaymentDetails interface
-      paymentMethod: '',
-      cardNumber: '',
-      cardName: '',
-      expiryDate: '',
-      cvv: '',
-      bankName: '',
-      accountNumber: '',
-      accountName: '',
-      gcashNumber: '',
-      gcashName: '',
-    },
-  });
-
-  const updateFormData = <T extends keyof ApplicationFormData>(field: T, data: Partial<ApplicationFormData[T]>) => {
-    setFormData((prevData: ApplicationFormData) => ({
-      ...prevData,
-      [field]: { ...prevData[field], ...data },
-    }));
-  };
-
-  const handleNextStep = () => {
-    // Attempt to validate the current step using the ref
-    if (stepRef.current && !stepRef.current.validate()) {
-      setModalTitle('Validation Error');
-      setModalMessage('Please correct the errors in the current step before proceeding.');
-      setModalType('error');
-      setShowModal(true);
-      return; // Prevent progression if validation fails
+    async function fetchClientDetails() {
+      try {
+        const response = await fetch(`/api/clientDetails/${userId}`);
+        const result = await response.json();
+        if (result.success && result.data) {
+          const clientData = result.data;
+          updateFormData('client', {
+            firstName: clientData.firstName || '',
+            lastName: clientData.lastName || '',
+            dob: clientData.dob ? new Date(clientData.dob).toISOString().split('T')[0] : '',
+            gender: clientData.gender || '',
+            phoneNumber: clientData.phoneNumber || '',
+            email: clientData.email || '',
+            streetAddress: clientData.streetAddress || '',
+            country: clientData.country || 'Philippines',
+            city: clientData.city || 'Iloilo City',
+            province: clientData.province || 'Iloilo',
+            postalCode: clientData.postalCode || '5000',
+            declarationAccuracy: clientData.declarationAccuracy || false,
+            title: clientData.title || '',
+            allowPhoneCollection: clientData.allowPhoneCollection || false,
+            pob: clientData.pob || '',
+            middleName: clientData.middleName || '',
+          });
+        }
+      } catch (error) {
+        console.error("Failed to fetch client details:", error);
+      }
     }
 
-    if (currentStep === applicationSteps.length) {
-      handleSubmit();
-    } else {
-      setCurrentStep((prevStep) => prevStep + 1);
-    }
-  };
+    fetchClientDetails();
+  }, [session, updateFormData]);
 
-  const handlePrevStep = () => {
-    if (currentStep > 1) {
-      setCurrentStep((prevStep) => prevStep - 1);
-    }
-  };
-
-  // Centralized final validation before submission
   const validateAllFormData = (): boolean => {
     const errors: string[] = [];
 
@@ -158,13 +69,12 @@ const NewApplicationForm: React.FC = () => {
     if (!formData.client.firstName) errors.push('Client First Name is required.');
     if (!formData.client.lastName) errors.push('Client Last Name is required.');
     if (!formData.client.email || !/\S+@\S+\.\S+/.test(formData.client.email)) errors.push('Valid Client Email is required.');
-    if (!formData.client.phoneNumber) errors.push('Client Phone Number is required.'); // Now required
+    if (!formData.client.phoneNumber) errors.push('Client Phone Number is required.');
     if (!formData.client.dob) errors.push('Client Date of Birth is required.');
     if (!formData.client.pob) errors.push('Client Place of Birth is required.');
     if (!formData.client.gender) errors.push('Client Gender is required.');
     if (!formData.client.streetAddress) errors.push('Client Street Address is required.');
     if (!formData.client.declarationAccuracy) errors.push('Declaration Accuracy must be confirmed.');
-
 
     // Pet Details validation
     if (!formData.pet.petName) errors.push('Pet Name is required.');
@@ -187,7 +97,6 @@ const NewApplicationForm: React.FC = () => {
     if (!formData.pet.vetClinicName) errors.push('Veterinary Clinic Name is required.');
     if (!formData.pet.clinicPhoneNumber) errors.push('Clinic Phone Number is required.');
     if (!formData.pet.clinicAddress) errors.push('Clinic Address is required.');
-
 
     // Product Details validation
     if (!formData.product.productName) errors.push('Product Name is required.');
@@ -216,10 +125,7 @@ const NewApplicationForm: React.FC = () => {
     }
 
     if (errors.length > 0) {
-      setModalTitle('Submission Failed: Missing Information');
-      setModalMessage(`Please complete all required fields:\n- ${errors.join('\n- ')}`);
-      setModalType('error');
-      setShowModal(true);
+      openModal('Submission Failed: Missing Information', `Please complete all required fields:\n- ${errors.join('\n- ')}`, 'error');
       return false;
     }
     return true;
@@ -228,16 +134,13 @@ const NewApplicationForm: React.FC = () => {
   const handleSubmit = async () => {
     console.log('Final Form Submission Attempt:', formData);
 
-    // Perform final comprehensive validation
     if (!validateAllFormData()) {
-      // Errors will be shown via MessageModal by validateAllFormData
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      // Sanitize deductible to remove currency symbols and commas before sending
       const sanitizedProduct = {
         ...formData.product,
         deductible: formData.product.deductible.replace(/[^0-9.-]+/g, ''),
@@ -252,7 +155,6 @@ const NewApplicationForm: React.FC = () => {
 
       const response = await createApplication(applicationData);
 
-      // After successful creation, update status to SUBMITTED
       if (response.data && response.data.id) {
         const statusUpdate = { updateData: { status: 'SUBMITTED' } };
         await updateApplication(response.data.id, statusUpdate);
@@ -260,123 +162,31 @@ const NewApplicationForm: React.FC = () => {
         throw new Error('Application ID not returned from creation.');
       }
 
-      setModalTitle('Application Submitted!');
-      setModalMessage('Your application has been submitted successfully.');
-      setModalType('success');
-      setShowModal(true);
-      // router.push('/advisor/dashboard'); // Will navigate after modal close
-    } catch(error){
+      openModal('Application Submitted!', 'Your application has been submitted successfully.', 'success');
+    } catch (error) {
       console.error('Error submitting application:', error);
-      setModalTitle('Submission Failed');
-      setModalMessage(`Submission failed: ${error instanceof Error ? error.message : 'An unknown error occurred.'}`);
-      setModalType('error');
-      setShowModal(true);
+      openModal('Submission Failed', `Submission failed: ${error instanceof Error ? error.message : 'An unknown error occurred.'}`, 'error');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const renderStepContent = () => {
-    // Derive pet-specific risk factors from formData.pet
-    const petAge = parseInt(formData.pet.estimatedAge || '0', 10);
-    const petBreed = formData.pet.breed;
-    const hasPreExistingConditions = 
-      formData.pet.chronicIllness === 'Yes' ||
-      formData.pet.surgeryHistory === 'Yes' ||
-      formData.pet.recurringConditions === 'Yes' ||
-      formData.pet.onMedication === 'Yes';
-
-    switch (currentStep) {
-      case 1:
-        return (
-          <ClientDetailsStep
-            ref={stepRef} // Attach ref to get validation function
-            formData={formData.client}
-            onUpdate={(data) => updateFormData('client', data)}
-            onNext={handleNextStep}
-          />
-        );
-      case 2:
-        return (
-          <PetDetailsStep
-            ref={stepRef}
-            formData={formData.pet}
-            onUpdate={(data) => updateFormData('pet', data)}
-            onNext={handleNextStep}
-            onPrev={handlePrevStep}
-          />
-        );
-      case 3:
-        return (
-          <ProductDetailsStep
-            ref={stepRef}
-            formData={formData.product}
-            onUpdate={(data) => updateFormData('product', data)}
-            onNext={handleNextStep}
-            onPrev={handlePrevStep}
-            // Pass the derived pet-specific risk factors
-            petAge={petAge}
-            petBreed={petBreed}
-            hasPreExistingConditions={hasPreExistingConditions}
-          />
-        );
-      case 4:
-        return (
-          <PaymentDetailsStep
-            ref={stepRef} // Add ref prop
-            formData={formData.payment}
-            productDetails={formData.product}
-            onUpdate={(data) => updateFormData('payment', data)}
-            onNext={handleNextStep}
-            onPrev={handlePrevStep}
-          />
-        );
-      case 5:
-        return (
-          <SummaryDetailsStep
-            ref={stepRef} // Add ref prop
-            formData={formData}
-            onNext={handleNextStep}
-            onPrev={handlePrevStep}
-          />
-        );
-      case 6:
-        return (
-          <SubmitStep
-            ref={stepRef} // Add ref prop
-            formData={formData}
-            onPrev={handlePrevStep}
-            onSubmit={handleSubmit}
-            isSubmitting={isSubmitting}
-          />
-        );
-      default:
-        return <div className="p-4 text-center text-red-500">Error: Invalid step.</div>;
-    }
-  };
-
   const handleModalClose = () => {
-    setShowModal(false);
     if (modalType === 'success') {
-      router.push('/advisor/dashboard'); // Navigate only after successful submission and modal close
+      router.push('/advisor/dashboard');
     }
+    closeModal();
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
-      <ApplicationStepNavbar currentStepId={currentStep} steps={applicationSteps} />
-      <div className="flex-1 py-8 px-4 overflow-y-auto">
-        <div className="bg-white p-6 rounded-lg shadow-md max-w-6xl w-full mx-auto flex flex-col min-h-[calc(100vh-160px)]">
-          {isSubmitting ? (
-            <div className="flex items-center justify-center h-full text-lg text-[#8cc63f]">
-              <p>Submitting your application, please wait...</p>
-            </div>
-          ) : (
-            renderStepContent()
-          )}
-        </div>
-      </div>
-
+    <>
+      <ApplicationFormStepper
+        formData={formData}
+        onUpdate={updateFormData}
+        onSubmit={handleSubmit}
+        isSubmitting={isSubmitting}
+        openModal={openModal}
+      />
       {showModal && (
         <MessageModal
           message={modalMessage}
@@ -385,7 +195,7 @@ const NewApplicationForm: React.FC = () => {
           title={modalTitle}
         />
       )}
-    </div>
+    </>
   );
 };
 

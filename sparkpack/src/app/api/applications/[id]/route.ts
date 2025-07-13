@@ -240,24 +240,26 @@ export async function PUT(req: NextRequest) {
           },
         });
 
-        // Generate temporary password
-        const tempPassword = generateTempPassword();
+        if (userRole === "ADMIN") {
+          // Generate temporary password
+          const tempPassword = generateTempPassword();
 
-        // Hash the temporary password
-        const hashedPassword = await bcrypt.hash(tempPassword, 10);
+          // Hash the temporary password
+          const hashedPassword = await bcrypt.hash(tempPassword, 10);
 
-        // Update the user's password in the database
-        await prisma.user.update({
-          where: { id: application.customer.id },
-          data: { password: hashedPassword },
-        });
+          // Update the user's password in the database
+          await prisma.user.update({
+            where: { id: application.customer.id },
+            data: { password: hashedPassword },
+          });
 
-        // Send the temporary password email
-        await sendTempPasswordEmail(
-          application.customer.email,
-          tempPassword,
-          application.customer.firstName || ""
-        );
+          // Send the temporary password email
+          await sendTempPasswordEmail(
+            application.customer.email,
+            tempPassword,
+            application.customer.firstName || ""
+          );
+        }
 
         return NextResponse.json({
           success: true,

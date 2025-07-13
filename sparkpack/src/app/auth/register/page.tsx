@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Eye, EyeOff } from "lucide-react";
 import { CheckedState } from "@radix-ui/react-checkbox";
-
+import Link from "next/link";
 import PrivacyPolicyModal from '@/components/ui/PrivacyPolicyModal';
 import TermsAndConditionsModal from '@/components/ui/TermsAndConditionsModal'; // Ensure this path is correct
 
@@ -167,10 +167,11 @@ export default function Register() {
     <div className="min-h-screen flex items-center justify-center bg-[#f5f7f8] p-2 md:p-4">
       <div className="z-10 w-full max-w-md p-4 md:px-6 lg:px-8 rounded-lg bg-white bg-opacity-95 border-2 border-gray-400 shadow-md">
         <div className="flex flex-col items-center mb-1 md:mb-2">
-          <img src="/Furrest_Logo-04.svg" width={100} height={100} alt="Furrest logo" className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full" />
+         <Link href={"/"}><img src="/Furrest_Logo-04.svg" width={100} height={100} alt="Furrest logo" className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full"/>
           <p className="text-base md:text-lg font-semibold text-[#7eb238]">
             SparkPack
           </p>
+          </Link> 
         </div>
         <form onSubmit={handleSubmit} className="space-y-2">
           {/* First Name and Last Name */}

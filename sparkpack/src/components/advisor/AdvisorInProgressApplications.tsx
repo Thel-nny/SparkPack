@@ -10,7 +10,7 @@ import PaginationControls from '@/components/advisor/common/PaginationControls';
 
 interface Application {
   id: string;
-  status: 'APPROVED' | 'SIGNATURE_PROCESS_PENDING' | 'SIGNATURE_IN_PROCESS' | string;
+  status: 'APPROVED' | string;
   ensured: string;
   owners: string[];
   product: string;
@@ -58,8 +58,8 @@ const AdvisorInProgressApplications: React.FC = () => {
       if (statusFilter && statusFilter !== 'ALL') {
         params.append('status', statusFilter);
       } else {
-        // Default to show APPROVED and signature process statuses
-        params.append('status', 'APPROVED,SIGNATURE_PROCESS_PENDING,SIGNATURE_IN_PROCESS');
+        // Default to show APPROVED status only
+        params.append('status', 'APPROVED');
       }
 
       if (productFilter) params.append('product', productFilter);

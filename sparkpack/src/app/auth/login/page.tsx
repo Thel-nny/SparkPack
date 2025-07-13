@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import validator from "validator";
 import { signIn } from "next-auth/react";
 import { getSession } from "next-auth/react";
+import Link from "next/link";
 
 import PrivacyPolicyModal from '@/components/ui/PrivacyPolicyModal';
 import TermsAndConditionsModal from '@/components/ui/TermsAndConditionsModal';
@@ -107,6 +108,7 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-[#f5f7f8] p-2 md:p-4">
       <div className="z-10 w-full max-w-md p-6 md:px-8 lg:px-10 rounded-lg bg-white bg-opacity-95 border-2 border-gray-400 shadow-md">
         <div className="flex flex-col items-center mb-2 md:mb-4">
+          <Link href={"/"}>
           <Image
             src="/Furrest_Logo-04.svg"
             width={120}
@@ -117,6 +119,7 @@ export default function Login() {
           <p className="text-base md:text-lg font-semibold text-[#7eb238]">
             SparkPack
           </p>
+          </Link>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -179,7 +182,7 @@ export default function Login() {
           </div>
           <div className="flex justify-between items-center">
             <a
-              href="/auth/reset-password"
+              href="/client/account/management"
               className="text-sm text-[#8cc63f] hover:underline"
             >
               Forgot Password?
