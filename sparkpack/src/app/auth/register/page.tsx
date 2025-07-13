@@ -7,10 +7,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Eye, EyeOff } from "lucide-react";
 import { CheckedState } from "@radix-ui/react-checkbox";
 
-// --- Import the PrivacyPolicyModal ---
-import PrivacyPolicyModal from '@/components/ui/PrivacyPolicyModal'; // Adjust the path if you placed it elsewhere
+import PrivacyPolicyModal from '@/components/ui/PrivacyPolicyModal';
+import TermsAndConditionsModal from '@/components/ui/TermsAndConditionsModal'; // Ensure this path is correct
 
-// Re-defining Spinner here for self-containment, but ideally it's imported
 const Spinner = ({ size = "small" }) => {
   const spinnerSize = size === "small" ? "h-4 w-4" : "h-6 w-6";
   return (
@@ -42,8 +41,8 @@ export default function Register() {
   const [errors, setErrors] = useState({ firstName: "", lastName: "", phoneNumber: "", email: "", password: "", confirmPassword: "", role: "", submit: "" });
   const [isLoading, setIsLoading] = useState(false);
 
-  // --- State for the Privacy Policy Modal ---
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
+  const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
 
 
   const isValidEmail = (email: string) => {
@@ -314,26 +313,33 @@ export default function Register() {
           <p className="text-sm text-gray-500">Already have an account? <a href={`/auth/login`} className="text-[#8cc63f] hover:underline">Log in here</a></p>
         </div>
         <div className="mt-4 text-center text-xs text-gray-500">
-          <a href="mailto:partnerships.iloilo@sparkpack.org" className="hover:underline">Help</a> · {/* Note: Your email says iloilo, but location is Cebu. Confirm correct email */}
-          {/* --- Modified Privacy Policy Link to open modal --- */}
+          <a href="mailto:partnerships.iloilo@sparkpack.org" className="hover:underline">Help</a> ·
           <button
-            type="button" // Use type="button" to prevent form submission
+            type="button"
             onClick={() => setIsPrivacyModalOpen(true)}
-            className="ml-2 hover:underline focus:outline-none" // Tailwind for button styling
+            className="ml-2 hover:underline focus:outline-none"
           >
             Privacy Policy
           </button>{" "}
           ·{" "}
-          <a href="/terms-and-conditions" className="ml-2 hover:underline">
+          <button
+            type="button"
+            onClick={() => setIsTermsModalOpen(true)} // Open Terms modal
+            className="ml-2 hover:underline focus:outline-none"
+          >
             Terms and Conditions
-          </a>
+          </button>
         </div>
       </div>
 
-      {/* --- Render the Privacy Policy Modal --- */}
       <PrivacyPolicyModal
         isOpen={isPrivacyModalOpen}
         onClose={() => setIsPrivacyModalOpen(false)}
+      />
+
+      <TermsAndConditionsModal
+        isOpen={isTermsModalOpen}
+        onClose={() => setIsTermsModalOpen(false)}
       />
     </div>
   );

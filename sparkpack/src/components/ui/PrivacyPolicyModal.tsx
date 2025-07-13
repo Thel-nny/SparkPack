@@ -167,7 +167,7 @@ const PrivacyPolicyModal: React.FC<PrivacyPolicyModalProps> = ({ isOpen, onClose
             If you have any questions about this Privacy Policy or our data practices, please don&apos;t hesitate to contact us at SparkPack:
           </p>
           <ul className="list-disc pl-5 sm:pl-6 mb-6 text-gray-700">
-            <li><strong>Email:</strong> <a href="mailto:sparkpackteam@gmail.com" className="text-[#8cc63f] hover:underline">support@furrestpetinsurance.ph</a></li>
+            <li><strong>Email:</strong> <a href="mailto:sparkpackteam@gmail.com" className="text-[#8cc63f] hover:underline">sparkpackteam@gmail.com</a></li>
             <li><strong>Phone:</strong> <a href="tel:+63912 727 7767" className="text-[#8cc63f] hover:underline">(033) 329 1971</a></li>
             <li><strong>Address:</strong> Lopez Jaena Street, Jaro, Iloilo City 5000</li>
           </ul>
